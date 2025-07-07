@@ -51,6 +51,7 @@ terraform.rc
 
 # Visual Studio Code
 .vscode/
+*.code-workspace
 
 ### Go ###
 # Binaries for programs and plugins
