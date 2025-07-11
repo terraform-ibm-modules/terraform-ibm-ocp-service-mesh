@@ -1,18 +1,26 @@
 terraform {
-  # require 1.9 or later to make use of cross-object referencing for input variable validations
-  #   more info: https://www.hashicorp.com/blog/terraform-1-9-enhances-input-variable-validations
   required_version = ">= 1.9.0"
-
-  #
-  # Developer tips:
-  #   - If your module requires any terraform providers, add them the "required_providers" section below.
-  #   - Each required provider's version should be a flexible range to future proof the module's usage with upcoming minor and patch versions.
-  #
-
   required_providers {
+    # Use a range in modules
     ibm = {
-      source  = "IBM-Cloud/ibm"
-      version = ">= 1.71.2, < 2.0.0"
+      source  = "ibm-cloud/ibm"
+      version = ">= 1.59.0, < 2.0.0"
+    }
+    # kubernetes = {
+    #   source  = "hashicorp/kubernetes"
+    #   version = ">= 2.16.1, < 3.0.0"
+    # }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.8.0, < 3.0.0"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.9.1, < 1.0.0"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = ">= 3.2.1, < 4.0.0"
     }
   }
 }

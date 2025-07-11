@@ -1,39 +1,56 @@
-########################################################################################################################
-# Input variables
-########################################################################################################################
-
-#
-# Module developer tips:
-#   - Examples are references that consumers can use to see how the module can be consumed. They are not designed to be
-#     flexible re-usable solutions for general consumption, so do not expose any more variables here and instead hard
-#     code things in the example main.tf with code comments explaining the different configurations.
-#   - For the same reason as above, do not add default values to the example inputs.
-#
-
 variable "ibmcloud_api_key" {
   type        = string
-  description = "The IBM Cloud API Key."
+  description = "IBM Cloud API Key for a user / serviceId with write access to the corresponding namespace in the OCP cluster"
   sensitive   = true
-}
-
-variable "region" {
-  type        = string
-  description = "Region to provision all resources created by this example."
 }
 
 variable "prefix" {
   type        = string
-  description = "A string value to prefix to all resources created by this example."
+  description = "Prefix for name of all resource created by this example"
+  default     = "ocp-sm"
+}
+
+variable "region" {
+  type        = string
+  description = "Region where resources are created"
 }
 
 variable "resource_group" {
   type        = string
-  description = "The name of an existing resource group to provision resources in to. If not set a new resource group will be created using the prefix variable."
+  description = "Optionally pass an existing resource group name to be used. If not passed a new one will be created"
   default     = null
 }
 
 variable "resource_tags" {
   type        = list(string)
-  description = "List of resource tag to associate with all resource instances created by this example."
+  description = "Optional list of tags to be added to created resources"
   default     = []
+}
+
+variable "cluster_id" {
+  type        = string
+  description = "Id of the target IBM Cloud OpenShift Cluster"
+}
+
+variable "deploy_operator" {
+  type        = bool
+  description = "Enable installing RedHat Service Mesh Operator"
+  default     = true
+}
+
+variable "develop_mode" {
+  type        = bool
+  description = "If true, output more logs, and reduce some wait periods"
+  default     = false
+}
+
+variable "cluster_config_endpoint_type" {
+  description = "Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster."
+  type        = string
+  default     = "default"
+  nullable    = false
+  validation {
+    error_message = "Invalid Endpoint Type! Valid values are 'default', 'private', 'vpe', or 'link'"
+    condition     = contains(["default", "private", "vpe", "link"], var.cluster_config_endpoint_type)
+  }
 }

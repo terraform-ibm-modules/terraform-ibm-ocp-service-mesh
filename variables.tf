@@ -1,36 +1,38 @@
-########################################################################################################################
+##############################################################################
 # Input Variables
-########################################################################################################################
+##############################################################################
 
-#
-# Developer tips:
-#   - Below are some common module input variables
-#   - They should be updated for input variables applicable to the module being added
-#   - Use variable validation when possible
-#
+# variable "ibmcloud_api_key" {
+#   description = "APIkey that's associated with the account to use, set via environment variable TF_VAR_ibmcloud_api_key"
+#   type        = string
+#   sensitive   = true
+#   default     = null
+# }
 
-variable "name" {
+variable "cluster_id" {
   type        = string
-  description = "A descriptive name used to identify the resource instance."
+  description = "Id of the target IBM Cloud OpenShift Cluster"
 }
 
-variable "plan" {
+variable "deploy_operator" {
+  type        = bool
+  description = "Enable installing RedHat Service Mesh Operator"
+  default     = true
+}
+
+variable "develop_mode" {
+  type        = bool
+  description = "If true, output more logs, and reduce some wait periods"
+  default     = false
+}
+
+variable "cluster_config_endpoint_type" {
+  description = "Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster."
   type        = string
-  description = "The name of the plan type supported by service."
-  default     = "standard"
+  default     = "default"
+  nullable    = false
   validation {
-    condition     = contains(["standard", "cos-one-rate-plan"], var.plan)
-    error_message = "The specified pricing plan is not available. The following plans are supported: 'standard', 'cos-one-rate-plan'"
+    error_message = "Invalid Endpoint Type! Valid values are 'default', 'private', 'vpe', or 'link'"
+    condition     = contains(["default", "private", "vpe", "link"], var.cluster_config_endpoint_type)
   }
-}
-
-variable "resource_group_id" {
-  type        = string
-  description = "The ID of the resource group where you want to create the service."
-}
-
-variable "resource_tags" {
-  type        = list(string)
-  description = "List of resource tag to associate with the instance."
-  default     = []
 }

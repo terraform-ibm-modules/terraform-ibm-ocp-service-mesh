@@ -1,0 +1,10 @@
+# Default values for service-mesh.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+operators:
+  namespace: openshift-operators
+  name: servicemeshoperator3
+  version: v3.0.2
+  source: redhat-operators
+  sourcenamespace: openshift-marketplace
