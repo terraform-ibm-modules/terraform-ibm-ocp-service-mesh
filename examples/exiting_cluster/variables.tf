@@ -4,12 +4,6 @@ variable "ibmcloud_api_key" {
   sensitive   = true
 }
 
-variable "prefix" {
-  type        = string
-  description = "Prefix for name of all resource created by this example"
-  default     = "ocpsm-basic"
-}
-
 variable "region" {
   type        = string
   description = "Region where resources are created"
@@ -21,10 +15,9 @@ variable "resource_group" {
   default     = null
 }
 
-variable "resource_tags" {
-  type        = list(string)
-  description = "Optional list of tags to be added to created resources"
-  default     = []
+variable "cluster_id" {
+  type        = string
+  description = "Id of the target IBM Cloud OpenShift Cluster"
 }
 
 variable "deploy_operator" {

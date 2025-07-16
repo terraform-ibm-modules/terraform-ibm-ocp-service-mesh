@@ -1,0 +1,6 @@
+apiVersion: v2
+name: istio-cni
+description: A Helm chart for Kubernetes to deploy istio-cni
+type: application
+version: 0.0.1
+appVersion: "0.0.1"

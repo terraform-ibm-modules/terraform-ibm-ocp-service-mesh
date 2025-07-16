@@ -1,0 +1,15 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  labels:
+    operators.coreos.com/servicemeshoperator3.openshift-operators: ""
+  name: {{ .Values.operators.name }}
+  namespace: {{ .Values.operators.namespace }}
+spec:
+  channel: stable
+  installPlanApproval: {{ .Values.operators.installplanapproval }}
+  name: {{ .Values.operators.name }}
+  source: {{ .Values.operators.source }}
+  sourceNamespace: {{ .Values.operators.sourcenamespace }}
+  # startingCSV: servicemeshoperator3.v3.0.1
+  # startingCSV: servicemeshoperator3.v3.0.3

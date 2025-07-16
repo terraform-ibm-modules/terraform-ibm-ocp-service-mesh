@@ -72,3 +72,5 @@ terraform.rc
 
 # Go workspace file
 go.work
+
+**/ge_topology

@@ -1,0 +1,8 @@
+apiVersion: sailoperator.io/v1
+kind: IstioCNI
+metadata:
+  finalizers:
+  - sailoperator.io/sail-operator
+  name: {{ .Values.istiocniconfiguration.name }}
+spec:
+  namespace: {{ .Values.istiocniconfiguration.namespace }}

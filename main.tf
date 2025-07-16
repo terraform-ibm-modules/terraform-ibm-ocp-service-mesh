@@ -10,9 +10,9 @@
 
 locals {
   operators_namespace      = "openshift-operators"
-  sm_operator_release_name = "helm-release-smv3.6-subscription"
+  sm_operator_release_name = "helm-release-smv3-subscription"
   sm_operator_chart_path   = "servicemeshoperator"
-  sm_operator_version      = "v3.0.2"
+  sm_operator_version      = "v3.0.3"
   sm_operator_name         = "servicemeshoperator3"
 
   # timeout in seconds for operators helm releases to be ready
@@ -48,7 +48,7 @@ resource "helm_release" "service_mesh_operator" {
   count      = var.deploy_operator == true ? 1 : 0
 
   name              = local.sm_operator_release_name
-  chart             = "${path.module}/charts/${local.sm_operator_chart_path}"
+  chart             = "${path.module}/chart/${local.sm_operator_chart_path}"
   namespace         = local.operators_namespace
   create_namespace  = false
   timeout           = local.operators_timeout

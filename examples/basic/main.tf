@@ -4,98 +4,6 @@
 
 locals {
   # sample_app_namespace = "bookinfo"
-
-  # VPC Configuration
-  acl_rules_map = {
-    private = concat(
-      module.acl_profile.base_acl,
-      module.acl_profile.https_acl,
-      [
-        {
-          name        = "allow-workload-http-inbound"
-          source      = "0.0.0.0/0"
-          action      = "allow"
-          destination = "0.0.0.0/0"
-          direction   = "inbound"
-          tcp = {
-            source_port_min = 1
-            source_port_max = 65535
-            port_min        = 80
-            port_max        = 80
-          }
-        },
-        {
-          name        = "allow-workload-http-outbound"
-          source      = "0.0.0.0/0"
-          action      = "allow"
-          destination = "0.0.0.0/0"
-          direction   = "outbound"
-          tcp = {
-            source_port_min = 80
-            source_port_max = 80
-            port_min        = 1
-            port_max        = 65535
-          }
-        }
-      ],
-      module.acl_profile.deny_all_acl
-    )
-  }
-  vpc_cidr_bases = {
-    private = "192.168.0.0/20",
-    transit = "192.168.16.0/20",
-    edge    = "192.168.32.0/20"
-  }
-
-  # OCP Configuration
-  ocp_worker_pools = [
-    {
-      subnet_prefix    = "private"
-      pool_name        = "default"
-      machine_type     = "bx2.4x16"
-      workers_per_zone = 1
-      operating_system = "RHEL_9_64"
-    },
-    {
-      subnet_prefix    = "edge"
-      pool_name        = "edge"
-      machine_type     = "bx2.4x16"
-      workers_per_zone = 1
-      operating_system = "RHEL_9_64"
-    }
-    ,
-    {
-      subnet_prefix    = "transit"
-      pool_name        = "transit"
-      machine_type     = "bx2.4x16"
-      workers_per_zone = 1
-      operating_system = "RHEL_9_64"
-    }
-  ]
-
-  worker_pools_taints = {
-    all = []
-    transit = [
-      {
-        key   = "dedicated"
-        value = "transit"
-        # Pod is evicted from the node if it is already running on the node,
-        # and is not scheduled onto the node if it is not yet running on the node.
-        effect = "NoExecute"
-      }
-    ]
-    edge = [
-      {
-        key   = "dedicated"
-        value = "edge"
-        # Pod is evicted from the node if it is already running on the node,
-        # and is not scheduled onto the node if it is not yet running on the node.
-        effect = "NoExecute"
-      }
-    ]
-    default = []
-  }
-
 }
 
 ##############################################################################
@@ -109,27 +17,62 @@ module "resource_group" {
   existing_resource_group_name = var.resource_group
 }
 
-##############################################################################
-# VPC ACLs
-##############################################################################
+########################################################################################################################
+# VPC + Subnet + Public Gateway
+#
+# NOTE: This is a very simple VPC with single subnet in a single zone with a public gateway enabled, that will allow
+# all traffic ingress/egress by default.
+# For production use cases this would need to be enhanced by adding more subnets and zones for resiliency, and
+# ACLs/Security Groups for network security.
+########################################################################################################################
 
-module "acl_profile" {
-  source = "git::https://github.ibm.com/GoldenEye/acl-profile-ocp.git?ref=1.3.3"
+resource "ibm_is_vpc" "vpc" {
+  name                      = "${var.prefix}-vpc"
+  resource_group            = module.resource_group.resource_group_id
+  address_prefix_management = "auto"
+  tags                      = var.resource_tags
 }
 
-##############################################################################
-# VPC
-##############################################################################
+resource "ibm_is_public_gateway" "gateway" {
+  name           = "${var.prefix}-gateway-1"
+  vpc            = ibm_is_vpc.vpc.id
+  resource_group = module.resource_group.resource_group_id
+  zone           = "${var.region}-1"
+}
 
-module "vpc" {
-  source                    = "git::https://github.ibm.com/GoldenEye/vpc-module.git?ref=6.6.1"
-  unique_name               = var.prefix
-  ibm_region                = var.region
-  resource_group_id         = module.resource_group.resource_group_id
-  cidr_bases                = local.vpc_cidr_bases
-  acl_rules_map             = local.acl_rules_map
-  virtual_private_endpoints = {}
-  vpc_tags                  = var.resource_tags
+resource "ibm_is_subnet" "subnet_zone_1" {
+  name                     = "${var.prefix}-subnet-1"
+  vpc                      = ibm_is_vpc.vpc.id
+  resource_group           = module.resource_group.resource_group_id
+  zone                     = "${var.region}-1"
+  total_ipv4_address_count = 256
+  public_gateway           = ibm_is_public_gateway.gateway.id
+}
+
+########################################################################################################################
+# OCP VPC cluster (single zone)
+########################################################################################################################
+
+locals {
+  cluster_vpc_subnets = {
+    default = [
+      {
+        id         = ibm_is_subnet.subnet_zone_1.id
+        cidr_block = ibm_is_subnet.subnet_zone_1.ipv4_cidr_block
+        zone       = ibm_is_subnet.subnet_zone_1.zone
+      }
+    ]
+  }
+
+  worker_pools = [
+    {
+      subnet_prefix    = "default"
+      pool_name        = "default" # ibm_container_vpc_cluster automatically names default pool "default" (See https://github.com/IBM-Cloud/terraform-provider-ibm/issues/2849)
+      machine_type     = "bx2.4x16"
+      workers_per_zone = 2 # minimum of 2 is allowed when using single zone
+      operating_system = "RHEL_9_64"
+    }
+  ]
 }
 
 ##############################################################################
@@ -137,19 +80,17 @@ module "vpc" {
 ##############################################################################
 
 module "ocp_base" {
-  source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.49.3"
-  cluster_name         = "${var.prefix}-cluster"
-  resource_group_id    = module.resource_group.resource_group_id
-  region               = var.region
-  force_delete_storage = true
-  vpc_id               = module.vpc.vpc_id
-  vpc_subnets          = module.vpc.subnets
-  worker_pools         = local.ocp_worker_pools
-  worker_pools_taints  = local.worker_pools_taints
-  tags                 = var.resource_tags
-  # outbound required by cluster proxy
-  disable_outbound_traffic_protection = true
+  source                              = "terraform-ibm-modules/base-ocp-vpc/ibm"
+  version                             = "3.49.3"
+  resource_group_id                   = module.resource_group.resource_group_id
+  region                              = var.region
+  tags                                = var.resource_tags
+  cluster_name                        = "${var.prefix}-cluster"
+  force_delete_storage                = true
+  vpc_id                              = ibm_is_vpc.vpc.id
+  vpc_subnets                         = local.cluster_vpc_subnets
+  worker_pools                        = local.worker_pools
+  disable_outbound_traffic_protection = true # set as True to enable outbound traffic; required for accessing Operator Hub in the OpenShift console.
 }
 
 ##############################################################################
@@ -157,16 +98,43 @@ module "ocp_base" {
 ##############################################################################
 
 data "ibm_container_cluster_config" "cluster_config" {
-  # cluster_name_id   = module.ocp_base.cluster_id
-  cluster_name_id   = var.cluster_id
+  cluster_name_id   = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+  endpoint_type     = "default"
 }
 
 module "service_mesh" {
   source     = "../.."
-  cluster_id = var.cluster_id
+  cluster_id = module.ocp_base.cluster_id
   # ibmcloud_api_key             = var.ibmcloud_api_key
   deploy_operator              = var.deploy_operator
   develop_mode                 = var.develop_mode
   cluster_config_endpoint_type = var.cluster_config_endpoint_type
+}
+
+module "deploy_istio_1" {
+  depends_on       = [module.service_mesh]
+  source           = "../../modules/sm-istio"
+  name             = "istio-1"
+  namespace        = "istio-system-1"
+  create_namespace = true
+  enable_mtls      = true
+  istiodiscovery   = "istio-1"
+}
+
+module "deploy_istio_2" {
+  depends_on       = [module.service_mesh]
+  source           = "../../modules/sm-istio"
+  name             = "istio-2"
+  namespace        = "istio-system-2"
+  create_namespace = true
+  enable_mtls      = true
+  istiodiscovery   = "istio-2"
+}
+
+module "deploy_istio_cni" {
+  depends_on       = [module.service_mesh]
+  source           = "../../modules/sm-istio-cni"
+  namespace        = "istio-system-cni"
+  create_namespace = true
 }

@@ -1,0 +1,12 @@
+{{- if .Values.istioconfiguration.enablemtls }}
+{{- if eq (default .Values.istioconfiguration.enablemtls true) true }}
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: {{ .Values.istioconfiguration.name }}-peerauthentication
+  namespace: {{ .Values.istioconfiguration.namespace }}
+spec:
+  mtls:
+    mode: STRICT
+{{- end }}
+{{- end }}

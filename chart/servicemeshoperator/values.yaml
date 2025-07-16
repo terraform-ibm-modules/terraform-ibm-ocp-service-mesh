@@ -8,3 +8,4 @@ operators:
   version: v3.0.2
   source: redhat-operators
   sourcenamespace: openshift-marketplace
+  installplanapproval: Manual

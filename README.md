@@ -27,6 +27,7 @@ TODO: Replace this with a description of the modules in this repo.
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
 * [terraform-ibm-ocp-service-mesh](#terraform-ibm-ocp-service-mesh)
+* [Submodules](./modules)
 * [Examples](./examples)
 * [Contributing](#contributing)
 <!-- END OVERVIEW HOOK -->
