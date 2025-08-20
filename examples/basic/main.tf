@@ -80,16 +80,17 @@ locals {
 ##############################################################################
 
 module "ocp_base" {
-  source                              = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version                             = "3.49.3"
-  resource_group_id                   = module.resource_group.resource_group_id
-  region                              = var.region
-  tags                                = var.resource_tags
-  cluster_name                        = "${var.prefix}-cluster"
-  force_delete_storage                = true
-  vpc_id                              = ibm_is_vpc.vpc.id
-  vpc_subnets                         = local.cluster_vpc_subnets
-  worker_pools                        = local.worker_pools
+  source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
+  version              = "3.55.3"
+  resource_group_id    = module.resource_group.resource_group_id
+  region               = var.region
+  tags                 = var.resource_tags
+  cluster_name         = "${var.prefix}-cluster"
+  force_delete_storage = true
+  vpc_id               = ibm_is_vpc.vpc.id
+  vpc_subnets          = local.cluster_vpc_subnets
+  worker_pools         = local.worker_pools
+  # ocp_version                         = "4.17"
   disable_outbound_traffic_protection = true # set as True to enable outbound traffic; required for accessing Operator Hub in the OpenShift console.
 }
 
@@ -119,17 +120,26 @@ module "deploy_istio_1" {
   namespace        = "istio-system-1"
   create_namespace = true
   enable_mtls      = true
-  istiodiscovery   = "istio-1"
 }
 
 module "deploy_istio_2" {
-  depends_on       = [module.service_mesh]
-  source           = "../../modules/sm-istio"
-  name             = "istio-2"
-  namespace        = "istio-system-2"
-  create_namespace = true
-  enable_mtls      = true
-  istiodiscovery   = "istio-2"
+  depends_on                    = [module.service_mesh]
+  source                        = "../../modules/sm-istio"
+  name                          = "istio-2"
+  namespace                     = "istio-system-2"
+  create_namespace              = true
+  enable_mtls                   = true
+  istio_discovery_configuration = var.istio_discovery_configuration
+  # istio_discovery_configuration = {
+  #   matchLabels: [{"istio-discovery": "enabled", "app": "test"}]
+  #   matchExpressions: [
+  #     {
+  #       key: "app"
+  #       operator: "In"
+  #       values: ["test1", "test2"]
+  #     }
+  #   ]
+  # }
 }
 
 module "deploy_istio_cni" {

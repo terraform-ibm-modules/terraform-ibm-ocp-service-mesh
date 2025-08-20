@@ -1,6 +1,34 @@
 istioconfiguration:
   namespace: istio-system
   name: default # use default for single cp or use cp name for multiple cp on the same cluster
-  outboundtrafficpolicy: REGISTRY_ONLY
-  istiodiscovery: default # use default for single cp or use cp name for multiple cp on the same cluster
+  outboundTrafficPolicy: REGISTRY_ONLY
   enablemtls: true
+  defaultpdb: false
+  pilot:
+    enabled: true
+    autoscale:
+      enabled: false
+      min: 1
+      max: 3
+      cpu:
+        targetavgutil: 80
+      memory:
+        targetavgutil: 80
+    replicacount: 1
+    nodeselector: { "dedicated": "private" }
+    affinity:
+    tolerations:
+    resources:
+    taint:
+      enabled: true
+      namespace: istio-cni
+  meshConfig:
+    tcpKeepalive:
+    connectTimeout:
+    ingressControllerMode: STRICT
+    ingressService: istio-ingressgateway
+    ingressSelector: ingressgateway
+    enableTracing: false
+    outboundTrafficPolicy: REGISTRY_ONLY
+    discoverySelectors:
+    - matchLabels: {"istio-discovery" : "enabled"} # use default for single cp or use cp name for multiple cp on the same cluster

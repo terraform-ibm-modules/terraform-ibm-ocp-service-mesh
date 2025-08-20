@@ -14,11 +14,37 @@ variable "namespace" {
   description = "Namespace where to install istio controlplane."
 }
 
-variable "istiodiscovery" {
-  type        = string
-  default     = "enabled"
+variable "istio_discovery_configuration" {
+  type = object({
+    matchLabels : optional(map(string), null),
+    matchExpressions : optional(list(object({
+      key : string
+      operator : string
+      values : list(string)
+    })), [])
+  })
+  default     = null
   description = "Istio controlplane discovery label. Default to enabled."
 }
+
+# variable "istio_discovery_configuration" {
+#   type = list(any)
+#   default     = null
+#   description = "Istio controlplane discovery label. Default to enabled."
+# }
+
+# istio_discovery_configuration = {
+#     "istioconfiguration": {
+#       "meshConfig": {
+#         "discoverySelectors": [
+#           {"matchLabels": {"istio-discovery": "enabled", "app": "test"}},
+#           {"matchExpressions": [
+#             {key: "app", operator: "In", values: ["test1", "test2"]}
+#           ]}
+#         ]
+#       }
+#     }
+#   }
 
 variable "outboundtrafficpolicy" {
   type        = string

@@ -1,3 +1,4 @@
+# https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md
 apiVersion: sailoperator.io/v1
 kind: Istio
 metadata:
@@ -9,52 +10,63 @@ spec:
     type: InPlace
   global:
     defaultPodDisruptionBudget:
-      enabled: false
+      enabled: {{ .Values.istioconfiguration.defaultpdb }}
   values:
-    outboundTrafficPolicy: {{ .Values.istioconfiguration.outboundtrafficpolicy }}
+    outboundTrafficPolicy: {{ .Values.istioconfiguration.outboundTrafficPolicy }}
     pilot:
-      enabled : true
-      autoscaleEnabled: false
-      replicaCount: 2
-      autoscaleMin: 2   # <-- number of desired min replicas
-      autoscaleMax: 5   # <-- number of desired max replicas
-      # nodeSelector: # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+      enabled: {{ .Values.istioconfiguration.pilot.enabled }}
+      autoscaleEnabled: {{ .Values.istioconfiguration.pilot.autoscale.enabled }}
+      replicaCount: {{ .Values.istioconfiguration.pilot.replicacount }}
+      autoscaleMin: {{ .Values.istioconfiguration.pilot.autoscale.min }}
+      autoscaleMax: {{ .Values.istioconfiguration.pilot.autoscale.max }}
+      nodeSelector: {{- toYaml .Values.istioconfiguration.pilot.nodeselector | nindent 6 }} # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
       cpu:
-        targetAverageUtilization: 80 # <-- target CPU utilization for autoscaling
+        targetAverageUtilization: {{ .Values.istioconfiguration.pilot.autoscale.cpu.targetavgutil }}
       memory:
-        targetAverageUtilization: 80 # <-- target memory utilization for autoscaling
-      resources:
-        requests:
-          cpu: 100m
-          memory: 1024Mi
-        limits:
-          cpu: 100m
-          memory: 1024Mi
-      affinity:
-        nodeAffinity: {{ .Values.istioconfiguration.nodeAffinity }} # to use toyaml
-        podAffinity: {{ .Values.istioconfiguration.podAffinity }} # to use toyaml
-        podAntiAffinity: {{ .Values.istioconfiguration.podAntiAffinity }} # to use toyaml
-        {{- if .Values.istioconfiguration.tolerations }}
-        tolerations: {{ .Values.istioconfiguration.tolerations }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core
-        {{- end }}
-        {{- if .Values.istioconfiguration.taint }}
-        taint: {{ .Values.istioconfiguration.taint }} # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#pilottaintcontrollerconfig
-        {{- end }}
+        targetAverageUtilization: {{ .Values.istioconfiguration.pilot.autoscale.memory.targetavgutil }}
+      {{- if .Values.istioconfiguration.pilot.resources }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcerequirements-v1-core
+      resources: {{- toYaml .Values.istioconfiguration.pilot.resources | nindent 6 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core
+      {{- end }}
+      {{- if .Values.istioconfiguration.pilot.affinity }}
+      affinity:  {{- toYaml .Values.istioconfiguration.pilot.affinity | nindent 6 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core
+      {{- end }}
+      {{- if .Values.istioconfiguration.pilot.tolerations }}
+      tolerations: {{- toYaml .Values.istioconfiguration.pilot.tolerations | nindent 6 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core
+      {{- end }}
+      {{- if .Values.istioconfiguration.taint }}
+      taint: # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#pilottaintcontrollerconfig
+        enabled: {{ .Values.istioconfiguration.pilot.taint.enabled }}
+        namespace: {{ .Values.istioconfiguration.pilot.taint.namespace }}
+      {{- end }}
+    {{- if .Values.istioconfiguration.meshConfig }}
     meshConfig: # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig
-      connectTimeout: 10s
-      tcpKeepalive: # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#connectionpoolsettingstcpsettingstcpkeepalive
-        probes: 9
-        time: 7200s
-        interval: 75s
-      ingressControllerMode: STRICT # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfigingresscontrollermode
-      ingressService: istio-ingressgateway
-      ingressSelector: ingressgateway
-      enableTracing: false
+      {{- if .Values.istioconfiguration.meshConfig.connectTimeout }}
+      connectTimeout: {{ .Values.istioconfiguration.meshConfig.connectTimeout }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.tcpKeepalive }}
+      tcpKeepalive: {{- toYaml .Values.istioconfiguration.meshConfig.tcpKeepalive | nindent 6 }} # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#connectionpoolsettingstcpsettingstcpkeepalive
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.ingressControllerMode }}
+      ingressControllerMode: {{ .Values.istioconfiguration.meshConfig.ingressControllerMode }} # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfigingresscontrollermode
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.ingressService }}
+      ingressService: {{ .Values.istioconfiguration.meshConfig.ingressService }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.ingressSelector }}
+      ingressSelector: {{ .Values.istioconfiguration.meshConfig.ingressSelector }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.enableTracing }}
+      enableTracing: {{ .Values.istioconfiguration.meshConfig.enableTracing }}
+      {{- end }}
       # accessLogFile: /dev/stdout
       # accessLogFormat:
       # accessLogEncoding: JSON
+      {{- if .Values.istioconfiguration.meshConfig.outboundTrafficPolicy }}
       outboundTrafficPolicy:
-        mode: {{ .Values.istioconfiguration.outboundtrafficpolicy }}
+        mode: {{ .Values.istioconfiguration.meshConfig.outboundTrafficPolicy }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.discoverySelectors }}
       discoverySelectors:
-      - matchLabels:
-          istio-discovery: {{ .Values.istioconfiguration.istiodiscovery }}
+        {{- toYaml .Values.istioconfiguration.meshConfig.discoverySelectors | nindent 8 }}
+      {{- end }}
+    {{- end }}

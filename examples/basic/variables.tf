@@ -49,3 +49,16 @@ variable "cluster_config_endpoint_type" {
     condition     = contains(["default", "private", "vpe", "link"], var.cluster_config_endpoint_type)
   }
 }
+
+variable "istio_discovery_configuration" {
+  type = object({
+    matchLabels : optional(map(string), null),
+    matchExpressions : optional(list(object({
+      key : string
+      operator : string
+      values : list(string)
+    })), [])
+  })
+  default     = null
+  description = "Istio controlplane discovery label. Default to enabled."
+}
