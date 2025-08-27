@@ -2,19 +2,6 @@ locals {
   istio_release_name = "${var.namespace}-${var.name}"
   istio_chart_path   = "istio"
 
-  # istio_discovery_configuration = {
-  #   "istioconfiguration": {
-  #     "meshConfig": {
-  #       "discoverySelectors": [
-  #         {"matchLabels": {"istio-discovery": "enabled", "app": "test"}},
-  #         {"matchExpressions": [
-  #           {key: "app", operator: "In", values: ["test1", "test2"]}
-  #         ]}
-  #       ]
-  #     }
-  #   }
-  # }
-
   istio_discovery_configuration = var.istio_discovery_configuration == null ? {} : {
     "istioconfiguration" : {
       "meshConfig" : {
@@ -22,13 +9,6 @@ locals {
       }
     }
   }
-  # istio_discovery_configuration = var.istio_discovery_configuration == null ? {} : {
-  #   "istioconfiguration": {
-  #     "meshConfig": {
-  #       "discoverySelectors": var.istio_discovery_configuration
-  #     }
-  #   }
-  # }
 
   istio_pilot_resources = var.pilot_resources == null ? {} : {
     "istioconfiguration" : {
@@ -66,6 +46,22 @@ locals {
     "istioconfiguration" : {
       "meshConfig" : {
         "tcpKeepalive" : var.mesh_config_tcp_keep_alive
+      }
+    }
+  }
+
+  istio_mesh_config_mesh_mtls = var.mesh_config_mesh_mtls == null ? {} : {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "meshMTLS" : var.mesh_config_mesh_mtls
+      }
+    }
+  }
+
+  istio_mesh_config_mesh_tls_defaults = var.mesh_config_mesh_tls_defaults == null ? {} : {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "tlsDefaults" : var.mesh_config_mesh_tls_defaults
       }
     }
   }
@@ -151,18 +147,30 @@ resource "helm_release" "istio" {
       name  = "istioconfiguration.istioconfiguration.defaultpdb"
       type  = "string"
       value = var.istio_enable_default_pod_disruption_budget != null ? var.istio_enable_default_pod_disruption_budget : null
+      }, {
+      name  = "istioconfiguration.meshConfig.accessLogFile"
+      type  = "string"
+      value = var.mesh_config_access_log_file != null ? var.mesh_config_access_log_file : null
+      }, {
+      name  = "istioconfiguration.meshConfig.accessLogEncoding"
+      type  = "string"
+      value = var.mesh_config_access_log_encoding != null ? var.mesh_config_access_log_encoding : null
+      }, {
+      name  = "istioconfiguration.meshConfig.accessLogFormat"
+      type  = "string"
+      value = var.mesh_config_access_log_format != null && var.mesh_config_access_log_format != "" ? var.mesh_config_access_log_format : ""
     }
   ])
 
-  # values = [yamlencode(local.istio_discovery_configuration)]
-  # values = [yamlencode(local.istio_discovery_configuration), yamlencode(local.istio_pilot_resources)]
   values = [
     yamlencode(local.istio_discovery_configuration),
     yamlencode(local.istio_pilot_resources),
     yamlencode(local.istio_pilot_affinity),
     yamlencode(local.istio_pilot_tolerations),
     yamlencode(local.istio_mesh_config_keep_alive),
-    yamlencode(local.istio_pilot_node_selector)
+    yamlencode(local.istio_pilot_node_selector),
+    yamlencode(local.istio_mesh_config_mesh_mtls),
+    yamlencode(local.istio_mesh_config_mesh_tls_defaults),
   ]
 
 }

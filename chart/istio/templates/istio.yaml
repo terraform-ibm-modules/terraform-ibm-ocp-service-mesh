@@ -9,6 +9,7 @@ spec:
     inactiveRevisionDeletionGracePeriodSeconds: 30
     type: InPlace
   global:
+    logAsJson: true
     defaultPodDisruptionBudget:
       enabled: {{ .Values.istioconfiguration.defaultpdb }}
   values:
@@ -39,16 +40,19 @@ spec:
       {{- end }}
       {{- if .Values.istioconfiguration.pilot.nodeselector }}
       nodeSelector:
-      {{- toYaml .Values.istioconfiguration.pilot.nodeselector | nindent 8 }} # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+      {{- toYaml .Values.istioconfiguration.pilot.nodeselector | nindent 8 }}
       {{- end }}
-      {{- if .Values.istioconfiguration.pilot.resources }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcerequirements-v1-core
-      resources: {{- toYaml .Values.istioconfiguration.pilot.resources | nindent 8 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core
+      {{- if .Values.istioconfiguration.pilot.resources }}
+      resources:
+      {{- toYaml .Values.istioconfiguration.pilot.resources | nindent 8 }}
       {{- end }}
       {{- if .Values.istioconfiguration.pilot.affinity }}
-      affinity:  {{- toYaml .Values.istioconfiguration.pilot.affinity | nindent 8 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core
+      affinity:
+      {{- toYaml .Values.istioconfiguration.pilot.affinity | nindent 8 }}
       {{- end }}
       {{- if .Values.istioconfiguration.pilot.tolerations }}
-      tolerations: {{- toYaml .Values.istioconfiguration.pilot.tolerations | nindent 8 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core
+      tolerations:
+      {{- toYaml .Values.istioconfiguration.pilot.tolerations | nindent 8 }}
       {{- end }}
     {{- if .Values.istioconfiguration.meshConfig }}
     meshConfig: # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig
@@ -60,26 +64,40 @@ spec:
       {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.tcpKeepalive }}
       tcpKeepalive:
-      {{- toYaml .Values.istioconfiguration.meshConfig.tcpKeepalive | nindent 8 }} # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#connectionpoolsettingstcpsettingstcpkeepalive
+      {{- toYaml .Values.istioconfiguration.meshConfig.tcpKeepalive | nindent 8 }}
       {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.ingressControllerMode }}
-      ingressControllerMode: {{ .Values.istioconfiguration.meshConfig.ingressControllerMode }} # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfigingresscontrollermode
+      ingressControllerMode: {{ .Values.istioconfiguration.meshConfig.ingressControllerMode }}
       {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.ingressService }}
-      ingressService: {{ .Values.istioconfiguration.meshConfig.ingressService }}
+      ingressService: {{ .Values.istioconfiguration.meshConfig.ingressService | quote }}
       {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.ingressSelector }}
-      ingressSelector: {{ .Values.istioconfiguration.meshConfig.ingressSelector }}
+      ingressSelector: {{ .Values.istioconfiguration.meshConfig.ingressSelector | quote }}
       {{- end }}
-      # accessLogFile: /dev/stdout
-      # accessLogFormat:
-      # accessLogEncoding: JSON
+      {{- if .Values.istioconfiguration.meshConfig.accessLogFile }}
+      accessLogFile: {{ .Values.istioconfiguration.meshConfig.accessLogFile | quote }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.accessLogFormat }}
+      accessLogFormat: {{ .Values.istioconfiguration.meshConfig.accessLogFormat | quote }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.accessLogEncoding }}
+      accessLogEncoding: {{ .Values.istioconfiguration.meshConfig.accessLogEncoding }}
+      {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.outboundTrafficPolicy }}
       outboundTrafficPolicy:
         mode: {{ .Values.istioconfiguration.meshConfig.outboundTrafficPolicy }}
       {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.discoverySelectors }}
-      discoverySelectors: # https://github.com/istio/api/blob/master/mesh/v1alpha1/config.proto#L1411 https://istio.io/latest/blog/2021/discovery-selectors/
+      discoverySelectors:
         {{- toYaml .Values.istioconfiguration.meshConfig.discoverySelectors | nindent 8 }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.meshMTLS }}
+      meshMTLS:
+        {{- toYaml .Values.istioconfiguration.meshConfig.meshMTLS | nindent 8 }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.tlsDefaults }}
+      tlsDefaults:
+        {{- toYaml .Values.istioconfiguration.meshConfig.tlsDefaults | nindent 8 }}
       {{- end }}
     {{- end }}

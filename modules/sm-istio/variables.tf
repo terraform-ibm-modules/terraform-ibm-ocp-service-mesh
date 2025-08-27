@@ -23,8 +23,12 @@ variable "istio_discovery_configuration" {
       values : list(string)
     })), [])
   })
-  default     = null
-  description = "Istio controlplane discovery label. Default to enabled."
+  default = {
+    matchLabels : {
+      "istio-discovery" : "enabled"
+    }
+  }
+  description = "Istio controlplane discovery label. Default to matchLabels: {'istio-discovery' : 'enabled'}. For more details https://istio.io/latest/blog/2021/discovery-selectors/ https://github.com/istio/api/blob/master/mesh/v1alpha1/config.proto#L1411"
 }
 
 variable "istio_enable_default_pod_disruption_budget" {
@@ -32,25 +36,6 @@ variable "istio_enable_default_pod_disruption_budget" {
   description = "Controls whether a PodDisruptionBudget with a default minAvailable value of 1 is created for each deployment. Default to null, using Istio default configuration. More details at https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#defaultpoddisruptionbudgetconfig"
   default     = null
 }
-
-# variable "istio_discovery_configuration" {
-#   type = list(any)
-#   default     = null
-#   description = "Istio controlplane discovery label. Default to enabled."
-# }
-
-# istio_discovery_configuration = {
-#     "istioconfiguration": {
-#       "meshConfig": {
-#         "discoverySelectors": [
-#           {"matchLabels": {"istio-discovery": "enabled", "app": "test"}},
-#           {"matchExpressions": [
-#             {key: "app", operator: "In", values: ["test1", "test2"]}
-#           ]}
-#         ]
-#       }
-#     }
-#   }
 
 variable "pilot_enabled" {
   type        = bool
@@ -98,7 +83,7 @@ variable "pilot_replicas" {
 variable "pilot_node_selector" {
   type        = map(string)
   default     = null
-  description = "Node selector configuration for Istio pilot pods. Default to null"
+  description = "Node selector configuration for Istio pilot pods. Default to null. For more details https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector"
 }
 
 variable "pilot_resources" {
@@ -106,20 +91,59 @@ variable "pilot_resources" {
     limits : optional(map(string), null),
     requests : optional(map(string), null)
   })
-  default     = null
-  description = "Istio pilot resources requests and limits. Default to null"
+  default = {
+    limits : {
+      cpu : "100m"
+      memory : "256M"
+    },
+    requests : {
+      cpu : "10m"
+      memory : "128M"
+    }
+  }
+  description = "Istio pilot pods resources requests and limits for memory and CPU. Default to requests CPU 10m memory 128M limits CPU 100m memory 256M, using the default Istio values. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcerequirements-v1-core"
 }
 
 variable "pilot_affinity" {
-  type        = list(any)
-  default     = null
-  description = "Istio pilot affinity configuration. Default to null"
+  type = object({
+    podAntiAffinity : optional(any, null),
+    podAffinity : optional(any, null),
+    nodeAffinity : optional(any, null)
+  })
+  default = {
+    podAntiAffinity : {
+      preferredDuringSchedulingIgnoredDuringExecution : [
+        {
+          weight : 100,
+          podAffinityTerm : {
+            labelSelector : {
+              matchExpressions : [
+                {
+                  key : "istio",
+                  operator : "In",
+                  values : ["istiod"]
+                }
+              ]
+            }
+            topologyKey : "topology.kubernetes.io/zone"
+          }
+        }
+      ]
+    }
+  }
+  description = "Istio pilot affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core."
 }
 
 variable "pilot_tolerations" {
-  type        = list(any)
-  default     = null
-  description = "Istio pilot tolerations configuration. Default to null"
+  type = list(any)
+  default = [
+    {
+      key : "dedicated"
+      value : "transit"
+      effect : "NoExecute"
+    }
+  ]
+  description = "Istio pilot tolerations configuration. Default to tolerate 'dedicated: transit' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
 }
 
 variable "outboundtrafficpolicy" {
@@ -177,8 +201,58 @@ variable "mesh_config_ingress_selector" {
 }
 
 variable "force_controlplane_update" {
-  description = "value"
+  description = "Force controlplane to be updated"
   default     = true
   type        = bool
   nullable    = false
+}
+
+variable "mesh_config_mesh_mtls" {
+  description = "Defines the mesh mTLS configuration. For more details https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig and https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfigtlsconfig."
+  type = object({
+    minProtocolVersion : optional(string, "TLSV1_2")
+    ecdhCurves : optional(list(string), null)
+    cipherSuites : optional(list(string), ["TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"])
+  })
+  nullable = false
+  default = {
+    minProtocolVersion : "TLSV1_2"
+    cipherSuites : ["TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"]
+  }
+}
+
+variable "mesh_config_mesh_tls_defaults" {
+  description = "Defines the TLS for all traffic except for ISTIO_MUTUAL mode For ISTIO_MUTUAL TLS settings, use var.mesh_config_mesh_mtls . For more details https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig and https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfigtlsconfig."
+  type = object({
+    minProtocolVersion : optional(string, "TLSV1_2")
+    ecdhCurves : optional(list(string), null)
+    cipherSuites : optional(list(string), ["TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"])
+  })
+  nullable = false
+  default = {
+    minProtocolVersion : "TLSV1_2"
+    cipherSuites : ["TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"]
+  }
+}
+
+variable "mesh_config_access_log_file" {
+  description = "File address for the Istio proxy access log. Empty value disables access logging. Default to /dev/stdout"
+  default     = "/dev/stdout"
+  type        = string
+}
+
+variable "mesh_config_access_log_encoding" {
+  description = "Encoding for the Istio proxy access log. Default value set to JSON. Allowed values TEXT or JSON"
+  default     = "JSON"
+  type        = string
+  validation {
+    condition     = var.mesh_config_access_log_encoding == "JSON" || var.mesh_config_access_log_encoding == "TEXT"
+    error_message = "The mesh_config_access_log_encoding value must be one of the following: JSON, TEXT"
+  }
+}
+
+variable "mesh_config_access_log_format" {
+  description = "Format for the Istio proxy access log. Set to empty or null to use proxy's default access log format."
+  default     = "[%START_TIME%] [%REQ(:AUTHORITY)%] [%BYTES_RECEIVED%] [%BYTES_SENT%] [%DOWNSTREAM_LOCAL_ADDRESS%] [%DOWNSTREAM_LOCAL_ADDRESS%] [%DOWNSTREAM_REMOTE_ADDRESS%] [%DOWNSTREAM_TLS_VERSION%] [%DURATION%] [%REQUEST_DURATION%] [%RESPONSE_DURATION%] [%RESPONSE_TX_DURATION%] [%DYNAMIC_METADATA(istio.mixer:status)%] [%REQ(:METHOD)%] [%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%] [%PROTOCOL%] [%REQ(X-REQUEST-ID)%] [%REQUESTED_SERVER_NAME%] [%RESPONSE_CODE%] [%RESPONSE_CODE_DETAILS%] [%RESPONSE_FLAGS%] [%ROUTE_NAME%] [%START_TIME%] [%UPSTREAM_CLUSTER%] [%UPSTREAM_HOST%] [%UPSTREAM_LOCAL_ADDRESS%] [%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%] [%UPSTREAM_TRANSPORT_FAILURE_REASON%] [%REQ(USER-AGENT)%] [%REQ(X-FORWARDED-FOR)%] [%REQ(X-ENVOY-ATTEMPT-COUNT)%]"
+  type        = string
 }

@@ -1,5 +1,5 @@
-{{- if .Values.istioconfiguration.enablemtls }}
-{{- if eq (default .Values.istioconfiguration.enablemtls true) true }}
+{{- if .Values.istioconfiguration.meshConfig.enableAutoMTLS }}
+{{- if eq (default .Values.istioconfiguration.meshConfig.enableAutoMTLS true) true }}
 apiVersion: security.istio.io/v1
 kind: PeerAuthentication
 metadata:
