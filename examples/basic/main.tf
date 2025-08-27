@@ -119,7 +119,6 @@ module "deploy_istio_1" {
   name             = "istio-1"
   namespace        = "istio-system-1"
   create_namespace = true
-  enable_mtls      = true
 }
 
 module "deploy_istio_2" {
@@ -128,7 +127,6 @@ module "deploy_istio_2" {
   name                          = "istio-2"
   namespace                     = "istio-system-2"
   create_namespace              = true
-  enable_mtls                   = true
   istio_discovery_configuration = var.istio_discovery_configuration
   # istio_discovery_configuration = {
   #   matchLabels: [{"istio-discovery": "enabled", "app": "test"}]

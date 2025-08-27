@@ -12,7 +12,7 @@ terraform {
     # }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.8.0, < 3.0.0"
+      version = ">= 3.0.0"
     }
     time = {
       source  = "hashicorp/time"

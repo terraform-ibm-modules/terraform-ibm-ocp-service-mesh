@@ -17,34 +17,50 @@ spec:
       enabled: {{ .Values.istioconfiguration.pilot.enabled }}
       autoscaleEnabled: {{ .Values.istioconfiguration.pilot.autoscale.enabled }}
       replicaCount: {{ .Values.istioconfiguration.pilot.replicacount }}
+      {{- if .Values.istioconfiguration.pilot.autoscale.enabled }}
+      {{- if .Values.istioconfiguration.pilot.autoscale.min }}
       autoscaleMin: {{ .Values.istioconfiguration.pilot.autoscale.min }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.pilot.autoscale.max }}
       autoscaleMax: {{ .Values.istioconfiguration.pilot.autoscale.max }}
-      nodeSelector: {{- toYaml .Values.istioconfiguration.pilot.nodeselector | nindent 6 }} # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+      {{- end }}
+      {{- if .Values.istioconfiguration.pilot.autoscale.cpu }}
+      {{- if .Values.istioconfiguration.pilot.autoscale.cpu.targetavgutil }}
       cpu:
         targetAverageUtilization: {{ .Values.istioconfiguration.pilot.autoscale.cpu.targetavgutil }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.pilot.autoscale.memory }}
+      {{- if .Values.istioconfiguration.pilot.autoscale.memory.targetavgutil }}
       memory:
         targetAverageUtilization: {{ .Values.istioconfiguration.pilot.autoscale.memory.targetavgutil }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.pilot.nodeselector }}
+      nodeSelector:
+      {{- toYaml .Values.istioconfiguration.pilot.nodeselector | nindent 8 }} # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+      {{- end }}
       {{- if .Values.istioconfiguration.pilot.resources }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcerequirements-v1-core
-      resources: {{- toYaml .Values.istioconfiguration.pilot.resources | nindent 6 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core
+      resources: {{- toYaml .Values.istioconfiguration.pilot.resources | nindent 8 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core
       {{- end }}
       {{- if .Values.istioconfiguration.pilot.affinity }}
-      affinity:  {{- toYaml .Values.istioconfiguration.pilot.affinity | nindent 6 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core
+      affinity:  {{- toYaml .Values.istioconfiguration.pilot.affinity | nindent 8 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core
       {{- end }}
       {{- if .Values.istioconfiguration.pilot.tolerations }}
-      tolerations: {{- toYaml .Values.istioconfiguration.pilot.tolerations | nindent 6 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core
-      {{- end }}
-      {{- if .Values.istioconfiguration.taint }}
-      taint: # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#pilottaintcontrollerconfig
-        enabled: {{ .Values.istioconfiguration.pilot.taint.enabled }}
-        namespace: {{ .Values.istioconfiguration.pilot.taint.namespace }}
+      tolerations: {{- toYaml .Values.istioconfiguration.pilot.tolerations | nindent 8 }} # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core
       {{- end }}
     {{- if .Values.istioconfiguration.meshConfig }}
     meshConfig: # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig
+      {{- if .Values.istioconfiguration.meshConfig.enableAutoMTLS }}
+      enableAutoMtls: {{ .Values.istioconfiguration.meshConfig.enableAutoMTLS }}
+      {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.connectTimeout }}
       connectTimeout: {{ .Values.istioconfiguration.meshConfig.connectTimeout }}
       {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.tcpKeepalive }}
-      tcpKeepalive: {{- toYaml .Values.istioconfiguration.meshConfig.tcpKeepalive | nindent 6 }} # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#connectionpoolsettingstcpsettingstcpkeepalive
+      tcpKeepalive:
+      {{- toYaml .Values.istioconfiguration.meshConfig.tcpKeepalive | nindent 8 }} # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#connectionpoolsettingstcpsettingstcpkeepalive
       {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.ingressControllerMode }}
       ingressControllerMode: {{ .Values.istioconfiguration.meshConfig.ingressControllerMode }} # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfigingresscontrollermode
@@ -55,9 +71,6 @@ spec:
       {{- if .Values.istioconfiguration.meshConfig.ingressSelector }}
       ingressSelector: {{ .Values.istioconfiguration.meshConfig.ingressSelector }}
       {{- end }}
-      {{- if .Values.istioconfiguration.meshConfig.enableTracing }}
-      enableTracing: {{ .Values.istioconfiguration.meshConfig.enableTracing }}
-      {{- end }}
       # accessLogFile: /dev/stdout
       # accessLogFormat:
       # accessLogEncoding: JSON
@@ -66,7 +79,7 @@ spec:
         mode: {{ .Values.istioconfiguration.meshConfig.outboundTrafficPolicy }}
       {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.discoverySelectors }}
-      discoverySelectors:
+      discoverySelectors: # https://github.com/istio/api/blob/master/mesh/v1alpha1/config.proto#L1411 https://istio.io/latest/blog/2021/discovery-selectors/
         {{- toYaml .Values.istioconfiguration.meshConfig.discoverySelectors | nindent 8 }}
       {{- end }}
     {{- end }}

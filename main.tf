@@ -59,23 +59,39 @@ resource "helm_release" "service_mesh_operator" {
 
   disable_openapi_validation = false
 
-  set {
-    name  = "smoperator.namespace"
-    type  = "string"
-    value = local.operators_namespace
-  }
+  # set {
+  #   name  = "smoperator.namespace"
+  #   type  = "string"
+  #   value = local.operators_namespace
+  # }
 
-  set {
-    name  = "smoperator.version"
-    type  = "string"
-    value = local.sm_operator_version
-  }
+  # set {
+  #   name  = "smoperator.version"
+  #   type  = "string"
+  #   value = local.sm_operator_version
+  # }
 
-  set {
-    name  = "smoperator.name"
-    type  = "string"
-    value = local.sm_operator_name
-  }
+  # set {
+  #   name  = "smoperator.name"
+  #   type  = "string"
+  #   value = local.sm_operator_name
+  # }
+
+  set = concat([
+    {
+      name  = "smoperator.namespace"
+      type  = "string"
+      value = local.operators_namespace
+      }, {
+      name  = "smoperator.version"
+      type  = "string"
+      value = local.sm_operator_version
+      }, {
+      name  = "smoperator.name"
+      type  = "string"
+      value = local.sm_operator_name
+    }
+  ])
 
   provisioner "local-exec" {
     command     = "${path.module}/scripts/approve-install-plan.sh \"${local.operators_namespace}\" ${local.operator_installplan_timeout}"

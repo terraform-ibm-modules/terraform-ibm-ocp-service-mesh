@@ -19,16 +19,14 @@ resource "helm_release" "istiocni" {
 
   disable_openapi_validation = false
 
-  set {
+  set = concat([{
     name  = "istiocniconfiguration.namespace"
     type  = "string"
     value = var.namespace
-  }
-
-  set {
+    }, {
     name  = "istiocniconfiguration.name"
     type  = "string"
     value = local.istiocni_name
-  }
+  }])
 
 }
