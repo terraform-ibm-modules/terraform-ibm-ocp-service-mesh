@@ -108,11 +108,11 @@ resource "helm_release" "istio" {
       type  = "string"
       value = var.pilot_autoscaling_enabled
       }, {
-      name  = "istioconfiguration.pilot.autoscale.min"
+      name  = "istioconfiguration.pilot.autoscale.autoscaleMin"
       type  = "string"
       value = var.pilot_autoscaling_min_pods
       }, {
-      name  = "istioconfiguration.pilot.autoscale.max"
+      name  = "istioconfiguration.pilot.autoscale.autoscaleMax"
       type  = "string"
       value = var.pilot_autoscaling_max_pods
       }, {

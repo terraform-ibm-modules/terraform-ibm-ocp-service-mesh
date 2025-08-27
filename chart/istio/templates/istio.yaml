@@ -19,12 +19,12 @@ spec:
       enabled: {{ .Values.istioconfiguration.pilot.enabled }}
       autoscaleEnabled: {{ .Values.istioconfiguration.pilot.autoscale.enabled }}
       replicaCount: {{ .Values.istioconfiguration.pilot.replicacount }}
-      {{- if eq (default .Values.istioconfiguration.pilot.autoscale.enabled false) true}}
-      {{- if .Values.istioconfiguration.pilot.autoscale.min }}
-      autoscaleMin: {{ .Values.istioconfiguration.pilot.autoscale.min }}
+      {{- if eq .Values.istioconfiguration.pilot.autoscale.enabled true }}
+      {{- if .Values.istioconfiguration.pilot.autoscale.autoscaleMin }}
+      autoscaleMin: {{ .Values.istioconfiguration.pilot.autoscale.autoscaleMin }}
       {{- end }}
-      {{- if .Values.istioconfiguration.pilot.autoscale.max }}
-      autoscaleMax: {{ .Values.istioconfiguration.pilot.autoscale.max }}
+      {{- if .Values.istioconfiguration.pilot.autoscale.autoscaleMax }}
+      autoscaleMax: {{ .Values.istioconfiguration.pilot.autoscale.autoscaleMax }}
       {{- end }}
       {{- if .Values.istioconfiguration.pilot.autoscale.cpu }}
       {{- if .Values.istioconfiguration.pilot.autoscale.cpu.targetavgutil }}
