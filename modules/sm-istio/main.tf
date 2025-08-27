@@ -144,7 +144,7 @@ resource "helm_release" "istio" {
       type  = "string"
       value = var.mesh_config_ingress_controller_mode != null ? var.mesh_config_connect_timeout : ""
       }, {
-      name  = "istioconfiguration.istioconfiguration.defaultpdb"
+      name  = "istioconfiguration.defaultpdb"
       type  = "string"
       value = var.istio_enable_default_pod_disruption_budget != null ? var.istio_enable_default_pod_disruption_budget : null
       }, {

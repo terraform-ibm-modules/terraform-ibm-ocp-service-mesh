@@ -10,6 +10,7 @@ spec:
     type: InPlace
   global:
     logAsJson: true
+    istioNamespace: {{ .Values.istioconfiguration.namespace }}
     defaultPodDisruptionBudget:
       enabled: {{ .Values.istioconfiguration.defaultpdb }}
   values:
@@ -18,7 +19,7 @@ spec:
       enabled: {{ .Values.istioconfiguration.pilot.enabled }}
       autoscaleEnabled: {{ .Values.istioconfiguration.pilot.autoscale.enabled }}
       replicaCount: {{ .Values.istioconfiguration.pilot.replicacount }}
-      {{- if .Values.istioconfiguration.pilot.autoscale.enabled }}
+      {{- if eq (default .Values.istioconfiguration.pilot.autoscale.enabled true) true}}
       {{- if .Values.istioconfiguration.pilot.autoscale.min }}
       autoscaleMin: {{ .Values.istioconfiguration.pilot.autoscale.min }}
       {{- end }}
