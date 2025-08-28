@@ -64,13 +64,13 @@ variable "pilot_autoscaling_max_pods" {
 
 variable "pilot_autoscaling_target_cpu" {
   type        = number
-  description = "If var.pilot_autoscaling_enabled is enabled this sets the target CPU average load. Default to 80 (%)"
+  description = "If var.pilot_autoscaling_enabled is enabled this sets the target CPU average load. Default to 80 (%). Set to null to leverage on Istio default value."
   default     = 80
 }
 
 variable "pilot_autoscaling_target_memory" {
   type        = number
-  description = "If var.pilot_autoscaling_enabled is enabled this sets the target memory average load. Default to 80 (%)"
+  description = "If var.pilot_autoscaling_enabled is enabled this sets the target memory average load. Default to 80 (%). Set to null to leverage on Istio default value."
   default     = 80
 }
 
