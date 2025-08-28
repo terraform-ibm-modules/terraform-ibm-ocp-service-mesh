@@ -202,7 +202,7 @@ variable "mesh_config_ingress_selector" {
 
 variable "force_controlplane_update" {
   description = "Force controlplane to be updated"
-  default     = true
+  default     = false
   type        = bool
   nullable    = false
 }
