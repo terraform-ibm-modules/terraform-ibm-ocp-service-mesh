@@ -19,7 +19,7 @@ spec:
       enabled: {{ .Values.istioconfiguration.pilot.enabled }}
       autoscaleEnabled: {{ .Values.istioconfiguration.pilot.autoscale.enabled }}
       replicaCount: {{ .Values.istioconfiguration.pilot.replicacount }}
-      {{- if eq .Values.istioconfiguration.pilot.autoscale.enabled "true" }}
+      {{- if (.Values.istioconfiguration.pilot.autoscale).enabled | default false -}}
       {{- if .Values.istioconfiguration.pilot.autoscale.autoscaleMin }}
       autoscaleMin: {{ .Values.istioconfiguration.pilot.autoscale.autoscaleMin }}
       {{- end }}

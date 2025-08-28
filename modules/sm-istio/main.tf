@@ -85,7 +85,6 @@ resource "helm_release" "istio" {
   set = concat([
     {
       name  = "istioconfiguration.pilot.enabled"
-      type  = "string"
       value = var.pilot_enabled
       }, {
       name  = "istioconfiguration.pilot.replicacount"
@@ -105,7 +104,6 @@ resource "helm_release" "istio" {
       value = var.outboundtrafficpolicy
       }, {
       name  = "istioconfiguration.pilot.autoscale.enabled"
-      type  = "string"
       value = var.pilot_autoscaling_enabled
       }, {
       name  = "istioconfiguration.pilot.autoscale.autoscaleMin"
@@ -125,7 +123,6 @@ resource "helm_release" "istio" {
       value = var.pilot_autoscaling_target_memory
       }, {
       name  = "istioconfiguration.meshConfig.enableAutoMTLS"
-      type  = "string"
       value = var.mesh_config_enable_mtls
       }, {
       name  = "istioconfiguration.meshConfig.ingressSelector"
@@ -145,7 +142,6 @@ resource "helm_release" "istio" {
       value = var.mesh_config_ingress_controller_mode != null ? var.mesh_config_connect_timeout : ""
       }, {
       name  = "istioconfiguration.defaultpdb"
-      type  = "string"
       value = var.istio_enable_default_pod_disruption_budget != null ? var.istio_enable_default_pod_disruption_budget : null
       }, {
       name  = "istioconfiguration.meshConfig.accessLogFile"
