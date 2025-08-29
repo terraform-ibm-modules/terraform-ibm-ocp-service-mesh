@@ -82,7 +82,7 @@ resource "helm_release" "istio" {
 
   disable_openapi_validation = false
 
-  set = concat([
+  set = [
     {
       name  = "istioconfiguration.pilot.enabled"
       value = var.pilot_enabled
@@ -156,7 +156,7 @@ resource "helm_release" "istio" {
       type  = "string"
       value = var.mesh_config_access_log_format != null && var.mesh_config_access_log_format != "" ? var.mesh_config_access_log_format : ""
     }
-  ])
+  ]
 
   values = [
     yamlencode(local.istio_discovery_configuration),
