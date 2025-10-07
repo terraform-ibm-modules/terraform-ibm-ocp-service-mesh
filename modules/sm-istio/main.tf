@@ -67,13 +67,37 @@ locals {
   }
 }
 
+module "istio_namespace" {
+  count   = var.create_namespace ? 1 : 0
+  source  = "terraform-ibm-modules/namespace/ibm"
+  version = "v1.0.3"
+  namespaces = [
+    {
+      name = var.namespace
+      metadata = {
+        labels      = var.istio_namespace_discovery_selector_labels
+        annotations = var.istio_namespace_discovery_selector_labels
+      }
+    }
+
+    #     labels = {
+    #       "${var.istio_namespace_discovery_selector_label.label}" = "${var.istio_namespace_discovery_selector_label.value}"
+    #     },
+    #     annotations = {
+    #       "${var.istio_namespace_discovery_selector_label.label}" = "${var.istio_namespace_discovery_selector_label.value}"
+    #     }
+    #   },
+    # }
+  ]
+}
+
 # installing helm chart for istio deployment
 resource "helm_release" "istio" {
-
+  depends_on       = [module.istio_namespace[0]]
   name             = local.istio_release_name
   chart            = "${path.module}/../../chart/${local.istio_chart_path}"
   namespace        = var.namespace
-  create_namespace = var.create_namespace
+  create_namespace = false
   # timeout           = "60"
   dependency_update = true
   force_update      = var.force_controlplane_update
@@ -169,4 +193,16 @@ resource "helm_release" "istio" {
     yamlencode(local.istio_mesh_config_mesh_tls_defaults),
   ]
 
+}
+
+
+resource "null_resource" "confirm_istio_operational" {
+  depends_on = [helm_release.istio]
+  provisioner "local-exec" {
+    command     = "${path.module}/scripts/confirm-istio-operational.sh \"${var.namespace}\" \"${var.name}\""
+    interpreter = ["/bin/bash", "-c"]
+    environment = {
+      KUBECONFIG = var.cluster_config_file_path
+    }
+  }
 }

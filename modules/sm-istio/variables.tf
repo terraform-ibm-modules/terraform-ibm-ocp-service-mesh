@@ -31,6 +31,14 @@ variable "istio_discovery_configuration" {
   description = "Istio controlplane discovery label. Default to matchLabels: {'istio-discovery' : 'enabled'}. For more details https://istio.io/latest/blog/2021/discovery-selectors/ https://github.com/istio/api/blob/master/mesh/v1alpha1/config.proto#L1411"
 }
 
+variable "istio_namespace_discovery_selector_labels" {
+  type = map(string)
+  default = {
+    "istio-discovery" = "enabled"
+  }
+  description = "Istio controlplane discovery label to apply to controlplane namespace. It is expected to be coherent with selectors of var.istio_discovery_configuration. Default to {\"istio-discovery\" : \"enabled\"}. For more details https://istio.io/latest/blog/2021/discovery-selectors/"
+}
+
 variable "istio_enable_default_pod_disruption_budget" {
   type        = bool
   description = "Controls whether a PodDisruptionBudget with a default minAvailable value of 1 is created for each deployment. Default to null, using Istio default configuration. More details at https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#defaultpoddisruptionbudgetconfig"
@@ -255,4 +263,10 @@ variable "mesh_config_access_log_format" {
   description = "Format for the Istio proxy access log. Set to empty or null to use proxy's default access log format."
   default     = "[%START_TIME%] [%REQ(:AUTHORITY)%] [%BYTES_RECEIVED%] [%BYTES_SENT%] [%DOWNSTREAM_LOCAL_ADDRESS%] [%DOWNSTREAM_LOCAL_ADDRESS%] [%DOWNSTREAM_REMOTE_ADDRESS%] [%DOWNSTREAM_TLS_VERSION%] [%DURATION%] [%REQUEST_DURATION%] [%RESPONSE_DURATION%] [%RESPONSE_TX_DURATION%] [%DYNAMIC_METADATA(istio.mixer:status)%] [%REQ(:METHOD)%] [%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%] [%PROTOCOL%] [%REQ(X-REQUEST-ID)%] [%REQUESTED_SERVER_NAME%] [%RESPONSE_CODE%] [%RESPONSE_CODE_DETAILS%] [%RESPONSE_FLAGS%] [%ROUTE_NAME%] [%START_TIME%] [%UPSTREAM_CLUSTER%] [%UPSTREAM_HOST%] [%UPSTREAM_LOCAL_ADDRESS%] [%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%] [%UPSTREAM_TRANSPORT_FAILURE_REASON%] [%REQ(USER-AGENT)%] [%REQ(X-FORWARDED-FOR)%] [%REQ(X-ENVOY-ATTEMPT-COUNT)%]"
   type        = string
+}
+
+variable "cluster_config_file_path" {
+  type        = string
+  nullable    = false
+  description = "Cluster config file path to use with kubernetes provider to run checks on the resources deployment"
 }

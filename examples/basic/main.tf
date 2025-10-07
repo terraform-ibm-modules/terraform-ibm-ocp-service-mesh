@@ -11,7 +11,7 @@ locals {
 ##############################################################################
 
 module "resource_group" {
-  source = "git::https://github.com/terraform-ibm-modules/terraform-ibm-resource-group.git?ref=v1.2.0"
+  source = "git::https://github.com/terraform-ibm-modules/terraform-ibm-resource-group.git?ref=v1.3.0"
   # if an existing resource group is not set (null) create a new one using prefix
   resource_group_name          = var.resource_group == null ? "${var.prefix}-resource-group" : null
   existing_resource_group_name = var.resource_group
@@ -113,31 +113,14 @@ module "service_mesh" {
   cluster_config_endpoint_type = var.cluster_config_endpoint_type
 }
 
-module "deploy_istio_1" {
-  depends_on       = [module.service_mesh]
-  source           = "../../modules/sm-istio"
-  name             = "istio-1"
-  namespace        = "istio-system-1"
-  create_namespace = true
-}
-
-module "deploy_istio_2" {
+module "deploy_istio" {
   depends_on                    = [module.service_mesh]
   source                        = "../../modules/sm-istio"
-  name                          = "istio-2"
-  namespace                     = "istio-system-2"
+  name                          = "istio"
+  namespace                     = "istio-system"
   create_namespace              = true
+  cluster_config_file_path      = data.ibm_container_cluster_config.cluster_config.config_file_path
   istio_discovery_configuration = var.istio_discovery_configuration
-  # istio_discovery_configuration = {
-  #   matchLabels: [{"istio-discovery": "enabled", "app": "test"}]
-  #   matchExpressions: [
-  #     {
-  #       key: "app"
-  #       operator: "In"
-  #       values: ["test1", "test2"]
-  #     }
-  #   ]
-  # }
 }
 
 module "deploy_istio_cni" {
