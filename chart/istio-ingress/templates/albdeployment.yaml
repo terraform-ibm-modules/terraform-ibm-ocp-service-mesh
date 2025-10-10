@@ -1,0 +1,77 @@
+{{- if or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "sdnlb") }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingress-{{ .Values.ingress.name }}
+  namespace: {{ .Values.ingress.namespace }}
+spec:
+  selector:
+    matchLabels:
+      {{- toYaml .Values.ingress.istioselectors | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        # Select the gateway injection template (rather than the default sidecar template)
+        inject.istio.io/templates: gateway
+      labels:
+        # Set a unique label for the gateway. This is required to ensure Gateways can select this workload
+        {{- toYaml .Values.ingress.istioselectors | nindent 8 }}
+        # Enable gateway injection. If connecting to a revisioned control plane, replace with "istio.io/rev: revision-name"
+        sidecar.istio.io/inject: "true"
+    spec:
+      replicas: {{ .Values.ingress.replicacount }}
+      nodeSelector:
+        {{- range $zone := .Values.ingress.nlbzones }}
+        ibm-cloud.kubernetes.io/zone: {{ $zone | quote }}
+        {{- end }}
+      affinity:
+      {{- toYaml .Values.ingress.affinity | nindent 6 }}
+      serviceAccountName: ingress-{{ .Values.ingress.name }}
+      serviceAccount: ingress-{{ .Values.ingress.name }}
+      terminationGracePeriodSeconds: {{ .Values.ingress.terminationGracePeriodSeconds }}
+      tolerations:
+      {{- if .Values.ingress.tolerations }}
+      {{- toYaml .Values.ingress.tolerations | nindent 6 }}
+      {{- end }}
+      containers:
+      - name: istio-proxy
+        image: auto # The image will automatically update each time the pod starts.
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+        resources:
+        {{- if .Values.ingress.resources }}
+        {{- toYaml .Values.ingress.resources | nindent 10 }}
+        {{- end }}
+        ports:
+        - containerPort: 15090
+          protocol: TCP
+          name: http-envoy-prom
+        {{- if .Values.ingress.ports }}
+        {{- range .Values.ingress.ports }}
+        - containerPort: {{ .port }}
+          protocol: {{ .proto | toString }}
+          name: {{ .name }}
+        {{- end }}
+        {{- end }}
+{{- end }}
+#---
+# Allow outside traffic to access the gateway
+# This is optional, only needed in case your cluster contains restrictive NetworkPolicies
+#apiVersion: networking.k8s.io/v1
+#kind: NetworkPolicy
+#metadata:
+#  name: gatewayingress
+#spec:
+#  podSelector:
+#    matchLabels:
+#      istio: ingressgateway
+#  ingress:
+#    - {}
+#  policyTypes:
+#  - Ingress

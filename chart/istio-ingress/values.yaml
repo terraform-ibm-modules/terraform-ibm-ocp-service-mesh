@@ -1,0 +1,71 @@
+ingress:
+  name: default
+  namespace: istio-system
+  enableproxyprotocol: true
+  svctype: LoadBalancer
+  lbtype: alb # nlb sdnlb
+  lbiptype: public # private
+  istioNamespaceEnrollmentLabels: { "istio-discovery": "enabled", "istio-injection": "enabled", "istio.io/rev": "default"}
+  istioselectors: { "app": "istio-ingress", "istio": "istio-ingress", "gateway-instance": "istio-ingressgateway" }
+  albsubnets:
+  # - 02b7-94569aa2-a865-446e-842a-a212a581ca08
+  # - 02c7-d5c6b995-e052-4883-b396-4b9fca20e777
+  # - 02d7-e42a285d-40a5-46ef-bddb-9f5573548493
+  nlbzonessubnets:
+  # - "eu-gb-1": "02b7-94569aa2-a865-446e-842a-a212a581ca08"
+  # - "eu-gb-2": "02c7-d5c6b995-e052-4883-b396-4b9fca20e777"
+  # - "eu-gb-3": "02d7-e42a285d-40a5-46ef-bddb-9f5573548493"
+  sdnlbWorkerPoolSelector: # { "ibm-cloud.kubernetes.io/worker-pool-name": "transit" }
+    name: "ibm-cloud.kubernetes.io/worker-pool-name"
+    value: "transit"
+  ports:
+  - port: 80
+    name: svc-http
+    proto: TCP # UDP
+    targetPort: 8080
+  externalTrafficPolicy: Local
+  internalTrafficPolicy: Cluster
+  autoscale:
+    enabled: false
+    # autoscaleMin: 1
+    # autoscaleMax: 3
+    # cpu:
+    #   targetavgutil: 80
+    # memory:
+    #   targetavgutil: 80
+  pdb:
+    # minAvailable: 1
+    # maxUnavailable: 2
+  replicacount: 1
+  resources:
+    # limits:
+    #   cpu: 2000m
+    #   memory: 1024Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  # nodeselector: { "ibm-cloud.kubernetes.io/worker-pool-name": "default" }
+  terminationGracePeriodSeconds: 30
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: ibm-cloud.kubernetes.io/worker-pool-name
+            operator: In
+            values:
+            - edge
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: maistra.io/gateway
+              operator: In
+              values:
+              - istio-ingressgateway.istio-system
+          topologyKey: topology.kubernetes.io/zone
+        weight: 100
+  tolerations:
+
+
