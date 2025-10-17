@@ -2,16 +2,19 @@ locals {
   istio_ingress_release_name = "${var.namespace}-${var.name}-ingress"
   istio_ingress_chart_path   = "istio-ingress"
 
-  ingress_namespace_enrollment_labels = var.ingress_namespace_enrollment_labels
-  # {
-  # "ingress": {
-  # "istioNamespaceEnrollmentLabels": var.ingress_namespace_enrollment_labels
-  # }
-  # }
+  ingress_discovery_configuration = var.ingress_discovery_custom_configuration != null ? var.ingress_discovery_custom_configuration : (
+    var.istio_mesh_enrollment == "default" ? {
+      "istio-discovery" : "enabled",
+      "istio-injection" : "enabled",
+      } : {
+      "istio-discovery" : var.istio_mesh_enrollment,
+      "istio.io/rev" : var.istio_mesh_enrollment,
+    }
+  )
 
   ingress_selectors = {
     "ingress" : {
-      "istioSelectors" : var.ingress_selectors
+      "istioselectors" : var.ingress_selectors
     }
   }
 
@@ -73,8 +76,8 @@ module "ingress_namespace" {
     {
       name = var.namespace
       metadata = {
-        labels      = local.ingress_namespace_enrollment_labels
-        annotations = local.ingress_namespace_enrollment_labels
+        labels      = local.ingress_discovery_configuration
+        annotations = local.ingress_discovery_configuration
       }
     }
   ]
@@ -143,8 +146,8 @@ resource "helm_release" "istio_ingress" {
     }
   ]
 
+  # yamlencode(local.ingress_namespace_enrollment_labels),
   values = [
-    yamlencode(local.ingress_namespace_enrollment_labels),
     yamlencode(local.ingress_selectors),
     yamlencode(local.ingress_alb_subnets),
     yamlencode(local.ingress_nlb_zones_subnets),

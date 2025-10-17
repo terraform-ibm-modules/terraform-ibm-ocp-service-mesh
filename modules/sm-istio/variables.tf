@@ -14,7 +14,7 @@ variable "namespace" {
   description = "Namespace where to install istio controlplane."
 }
 
-variable "istio_discovery_configuration" {
+variable "istio_discovery_custom_configuration" {
   type = object({
     matchLabels : optional(map(string), null),
     matchExpressions : optional(list(object({
@@ -23,20 +23,22 @@ variable "istio_discovery_configuration" {
       values : list(string)
     })), [])
   })
-  default = {
-    matchLabels : {
-      "istio-discovery" : "enabled"
-    }
-  }
-  description = "Istio controlplane discovery label. Default to matchLabels: {'istio-discovery' : 'enabled'}. For more details https://istio.io/latest/blog/2021/discovery-selectors/ https://github.com/istio/api/blob/master/mesh/v1alpha1/config.proto#L1411"
+  # default = {
+  #   matchLabels : {
+  #     "istio-discovery" : "enabled"
+  #   }
+  # }
+  default     = null
+  description = "Istio controlplane discovery label. Default to null to autogenerate the labels according to var.name value to matchLabels: {\"istio-discovery\" : \"enabled\"}. For more details https://istio.io/latest/blog/2021/discovery-selectors/ https://github.com/istio/api/blob/master/mesh/v1alpha1/config.proto#L1411 https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh#ossm-discoveryselectors-scope-service-mesh_ossm-installing-openshift-service-mesh"
 }
 
-variable "istio_namespace_discovery_selector_labels" {
+variable "istio_namespace_discovery_custom_labels" {
   type = map(string)
-  default = {
-    "istio-discovery" = "enabled"
-  }
-  description = "Istio controlplane discovery label to apply to controlplane namespace. It is expected to be coherent with selectors of var.istio_discovery_configuration. Default to {\"istio-discovery\" : \"enabled\"}. For more details https://istio.io/latest/blog/2021/discovery-selectors/"
+  # default = {
+  #   "istio-discovery" = "enabled"
+  # }
+  default     = null
+  description = "Istio controlplane discovery label to apply to controlplane namespace. Default to null to autogenerate the labels according to var.name to {\"istio-discovery\" : \"enabled\"}. If overridden consider it to be coherent with selectors of var.istio_discovery_configuration. For more details https://istio.io/latest/blog/2021/discovery-selectors/"
 }
 
 variable "istio_enable_default_pod_disruption_budget" {

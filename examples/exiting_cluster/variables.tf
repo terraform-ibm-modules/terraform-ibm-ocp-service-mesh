@@ -7,7 +7,7 @@ variable "ibmcloud_api_key" {
 variable "prefix" {
   type        = string
   description = "Prefix for name of all resource created by this example"
-  default     = "ocpsm-basic"
+  default     = "ocpsm-excluster"
 }
 
 variable "region" {
@@ -15,16 +15,16 @@ variable "region" {
   description = "Region where resources are created"
 }
 
+variable "existing_cluster_id" {
+  type        = string
+  description = "Existing cluster ID to deploy the ServiceMesh"
+  nullable    = false
+}
+
 variable "resource_group" {
   type        = string
   description = "Optionally pass an existing resource group name to be used. If not passed a new one will be created"
   default     = null
-}
-
-variable "resource_tags" {
-  type        = list(string)
-  description = "Optional list of tags to be added to created resources"
-  default     = []
 }
 
 variable "deploy_operator" {
@@ -49,3 +49,22 @@ variable "cluster_config_endpoint_type" {
     condition     = contains(["default", "private", "vpe", "link"], var.cluster_config_endpoint_type)
   }
 }
+
+# variable "istio_namespace_discovery_selector_labels" {
+#   type        = map(string)
+#   default     = null
+#   description = "Istio controlplane discovery label to apply to controlplane namespace."
+# }
+
+# variable "istio_discovery_configuration" {
+#   type = object({
+#     matchLabels : optional(map(string), null),
+#     matchExpressions : optional(list(object({
+#       key : string
+#       operator : string
+#       values : list(string)
+#     })), [])
+#   })
+#   default     = null
+#   description = "Istio controlplane discovery label."
+# }

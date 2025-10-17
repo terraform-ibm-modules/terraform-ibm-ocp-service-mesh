@@ -5,17 +5,11 @@ ingress:
   svctype: LoadBalancer
   lbtype: alb # nlb sdnlb
   lbiptype: public # private
-  istioNamespaceEnrollmentLabels: { "istio-discovery": "enabled", "istio-injection": "enabled", "istio.io/rev": "default"}
-  istioselectors: { "app": "istio-ingress", "istio": "istio-ingress", "gateway-instance": "istio-ingressgateway" }
+  istioNamespaceEnrollmentLabels: {}
+  istioselectors: {}
   albsubnets:
-  # - 02b7-94569aa2-a865-446e-842a-a212a581ca08
-  # - 02c7-d5c6b995-e052-4883-b396-4b9fca20e777
-  # - 02d7-e42a285d-40a5-46ef-bddb-9f5573548493
   nlbzonessubnets:
-  # - "eu-gb-1": "02b7-94569aa2-a865-446e-842a-a212a581ca08"
-  # - "eu-gb-2": "02c7-d5c6b995-e052-4883-b396-4b9fca20e777"
-  # - "eu-gb-3": "02d7-e42a285d-40a5-46ef-bddb-9f5573548493"
-  sdnlbWorkerPoolSelector: # { "ibm-cloud.kubernetes.io/worker-pool-name": "transit" }
+  sdnlbWorkerPoolSelector:
     name: "ibm-cloud.kubernetes.io/worker-pool-name"
     value: "transit"
   ports:
@@ -67,5 +61,3 @@ ingress:
           topologyKey: topology.kubernetes.io/zone
         weight: 100
   tolerations:
-
-

@@ -32,7 +32,13 @@ done
 # checking istio svc to be successfully deployed
 wait=30
 clusterIP=""
-istiodsvc="istiod-${name}"
+# istiod svc named istiod if name is default otherwise istiod-name
+if [[ "${name}" == "default" ]]; then
+  istiodsvc="istiod"
+else
+  istiodsvc="istiod-${name}"
+fi
+
 echo "Checking for istiod svc ${istiodsvc} in namespace ${namespace} correctly deployed"
 while [ -z "${clusterIP}" ]; do
   # Get the hostname from the kube service (retry needed on service lookup, as sometimes service may not exist yet)

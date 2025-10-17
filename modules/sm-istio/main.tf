@@ -2,13 +2,38 @@ locals {
   istio_release_name = "${var.namespace}-${var.name}"
   istio_chart_path   = "istio"
 
-  istio_discovery_configuration = var.istio_discovery_configuration == null ? {} : {
+  # if istio_discovery_custom_configuration is null the istio_discovery_configuration is generated according to controlplane name
+  istio_discovery_configuration = var.istio_discovery_custom_configuration == null ? (
+    var.name == "default" ? {
+      "istioconfiguration" : {
+        "meshConfig" : {
+          "discoverySelectors" : [
+            { "matchLabels" : { "istio-discovery" : "enabled" } }, { "matchExpressions" : null }
+          ]
+        }
+      }
+    } :
+    {
+      "istioconfiguration" : {
+        "meshConfig" : {
+          "discoverySelectors" : [
+            { "matchLabels" : { "istio-discovery" : var.name } }, { "matchExpressions" : null }
+          ]
+        }
+      }
+    }
+    ) : {
     "istioconfiguration" : {
       "meshConfig" : {
-        "discoverySelectors" : [var.istio_discovery_configuration.matchLabels != null ? { "matchLabels" : var.istio_discovery_configuration.matchLabels } : null, var.istio_discovery_configuration.matchExpressions != null ? { "matchExpressions" : var.istio_discovery_configuration.matchExpressions } : null]
+        "discoverySelectors" : [var.istio_discovery_custom_configuration.matchLabels != null ? { "matchLabels" : var.istio_discovery_custom_configuration.matchLabels } : null, var.istio_discovery_custom_configuration.matchExpressions != null ? { "matchExpressions" : var.istio_discovery_custom_configuration.matchExpressions } : null]
       }
     }
   }
+
+  # if istio_namespace_discovery_custom_labels is null the istio_namespace_discovery_labels value is generated according to controlplane name
+  istio_namespace_discovery_labels = var.istio_namespace_discovery_custom_labels == null ? (
+    var.name == "default" ? { "istio-discovery" = "enabled" } : { "istio-discovery" : var.name }
+  ) : var.istio_namespace_discovery_custom_labels
 
   istio_pilot_resources = var.pilot_resources == null ? {} : {
     "istioconfiguration" : {
@@ -75,8 +100,8 @@ module "istio_namespace" {
     {
       name = var.namespace
       metadata = {
-        labels      = var.istio_namespace_discovery_selector_labels
-        annotations = var.istio_namespace_discovery_selector_labels
+        labels      = local.istio_namespace_discovery_labels
+        annotations = local.istio_namespace_discovery_labels
       }
     }
 
@@ -92,7 +117,7 @@ module "istio_namespace" {
 }
 
 # installing helm chart for istio deployment
-resource "helm_release" "istio" {
+resource "helm_release" "istio_controlplane" {
   depends_on       = [module.istio_namespace[0]]
   name             = local.istio_release_name
   chart            = "${path.module}/../../chart/${local.istio_chart_path}"
@@ -197,7 +222,7 @@ resource "helm_release" "istio" {
 
 
 resource "null_resource" "confirm_istio_operational" {
-  depends_on = [helm_release.istio]
+  depends_on = [helm_release.istio_controlplane]
   provisioner "local-exec" {
     command     = "${path.module}/scripts/confirm-istio-operational.sh \"${var.namespace}\" \"${var.name}\""
     interpreter = ["/bin/bash", "-c"]

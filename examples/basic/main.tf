@@ -80,17 +80,16 @@ locals {
 ##############################################################################
 
 module "ocp_base" {
-  source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.55.3"
-  resource_group_id    = module.resource_group.resource_group_id
-  region               = var.region
-  tags                 = var.resource_tags
-  cluster_name         = "${var.prefix}-cluster"
-  force_delete_storage = true
-  vpc_id               = ibm_is_vpc.vpc.id
-  vpc_subnets          = local.cluster_vpc_subnets
-  worker_pools         = local.worker_pools
-  # ocp_version                         = "4.17"
+  source                              = "terraform-ibm-modules/base-ocp-vpc/ibm"
+  version                             = "3.64.1"
+  resource_group_id                   = module.resource_group.resource_group_id
+  region                              = var.region
+  tags                                = var.resource_tags
+  cluster_name                        = "${var.prefix}-cluster"
+  force_delete_storage                = true
+  vpc_id                              = ibm_is_vpc.vpc.id
+  vpc_subnets                         = local.cluster_vpc_subnets
+  worker_pools                        = local.worker_pools
   disable_outbound_traffic_protection = true # set as True to enable outbound traffic; required for accessing Operator Hub in the OpenShift console.
 }
 
@@ -114,13 +113,12 @@ module "service_mesh" {
 }
 
 module "deploy_istio" {
-  depends_on                    = [module.service_mesh]
-  source                        = "../../modules/sm-istio"
-  name                          = "istio"
-  namespace                     = "istio-system"
-  create_namespace              = true
-  cluster_config_file_path      = data.ibm_container_cluster_config.cluster_config.config_file_path
-  istio_discovery_configuration = var.istio_discovery_configuration
+  depends_on               = [module.service_mesh]
+  source                   = "../../modules/sm-istio"
+  name                     = "default"
+  namespace                = "istio-system"
+  create_namespace         = true
+  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
 
 module "deploy_istio_cni" {
@@ -128,4 +126,36 @@ module "deploy_istio_cni" {
   source           = "../../modules/sm-istio-cni"
   namespace        = "istio-system-cni"
   create_namespace = true
+}
+
+resource "time_sleep" "wait_istio" {
+  depends_on = [module.deploy_istio, module.deploy_istio_cni]
+
+  create_duration  = "300s"
+  destroy_duration = "60s"
+}
+
+module "basic_workload_ingress" {
+  depends_on                = [time_sleep.wait_istio]
+  source                    = "../../modules/sm-istio-ingress"
+  name                      = "basic-ingress"
+  namespace                 = "basic-ingress"
+  create_namespace          = true
+  force_controlplane_update = false
+  ingress_loadbalancer_type = "alb"
+  ingress_service_type      = "LoadBalancer"
+  ingress_ip_type           = "public"
+  istio_mesh_enrollment     = "default"
+  ingress_selectors = {
+    "istio" : "ingress-gateway",
+  }
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    }
+  ]
+  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }

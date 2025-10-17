@@ -1,21 +1,21 @@
 variable "name" {
   type        = string
-  description = "Name of the Istio controlplane revision"
+  description = "Name of the Istio ingress deployment"
 }
 
 variable "create_namespace" {
   type        = bool
-  description = "Flag to create the namespace where to install istio controlplane. Default to true"
+  description = "Flag to create the namespace where to install istio ingress dataplane. Default to true"
   default     = true
 }
 
 variable "namespace" {
   type        = string
-  description = "Namespace where to install istio controlplane."
+  description = "Namespace where to install istio ingress dataplane."
 }
 
 variable "force_controlplane_update" {
-  description = "Force controlplane to be updated"
+  description = "Force dataplane to be updated"
   default     = false
   type        = bool
   nullable    = false
@@ -54,15 +54,22 @@ variable "ingress_ip_type" {
   }
 }
 
-variable "ingress_namespace_enrollment_labels" {
-  type = map(string)
-  default = {
-    "istio-discovery" : "enabled",
-    "istio-injection" : "enabled",
-    "istio.io/rev" : "default"
-  }
-  nullable    = false
-  description = "Label used to annotate the ingress namespace labels to enroll in the expected mesh controlplane. For more details refer to https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-sidecar-injection#ossm-about-sidecar-injection_ossm-sidecar-injection and https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-deploying-multiple-service-meshes-on-single-cluster. Default values \"istio-discovery\": \"enabled\" \"istio-injection\": \"enabled\" \"istio.io/rev\": \"default\". Null not allowed."
+variable "istio_mesh_enrollment" {
+  type        = string
+  default     = "default"
+  description = "Name of the Istio mesh controlplane to enroll this dataplane with. Default value to default. This value is used to generate discovery selectors, to override the computed values customise var.ingress_discovery_custom_configuration."
+}
+
+variable "ingress_discovery_custom_configuration" {
+  type    = map(string)
+  default = null
+  # default = {
+  #   "istio-discovery" : "enabled",
+  #   "istio-injection" : "enabled",
+  #   // "istio.io/rev" : "default"
+  # }
+  # nullable    = false
+  description = "Map of key-value entries to set custom istio discovery labels. Default to null to autogenerate the labels according to var.istio_mesh_enrollment value. For more details about istio discovery configuration refer to https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-sidecar-injection#ossm-about-sidecar-injection_ossm-sidecar-injection and https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-deploying-multiple-service-meshes-on-single-cluster."
 }
 
 variable "ingress_selectors" {
@@ -70,7 +77,6 @@ variable "ingress_selectors" {
   default = {
     "app" : "istio-ingress",
     "istio" : "istio-ingress",
-    "gateway-instance" : "istio-ingressgateway"
   }
   nullable    = false
   description = "Istio ingress selectors to route inbound ingress traffic to the expected istio gateway and to the expected workload. Default to \"app\": \"istio-ingress\" \"istio\": \"istio-ingress\" \"gateway-instance\": \"istio-ingressgateway\". Null not allowed"
@@ -217,9 +223,9 @@ variable "ingress_affinity" {
   })
   default = {
     nodeAffinity : {
-      requiredDuringSchedulingIgnoredDuringExecution : [
-        {
-          nodeSelectorTerms : {
+      requiredDuringSchedulingIgnoredDuringExecution : {
+        nodeSelectorTerms : [
+          {
             matchExpressions : [
               {
                 key : "ibm-cloud.kubernetes.io/worker-pool-name",
@@ -228,28 +234,29 @@ variable "ingress_affinity" {
               }
             ]
           }
-        }
-      ]
-    },
-    podAntiAffinity : {
-      preferredDuringSchedulingIgnoredDuringExecution : [
-        {
-          podAffinityTerm : {
-            labelSelector : {
-              matchExpressions : [
-                {
-                  key : "maistra.io/gateway",
-                  operator : "In",
-                  values : ["istio-ingressgateway.istio-system"]
-                }
-              ]
-            }
-          }
-          topologyKey : "topology.kubernetes.io/zone"
-          weight : 100
-        }
-      ]
+        ]
+      }
     }
+    # ,
+    # podAntiAffinity : {
+    #   preferredDuringSchedulingIgnoredDuringExecution : [
+    #     {
+    #       podAffinityTerm : {
+    #         labelSelector : {
+    #           matchExpressions : [
+    #             {
+    #               key : "maistra.io/gateway",
+    #               operator : "In",
+    #               values : ["istio-ingressgateway.istio-system"]
+    #             }
+    #           ]
+    #         }
+    #       }
+    #       topologyKey : "topology.kubernetes.io/zone"
+    #       weight : 100
+    #     }
+    #   ]
+    # }
   }
   description = "Istio ingress affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core."
 }
