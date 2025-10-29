@@ -49,15 +49,4 @@ ingress:
             operator: In
             values:
             - edge
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-      - podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-            - key: maistra.io/gateway
-              operator: In
-              values:
-              - istio-ingressgateway.istio-system
-          topologyKey: topology.kubernetes.io/zone
-        weight: 100
   tolerations:

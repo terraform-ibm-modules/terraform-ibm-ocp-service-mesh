@@ -1,5 +1,5 @@
 locals {
-  istio_ingress_release_name = "${var.namespace}-${var.name}-ingress"
+  istio_ingress_release_name = "${var.namespace}-${var.name}"
   istio_ingress_chart_path   = "istio-ingress"
 
   ingress_discovery_configuration = var.ingress_discovery_custom_configuration != null ? var.ingress_discovery_custom_configuration : (
@@ -92,7 +92,7 @@ resource "helm_release" "istio_ingress" {
   create_namespace = false
   # timeout           = "60"
   dependency_update = true
-  force_update      = var.force_controlplane_update
+  force_update      = var.force_dataplane_update
   cleanup_on_fail   = false
   wait              = true
 
@@ -127,17 +127,17 @@ resource "helm_release" "istio_ingress" {
     {
       name  = "ingress.externalTrafficPolicy"
       type  = "string"
-      value = var.ingress_external_traffic_policy # Local Cluster
+      value = var.ingress_external_traffic_policy
     },
     {
       name  = "ingress.internalTrafficPolicy"
       type  = "string"
-      value = var.ingress_internal_traffic_policy # Cluster Local
+      value = var.ingress_internal_traffic_policy
     },
     {
       name  = "ingress.replicacount"
       type  = "string"
-      value = var.ingress_replicas #
+      value = var.ingress_replicas
     },
     {
       name  = "ingress.terminationGracePeriodSeconds"

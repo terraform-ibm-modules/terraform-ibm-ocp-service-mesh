@@ -14,7 +14,7 @@ variable "namespace" {
   description = "Namespace where to install istio ingress dataplane."
 }
 
-variable "force_controlplane_update" {
+variable "force_dataplane_update" {
   description = "Force dataplane to be updated"
   default     = false
   type        = bool
@@ -245,9 +245,9 @@ variable "ingress_affinity" {
     #         labelSelector : {
     #           matchExpressions : [
     #             {
-    #               key : "maistra.io/gateway",
+    #               key : "istio.io/gateway",
     #               operator : "In",
-    #               values : ["istio-ingressgateway.istio-system"]
+    #               values : ["def-workload-ingress.default-workload"]
     #             }
     #           ]
     #         }
