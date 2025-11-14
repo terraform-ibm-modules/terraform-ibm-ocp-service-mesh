@@ -33,10 +33,7 @@ variable "istio_discovery_custom_configuration" {
 }
 
 variable "istio_namespace_discovery_custom_labels" {
-  type = map(string)
-  # default = {
-  #   "istio-discovery" = "enabled"
-  # }
+  type        = map(string)
   default     = null
   description = "Istio controlplane discovery label to apply to controlplane namespace. Default to null to autogenerate the labels according to var.name to {\"istio-discovery\" : \"enabled\"}. If overridden consider it to be coherent with selectors of var.istio_discovery_configuration. For more details https://istio.io/latest/blog/2021/discovery-selectors/"
 }
@@ -141,19 +138,13 @@ variable "pilot_affinity" {
       ]
     }
   }
-  description = "Istio pilot affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core."
+  description = "Istio pilot pods affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core."
 }
 
 variable "pilot_tolerations" {
-  type = list(any)
-  default = [
-    {
-      key : "dedicated"
-      value : "transit"
-      effect : "NoExecute"
-    }
-  ]
-  description = "Istio pilot tolerations configuration. Default to tolerate 'dedicated: transit' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
+  type        = list(any)
+  default     = []
+  description = "Istio pilot pods tolerations configuration. Default to empty list. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
 }
 
 variable "outboundtrafficpolicy" {

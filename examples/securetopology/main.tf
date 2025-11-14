@@ -1,8 +1,18 @@
+########################################################################################################################
+# VPC + Subnet + Public Gateway
+#
+# NOTE: This example deploys secure VPC deployment with 3 zones and 3 subnets in each zone with a public gateway enabled, that will allow
+# all traffic ingress/egress by default.
+# The three subnets allow to isolate the cluster nodes for their purpose: edge for public access enabled workers, default for workload deployment, transit for internal traffic
+# For production use cases this would need to be enhanced by adding ACLs/Security Groups for network security.
+########################################################################################################################
+
 ##############################################################################
 # Locals
 ##############################################################################
 
 locals {
+
   # VPC Configuration
   acl_rules_map = {
     private = concat(
@@ -136,7 +146,7 @@ module "vpc" {
 
 module "ocp_base" {
   source               = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version              = "3.60.1"
+  version              = "3.71.4"
   cluster_name         = "${var.prefix}-cluster"
   resource_group_id    = module.resource_group.resource_group_id
   region               = var.region
@@ -155,7 +165,7 @@ module "ocp_base" {
 ############################################################################
 
 module "cluster_proxy" {
-  source     = "git::https://github.ibm.com/GoldenEye/cluster-proxy-module.git?ref=4.1.1"
+  source     = "git::https://github.ibm.com/GoldenEye/cluster-proxy-module.git?ref=4.2.4"
   cluster_id = module.ocp_base.cluster_id
 }
 
@@ -166,4 +176,56 @@ module "cluster_proxy" {
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+}
+
+# deploying servicemesh operator
+
+module "service_mesh_operator" {
+  source                       = "../.."
+  cluster_id                   = module.ocp_base.cluster_id
+  deploy_operator              = var.deploy_operator
+  develop_mode                 = var.develop_mode
+  cluster_config_endpoint_type = var.cluster_config_endpoint_type
+}
+
+# deploying istio cni
+
+module "istio_cni" {
+  depends_on       = [module.service_mesh_operator]
+  source           = "../../modules/sm-istio-cni"
+  namespace        = "istio-system-cni"
+  create_namespace = true
+}
+
+# deploying istio controlplane by setting customised configuration
+
+module "istio" {
+  depends_on                                 = [module.service_mesh_operator]
+  source                                     = "../../modules/sm-istio"
+  name                                       = "default"
+  namespace                                  = "istio-system"
+  force_controlplane_update                  = false
+  mesh_config_enable_mtls                    = true
+  istio_discovery_custom_configuration       = var.istio_discovery_configuration
+  istio_namespace_discovery_custom_labels    = var.istio_namespace_discovery_labels
+  pilot_autoscaling_enabled                  = var.pilot_autoscaling_enabled
+  pilot_autoscaling_max_pods                 = var.pilot_autoscaling_max_pods
+  pilot_autoscaling_min_pods                 = var.pilot_autoscaling_min_pods
+  pilot_replicas                             = var.pilot_replicas
+  istio_enable_default_pod_disruption_budget = var.istio_enable_default_pod_disruption_budget
+  pilot_autoscaling_target_memory            = var.pilot_autoscaling_target_memory
+  pilot_autoscaling_target_cpu               = var.pilot_autoscaling_target_cpu
+  pilot_node_selector                        = var.pilot_node_selector
+  pilot_tolerations                          = var.pilot_tolerations
+  pilot_resources                            = var.pilot_resources
+  pilot_affinity                             = var.pilot_affinity
+  mesh_config_tcp_keep_alive                 = var.mesh_config_tcp_keep_alive
+  cluster_config_file_path                   = data.ibm_container_cluster_config.cluster_config.config_file_path
+}
+
+resource "time_sleep" "wait_istio" {
+  depends_on = [module.istio_cni, module.istio]
+
+  create_duration  = "300s"
+  destroy_duration = "60s"
 }

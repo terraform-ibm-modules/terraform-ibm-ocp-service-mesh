@@ -1,12 +1,4 @@
 ##############################################################################
-# Locals
-##############################################################################
-
-locals {
-  # sample_app_namespace = "bookinfo"
-}
-
-##############################################################################
 # Resource Group
 ##############################################################################
 
@@ -81,7 +73,7 @@ locals {
 
 module "ocp_base" {
   source                              = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version                             = "3.64.1"
+  version                             = "3.71.4"
   resource_group_id                   = module.resource_group.resource_group_id
   region                              = var.region
   tags                                = var.resource_tags
@@ -103,17 +95,16 @@ data "ibm_container_cluster_config" "cluster_config" {
   endpoint_type     = "default"
 }
 
-module "service_mesh" {
-  source     = "../.."
-  cluster_id = module.ocp_base.cluster_id
-  # ibmcloud_api_key             = var.ibmcloud_api_key
+module "service_mesh_operator" {
+  source                       = "../.."
+  cluster_id                   = module.ocp_base.cluster_id
   deploy_operator              = var.deploy_operator
   develop_mode                 = var.develop_mode
   cluster_config_endpoint_type = var.cluster_config_endpoint_type
 }
 
 module "deploy_istio" {
-  depends_on               = [module.service_mesh]
+  depends_on               = [module.service_mesh_operator]
   source                   = "../../modules/sm-istio"
   name                     = "default"
   namespace                = "istio-system"
@@ -122,7 +113,7 @@ module "deploy_istio" {
 }
 
 module "deploy_istio_cni" {
-  depends_on       = [module.service_mesh]
+  depends_on       = [module.service_mesh_operator]
   source           = "../../modules/sm-istio-cni"
   namespace        = "istio-system-cni"
   create_namespace = true
@@ -133,29 +124,4 @@ resource "time_sleep" "wait_istio" {
 
   create_duration  = "300s"
   destroy_duration = "60s"
-}
-
-module "basic_workload_ingress" {
-  depends_on                = [time_sleep.wait_istio]
-  source                    = "../../modules/sm-istio-ingress"
-  name                      = "basic-ingress"
-  namespace                 = "basic-ingress"
-  create_namespace          = true
-  force_controlplane_update = false
-  ingress_loadbalancer_type = "alb"
-  ingress_service_type      = "LoadBalancer"
-  ingress_ip_type           = "public"
-  istio_mesh_enrollment     = "default"
-  ingress_selectors = {
-    "istio" : "ingress-gateway",
-  }
-  ingress_ports = [
-    {
-      "name" : "http2"
-      "port" : "80"
-      "targetPort" : "8000"
-      "proto" : "TCP"
-    }
-  ]
-  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
