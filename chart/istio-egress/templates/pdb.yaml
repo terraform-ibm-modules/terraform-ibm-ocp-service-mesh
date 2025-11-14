@@ -1,0 +1,20 @@
+{{- if .Values.egress.pdb }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    {{- toYaml .Values.egress.istioselectors | nindent 4 }}
+    release: istio
+  name: egress-{{ .Values.egress.name }}
+  namespace: {{ .Values.egress.namespace }}
+spec:
+  {{- if .Values.egress.pdb.minAvailable }}
+  minAvailable: {{ .Values.egress.pdb.minAvailable }}
+  {{- end }}
+  {{- if .Values.egress.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.egress.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- toYaml .Values.egress.istioselectors | nindent 6 }}
+{{- end }}

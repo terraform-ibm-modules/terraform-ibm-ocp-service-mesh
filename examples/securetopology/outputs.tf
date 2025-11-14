@@ -17,3 +17,10 @@ output "ingress_alb_subnets" {
   description = "Details of the subnets deployed in the VPC and attached to the cluster to be attached to the ALB loadbalancer"
   value       = [for subnet in module.vpc.subnets["edge"] : subnet["id"]]
 }
+
+output "ingress_nlb_subnets" {
+  description = "Details of the subnets deployed in the VPC and attached to the cluster to be attached to the NLB loadbalancer"
+  value = { for subnet in module.vpc.subnets["edge"] :
+    subnet["id"] => subnet["zone"]
+  }
+}

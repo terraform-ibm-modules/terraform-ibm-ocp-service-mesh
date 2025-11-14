@@ -1,0 +1,43 @@
+egress:
+  name: default
+  namespace: istio-system
+  istioNamespaceEnrollmentLabels: {}
+  istioselectors: {}
+  ports:
+  - port: 80
+    name: svc-http
+    proto: TCP # UDP
+    targetPort: 8080
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Local
+  autoscale:
+    enabled: false
+    # autoscaleMin: 1
+    # autoscaleMax: 3
+    # cpu:
+    #   targetavgutil: 80
+    # memory:
+    #   targetavgutil: 80
+  pdb:
+    # minAvailable: 1
+    # maxUnavailable: 2
+  replicacount: 1
+  resources:
+    # limits:
+    #   cpu: 2000m
+    #   memory: 1024Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  # nodeselector: { "ibm-cloud.kubernetes.io/worker-pool-name": "default" }
+  terminationGracePeriodSeconds: 30
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: ibm-cloud.kubernetes.io/worker-pool-name
+            operator: In
+            values:
+            - edge
+  tolerations:

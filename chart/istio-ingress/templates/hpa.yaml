@@ -1,0 +1,40 @@
+{{- if (.Values.ingress.autoscale).enabled | default false -}}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    {{- if .Values.ingress.istioselectors }}
+    {{- toYaml .Values.ingress.istioselectors | nindent 4 }}
+    {{- end }}
+    release: istio
+  name: ingress-{{ .Values.ingress.name }}
+  namespace: {{ .Values.ingress.namespace }}
+spec:
+  metrics:
+  {{- if .Values.ingress.autoscale.cpu }}
+  {{- if .Values.ingress.autoscale.cpu.targetavgutil }}
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: {{ .Values.ingress.autoscale.cpu.targetavgutil }}
+        type: Utilization
+    type: Resource
+  {{- end }}
+  {{- end }}
+  {{- if .Values.ingress.autoscale.memory }}
+  {{- if .Values.ingress.autoscale.memory.targetavgutil }}
+  - resource:
+      name: memory
+      target:
+        averageUtilization: {{ .Values.ingress.autoscale.memory.targetavgutil }}
+        type: Utilization
+    type: Resource
+  {{- end }}
+  {{- end }}
+  minReplicas: {{ .Values.ingress.autoscale.autoscaleMin }}
+  maxReplicas: {{ .Values.ingress.autoscale.autoscaleMax }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ingress-{{ .Values.ingress.name }}
+{{- end }}

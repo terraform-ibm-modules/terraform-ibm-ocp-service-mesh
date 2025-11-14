@@ -229,3 +229,214 @@ resource "time_sleep" "wait_istio" {
   create_duration  = "300s"
   destroy_duration = "60s"
 }
+
+# definition of affinity for ingress nodes
+locals {
+  affinity = {
+    nodeAffinity : {
+      requiredDuringSchedulingIgnoredDuringExecution : {
+        nodeSelectorTerms : [
+          {
+            matchExpressions : [
+              {
+                key : "ibm-cloud.kubernetes.io/worker-pool-name",
+                operator : "In",
+                values : ["edge"]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    podAntiAffinity : {
+      preferredDuringSchedulingIgnoredDuringExecution : [
+        {
+          podAffinityTerm : {
+            labelSelector : {
+              matchExpressions : [
+                {
+                  key : "istio.io/gateway",
+                  operator : "In",
+                  values : ["def-workload-ingress.default-workload"]
+                }
+              ]
+            }
+            topologyKey : "topology.kubernetes.io/zone"
+          }
+          weight : 100
+        }
+      ]
+    }
+  }
+}
+
+# deploy ingress gateway with ALB loadbalancer type
+module "default_workload_ingress_alb" {
+  depends_on                = [time_sleep.wait_istio]
+  source                    = "../../modules/sm-istio-ingress"
+  name                      = "def-workload-ingress"
+  namespace                 = "default-workload"
+  create_namespace          = true
+  force_dataplane_update    = true
+  ingress_loadbalancer_type = "alb"
+  ingress_service_type      = "LoadBalancer"
+  ingress_ip_type           = "public"
+  istio_mesh_enrollment     = "default"
+  ingress_selectors = {
+    "istio" : "default-workload-ingress",
+  }
+  ingress_alb_subnets = [for subnet in module.vpc.subnets["edge"] : subnet["id"]]
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    },
+    {
+      "name" : "istio-health"
+      "port" : "15021"
+      "targetPort" : "15021"
+      "proto" : "TCP"
+    }
+  ]
+  ingress_autoscale_configuration = {
+    "enabled" : false
+  }
+  ingress_pdb_configuration = {
+    "minAvailable" = "1"
+  }
+  ingress_replicas = 3
+  ingress_resources_configuration = {
+    "limits" : {
+      "cpu" : "200m"
+      "memory" : "1024Mi"
+    },
+    "requests" : {
+      "cpu" : "100m"
+      "memory" : "128Mi"
+    }
+  }
+  ingress_termination_grace_period = 30
+  ingress_affinity                 = local.affinity
+  ingress_tolerations = [
+    {
+      key : "dedicated"
+      value : "edge"
+      effect : "NoExecute"
+    }
+  ]
+  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  ingress_enable_proxy_protocol = false
+  # ingress_proxy_protocol_allow_without = true
+}
+
+# deploy egress gateway
+module "default_workload_egress" {
+  depends_on             = [time_sleep.wait_istio]
+  source                 = "../../modules/sm-istio-egress"
+  name                   = "def-workload-egress"
+  namespace              = "default-workload"
+  create_namespace       = false
+  force_dataplane_update = true
+  istio_mesh_enrollment  = "default"
+  egress_selectors = {
+    "istio" : "default-workload-egress",
+  }
+
+  egress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    },
+    {
+      "name" : "https"
+      "port" : "443"
+      "targetPort" : "443"
+      "proto" : "TCP"
+    },
+    {
+      "name" : "tcp"
+      "port" : "5432"
+      "targetPort" : "5432"
+      "proto" : "TCP"
+    }
+  ]
+  egress_autoscale_configuration = {
+    "enabled" : false
+  }
+  egress_pdb_configuration = null
+  egress_replicas          = 3
+  egress_resources_configuration = {
+    "limits" : {
+      "cpu" : "200m"
+      "memory" : "1024Mi"
+    },
+    "requests" : {
+      "cpu" : "100m"
+      "memory" : "128Mi"
+    }
+  }
+  egress_termination_grace_period = 30
+  egress_affinity                 = local.affinity
+  egress_tolerations = [
+    {
+      key : "dedicated"
+      value : "edge"
+      effect : "NoExecute"
+    }
+  ]
+  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+}
+
+# deploy ingress gateway with NLB loadbalancer type on the same namespace of ALB
+module "default_workload_ingress_nlb" {
+  depends_on                       = [time_sleep.wait_istio]
+  source                           = "../../modules/sm-istio-ingress"
+  name                             = "def-workload-ingress-nlb"
+  namespace                        = "default-workload"
+  create_namespace                 = false
+  force_dataplane_update           = true
+  istio_ingress_deployment_timeout = "600"
+  ingress_loadbalancer_type        = "nlb"
+  ingress_service_type             = "LoadBalancer"
+  ingress_ip_type                  = "public"
+  istio_mesh_enrollment            = "default"
+  ingress_selectors = {
+    "istio" : "default-workload-ingress-nlb",
+  }
+  ingress_nlb_zones_subnets = { for subnet in module.vpc.subnets["edge"] :
+    subnet["id"] => subnet["zone"]
+  }
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    },
+    {
+      "name" : "istio-health"
+      "port" : "15021"
+      "targetPort" : "15021"
+      "proto" : "TCP"
+    }
+  ]
+  ingress_autoscale_configuration = {
+    "enabled" : false
+  }
+
+
+  ingress_replicas = 3
+  ingress_affinity = local.affinity
+  ingress_tolerations = [
+    {
+      key : "dedicated"
+      value : "edge"
+      effect : "NoExecute"
+    }
+  ]
+  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+}

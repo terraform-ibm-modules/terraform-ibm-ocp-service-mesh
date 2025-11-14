@@ -29,6 +29,9 @@ TODO: Replace this with a description of the modules in this repo.
 * [terraform-ibm-ocp-service-mesh](#terraform-ibm-ocp-service-mesh)
 * [Submodules](./modules)
 * [Examples](./examples)
+    * [Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3](./examples/basic)
+    * [RedHat ServiceMesh v3 on existing cluster](./examples/exiting_cluster)
+    * [Secure OpenShift cluster with 3 zones and 3 subnets](./examples/securetopology)
 * [Contributing](#contributing)
 <!-- END OVERVIEW HOOK -->
 

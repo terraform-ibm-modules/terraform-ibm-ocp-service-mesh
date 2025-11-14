@@ -125,3 +125,57 @@ resource "time_sleep" "wait_istio" {
   create_duration  = "300s"
   destroy_duration = "60s"
 }
+
+
+module "basic_workload_ingress" {
+  depends_on                = [time_sleep.wait_istio]
+  source                    = "../../modules/sm-istio-ingress"
+  name                      = "basic-ingress"
+  namespace                 = "basic-ingress"
+  create_namespace          = true
+  force_dataplane_update    = false
+  ingress_loadbalancer_type = "alb"
+  ingress_service_type      = "LoadBalancer"
+  ingress_ip_type           = "public"
+  istio_mesh_enrollment     = "default"
+  ingress_selectors = {
+    "istio" : "ingress-gateway",
+  }
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    }
+  ]
+  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+}
+
+module "default_workload_egress" {
+  depends_on             = [time_sleep.wait_istio]
+  source                 = "../../modules/sm-istio-egress"
+  name                   = "basic-egress"
+  namespace              = "basic-egress"
+  create_namespace       = false
+  force_dataplane_update = true
+  istio_mesh_enrollment  = "default"
+  egress_selectors = {
+    "istio" : "egress-gateway",
+  }
+  egress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    },
+    {
+      "name" : "https"
+      "port" : "443"
+      "targetPort" : "443"
+      "proto" : "TCP"
+    }
+  ]
+  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+}

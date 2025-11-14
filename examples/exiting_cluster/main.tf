@@ -57,3 +57,80 @@ resource "time_sleep" "wait_istio" {
   create_duration  = "300s"
   destroy_duration = "60s"
 }
+
+module "default_workload_ingress" {
+  depends_on                = [time_sleep.wait_istio]
+  source                    = "../../modules/sm-istio-ingress"
+  name                      = "workload-ingress"
+  namespace                 = "default-workload"
+  create_namespace          = true
+  force_dataplane_update    = false
+  ingress_loadbalancer_type = "alb"
+  ingress_service_type      = "LoadBalancer"
+  ingress_ip_type           = "public"
+  istio_mesh_enrollment     = "default"
+  ingress_selectors = {
+    "istio" : "default-workload-ingress",
+  }
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    },
+    {
+      "name" : "istio-health"
+      "port" : "15021"
+      "targetPort" : "15021"
+      "proto" : "TCP"
+    }
+  ]
+  ingress_autoscale_configuration = {
+    "enabled" : false
+  }
+  ingress_pdb_configuration = {
+    "minAvailable" = "1"
+  }
+  ingress_replicas = 3
+  ingress_resources_configuration = {
+    "limits" : {
+      "cpu" : "200m"
+      "memory" : "1024Mi"
+    },
+    "requests" : {
+      "cpu" : "100m"
+      "memory" : "128Mi"
+    }
+  }
+  ingress_termination_grace_period = 30
+  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+}
+
+
+module "default_workload_egress" {
+  depends_on             = [time_sleep.wait_istio]
+  source                 = "../../modules/sm-istio-egress"
+  name                   = "workload-eress"
+  namespace              = "workload-default"
+  create_namespace       = false
+  force_dataplane_update = true
+  istio_mesh_enrollment  = "default"
+  egress_selectors = {
+    "istio" : "egress-gateway",
+  }
+  egress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    },
+    {
+      "name" : "https"
+      "port" : "443"
+      "targetPort" : "443"
+      "proto" : "TCP"
+    }
+  ]
+}

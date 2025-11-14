@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: egress-{{ .Values.egress.name }}
+  namespace: {{ .Values.egress.namespace }}
+  annotations:
+spec:
+  type: {{ .Values.egress.svctype }}
+  # externalTrafficPolicy: {{ .Values.egress.externalTrafficPolicy }}
+  # internalTrafficPolicy: {{ .Values.egress.internalTrafficPolicy }}
+  selector:
+  {{- if .Values.egress.istioselectors }}
+  {{- toYaml .Values.egress.istioselectors | nindent 4 }}
+  {{- end }}
+  ports:
+  {{- if .Values.egress.ports }}
+  {{- range .Values.egress.ports }}
+  - port: {{ .port }}
+    protocol: {{ .proto | toString }}
+    name: {{ .name | toString }}
+    targetPort: {{ .targetPort }}
+  {{- end }}
+  {{- end }}

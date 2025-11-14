@@ -1,0 +1,40 @@
+{{- if or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "sdnlb") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-{{ .Values.ingress.name }}
+  namespace: {{ .Values.ingress.namespace }}
+  annotations:
+    {{- if (eq .Values.ingress.lbtype "alb") }}
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features: "alb"
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-vpc-subnets: {{ join "," .Values.ingress.albsubnets | quote }}
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-ip-type: {{ .Values.ingress.lbiptype }}
+    {{- if .Values.ingress.proxyProtocol }}
+    {{- if eq (default .Values.ingress.proxyProtocol.enabled false) true }}
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features: "proxy-protocol"
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- if (eq .Values.ingress.lbtype "sdnlb") }}
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features: service-dnlb
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-ip-type: private
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-vpc-node-selector: {{ .Values.ingress.sdnlbWorkerPoolSelector.name | quote }}={{ .Values.ingress.sdnlbWorkerPoolSelector.value | quote }}
+    {{- end }}
+spec:
+  type: {{ .Values.ingress.svctype }}
+  externalTrafficPolicy: {{ .Values.ingress.externalTrafficPolicy }}
+  internalTrafficPolicy: {{ .Values.ingress.internalTrafficPolicy }}
+  selector:
+  {{- if .Values.ingress.istioselectors }}
+  {{- toYaml .Values.ingress.istioselectors | nindent 4 }}
+  {{- end }}
+  ports:
+  {{- if .Values.ingress.ports }}
+  {{- range .Values.ingress.ports }}
+  - port: {{ .port }}
+    protocol: {{ .proto | toString }}
+    name: {{ .name | toString }}
+    targetPort: {{ .targetPort }}
+  {{- end }}
+  {{- end }}
+{{- end }}
