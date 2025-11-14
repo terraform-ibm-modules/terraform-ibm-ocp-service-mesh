@@ -1,3 +1,0 @@
-istiocniconfiguration:
-  namespace: istio-cni
-  name: default

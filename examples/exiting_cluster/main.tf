@@ -34,26 +34,3 @@ module "service_mesh_operator" {
   develop_mode                 = var.develop_mode
   cluster_config_endpoint_type = var.cluster_config_endpoint_type
 }
-
-module "deploy_istio_cni" {
-  depends_on       = [module.service_mesh_operator]
-  source           = "../../modules/sm-istio-cni"
-  namespace        = "istio-system-cni"
-  create_namespace = true
-}
-
-module "deploy_istio" {
-  depends_on               = [module.service_mesh_operator]
-  source                   = "../../modules/sm-istio"
-  name                     = "default"
-  namespace                = "istio-system"
-  create_namespace         = true
-  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
-}
-
-resource "time_sleep" "wait_istio" {
-  depends_on = [module.deploy_istio, module.deploy_istio_cni]
-
-  create_duration  = "300s"
-  destroy_duration = "60s"
-}
