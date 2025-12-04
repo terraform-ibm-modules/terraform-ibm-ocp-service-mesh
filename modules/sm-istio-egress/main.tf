@@ -126,14 +126,14 @@ resource "helm_release" "istio_egress" {
 
 }
 
-
-# resource "null_resource" "confirm_istio_operational" {
-#   depends_on = [helm_release.istio_egress]
-#   provisioner "local-exec" {
-#     command     = "${path.module}/scripts/confirm-istio-operational.sh \"${var.namespace}\" \"${var.name}\""
-#     interpreter = ["/bin/bash", "-c"]
-#     environment = {
-#       KUBECONFIG = var.cluster_config_file_path
-#     }
-#   }
-# }
+resource "null_resource" "confirm_ingress_operational" {
+  depends_on = [helm_release.istio_egress]
+  count      = var.cluster_config_file_path != null ? 1 : 0
+  provisioner "local-exec" {
+    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"egress-${var.name}\""
+    interpreter = ["/bin/bash", "-c"]
+    environment = {
+      KUBECONFIG = var.cluster_config_file_path
+    }
+  }
+}

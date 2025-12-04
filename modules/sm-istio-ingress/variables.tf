@@ -263,12 +263,11 @@ variable "ingress_tolerations" {
   description = "Istio ingress tolerations configuration. Default to tolerate 'dedicated: edge' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
 }
 
-# commented while waiting to add check of ingress ready
-# variable "cluster_config_file_path" {
-#   type        = string
-#   nullable    = false
-#   description = "Cluster config file path to use with kubernetes provider to run checks on the resources deployment."
-# }
+variable "cluster_config_file_path" {
+  type        = string
+  nullable    = false
+  description = "Cluster config file path to use with kubernetes provider to run checks on the resources deployment"
+}
 
 variable "ingress_enable_proxy_protocol" {
   description = "Flag to enable Proxy Protocol on ingress LoadBalancer (only ALB type) and to enable the EnvoyFilter to implement Proxy Protocol on ingress gateway"

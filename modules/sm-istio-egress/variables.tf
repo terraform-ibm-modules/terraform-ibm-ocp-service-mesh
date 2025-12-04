@@ -209,9 +209,8 @@ variable "egress_tolerations" {
   description = "Istio egress tolerations configuration. Default to tolerate 'dedicated: edge' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
 }
 
-# commented while waiting to add check of ingress ready
-# variable "cluster_config_file_path" {
-#   type        = string
-#   nullable    = false
-#   description = "Cluster config file path to use with kubernetes provider to run checks on the resources deployment."
-# }
+variable "cluster_config_file_path" {
+  type        = string
+  nullable    = false
+  description = "Cluster config file path to use with kubernetes provider to run checks on the resources deployment."
+}

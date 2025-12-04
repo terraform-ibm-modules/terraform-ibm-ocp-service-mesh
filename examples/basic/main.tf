@@ -149,7 +149,7 @@ module "basic_workload_ingress" {
       "proto" : "TCP"
     }
   ]
-  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
 
 module "default_workload_egress" {
@@ -177,5 +177,5 @@ module "default_workload_egress" {
       "proto" : "TCP"
     }
   ]
-  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }

@@ -326,9 +326,9 @@ module "default_workload_ingress_alb" {
       effect : "NoExecute"
     }
   ]
-  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
   ingress_enable_proxy_protocol = false
   # ingress_proxy_protocol_allow_without = true
+  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
 
 # deploy egress gateway
@@ -388,7 +388,7 @@ module "default_workload_egress" {
       effect : "NoExecute"
     }
   ]
-  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
 
 # deploy ingress gateway with NLB loadbalancer type on the same namespace of ALB
@@ -399,7 +399,7 @@ module "default_workload_ingress_nlb" {
   namespace                        = "default-workload"
   create_namespace                 = false
   force_dataplane_update           = true
-  istio_ingress_deployment_timeout = "600"
+  istio_ingress_deployment_timeout = "900"
   ingress_loadbalancer_type        = "nlb"
   ingress_service_type             = "LoadBalancer"
   ingress_ip_type                  = "public"
@@ -439,4 +439,5 @@ module "default_workload_ingress_nlb" {
     }
   ]
   # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
