@@ -30,7 +30,6 @@ data "ibm_container_cluster_config" "cluster_config" {
 module "service_mesh_operator" {
   source                       = "../.."
   cluster_id                   = var.existing_cluster_id
-  deploy_operator              = var.deploy_operator
   develop_mode                 = var.develop_mode
   cluster_config_endpoint_type = var.cluster_config_endpoint_type
 }
@@ -104,7 +103,7 @@ module "default_workload_ingress" {
     }
   }
   ingress_termination_grace_period = 30
-  # cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  cluster_config_file_path         = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
 
 
@@ -133,4 +132,5 @@ module "default_workload_egress" {
       "proto" : "TCP"
     }
   ]
+  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }

@@ -186,7 +186,7 @@ resource "null_resource" "confirm_ingress_operational_alb" {
 # for nlb the ingress svc are created for each zone so there are a set of svc to check named "ingress-[svc name]-[zone]"
 resource "null_resource" "confirm_ingress_operational_nlb" {
   depends_on = [helm_release.istio_ingress]
-  for_each   = var.ingress_loadbalancer_type == "nlb" ? var.ingress_nlb_zones_subnets : {}
+  for_each   = var.ingress_loadbalancer_type == "nlb" && var.cluster_config_file_path != null ? var.ingress_nlb_zones_subnets : {}
   provisioner "local-exec" {
     command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"ingress-${var.name}-${each.value}\""
     interpreter = ["/bin/bash", "-c"]

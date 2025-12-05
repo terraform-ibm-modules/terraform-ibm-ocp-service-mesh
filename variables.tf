@@ -7,15 +7,9 @@ variable "cluster_id" {
   description = "Id of the target IBM Cloud OpenShift Cluster"
 }
 
-variable "deploy_operator" {
-  type        = bool
-  description = "Enable installing RedHat Service Mesh Operator"
-  default     = true
-}
-
 variable "develop_mode" {
   type        = bool
-  description = "If true, output more logs, and reduce some wait periods"
+  description = "If true raise time waited for operator deployment and undeployment to allow to debug the cluster"
   default     = false
 }
 

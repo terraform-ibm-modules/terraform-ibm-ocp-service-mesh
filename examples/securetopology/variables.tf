@@ -27,12 +27,6 @@ variable "resource_tags" {
   default     = []
 }
 
-variable "deploy_operator" {
-  type        = bool
-  description = "Enable installing RedHat Service Mesh Operator"
-  default     = true
-}
-
 variable "develop_mode" {
   type        = bool
   description = "If true, output more logs, and reduce some wait periods"

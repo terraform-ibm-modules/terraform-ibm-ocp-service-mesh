@@ -202,7 +202,7 @@ variable "mesh_config_ingress_selector" {
 }
 
 variable "force_controlplane_update" {
-  description = "Force controlplane to be updated"
+  description = "Force controlplane to be recreated when updated. Default to false (may require to taint the resource to apply changes)"
   default     = false
   type        = bool
   nullable    = false

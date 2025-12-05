@@ -211,6 +211,5 @@ variable "egress_tolerations" {
 
 variable "cluster_config_file_path" {
   type        = string
-  nullable    = false
-  description = "Cluster config file path to use with kubernetes provider to run checks on the resources deployment."
+  description = "Cluster config file path to use with kubernetes provider to run checks on the resources deployment. Set to null to skip this check."
 }

@@ -183,7 +183,6 @@ data "ibm_container_cluster_config" "cluster_config" {
 module "service_mesh_operator" {
   source                       = "../.."
   cluster_id                   = module.ocp_base.cluster_id
-  deploy_operator              = var.deploy_operator
   develop_mode                 = var.develop_mode
   cluster_config_endpoint_type = var.cluster_config_endpoint_type
 }

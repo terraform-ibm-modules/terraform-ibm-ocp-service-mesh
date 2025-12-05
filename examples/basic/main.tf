@@ -98,7 +98,6 @@ data "ibm_container_cluster_config" "cluster_config" {
 module "service_mesh_operator" {
   source                       = "../.."
   cluster_id                   = module.ocp_base.cluster_id
-  deploy_operator              = var.deploy_operator
   develop_mode                 = var.develop_mode
   cluster_config_endpoint_type = var.cluster_config_endpoint_type
 }
@@ -157,7 +156,7 @@ module "default_workload_egress" {
   source                 = "../../modules/sm-istio-egress"
   name                   = "basic-egress"
   namespace              = "basic-egress"
-  create_namespace       = false
+  create_namespace       = true
   force_dataplane_update = true
   istio_mesh_enrollment  = "default"
   egress_selectors = {
