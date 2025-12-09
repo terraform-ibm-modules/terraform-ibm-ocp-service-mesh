@@ -72,3 +72,8 @@ terraform.rc
 
 # Go workspace file
 go.work
+
+examples/securetopology
+examples/ge_topology
+
+kubeconfig/*
