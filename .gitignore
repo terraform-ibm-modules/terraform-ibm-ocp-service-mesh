@@ -73,7 +73,6 @@ terraform.rc
 # Go workspace file
 go.work
 
-**/ge_topology
-
-# to remove
-modules/sm-istio-ingress-sdnlb
+# ge examples
+examples/ge_topology
+examples/securetopology
