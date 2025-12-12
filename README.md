@@ -30,6 +30,7 @@ The submodule [modules/sm-istio](./modules/sm-istio) supports configuring Servic
 This module supports sidecar inject at namespace level in this moment, following the rules below:
 
 | IstioRevision name | Enabled label & value	| Disabled value |
+| --- | --- | --- |
 | default | istio-injection=enabled | istio-injection=disabled |
 | not default - i.e. `my-mesh-1` | istio.io/rev=my-mesh-1 | istio-injection=disabled |
 
