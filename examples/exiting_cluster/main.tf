@@ -110,7 +110,7 @@ module "default_workload_ingress" {
 module "default_workload_egress" {
   depends_on             = [time_sleep.wait_istio]
   source                 = "../../modules/sm-istio-egress"
-  name                   = "workload-eress"
+  name                   = "workload-egress"
   namespace              = "workload-default"
   create_namespace       = false
   force_dataplane_update = true

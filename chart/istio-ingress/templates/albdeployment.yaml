@@ -48,7 +48,6 @@ spec:
         {{- end }}
       {{- end }}
       serviceAccountName: ingress-{{ .Values.ingress.name }}
-      serviceAccount: ingress-{{ .Values.ingress.name }}
       {{- if .Values.ingress.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.ingress.terminationGracePeriodSeconds }}
       {{- end }}

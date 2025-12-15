@@ -39,7 +39,6 @@ spec:
         {{- end }}
       {{- end }}
       serviceAccountName: egress-{{ .Values.egress.name }}
-      serviceAccount: egress-{{ .Values.egress.name }}
       {{- if .Values.egress.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.egress.terminationGracePeriodSeconds }}
       {{- end }}
