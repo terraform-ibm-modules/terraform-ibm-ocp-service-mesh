@@ -9,15 +9,6 @@ module "resource_group" {
   existing_resource_group_name = var.resource_group
 }
 
-############################################################################
-# CLUSTER PROXY
-############################################################################
-
-module "cluster_proxy" {
-  source     = "git::https://github.ibm.com/GoldenEye/cluster-proxy-module.git?ref=4.2.4"
-  cluster_id = var.existing_cluster_id
-}
-
 ##############################################################################
 # Init cluster config for helm and kubernetes providers for existing cluster
 ##############################################################################
@@ -32,6 +23,7 @@ module "service_mesh_operator" {
   cluster_id                   = var.existing_cluster_id
   develop_mode                 = var.develop_mode
   cluster_config_endpoint_type = var.cluster_config_endpoint_type
+  resource_group_id            = module.resource_group.resource_group_id
 }
 
 module "deploy_istio_cni" {
@@ -42,12 +34,13 @@ module "deploy_istio_cni" {
 }
 
 module "deploy_istio" {
-  depends_on               = [module.service_mesh_operator]
-  source                   = "../../modules/sm-istio"
-  name                     = "default"
-  namespace                = "istio-system"
-  create_namespace         = true
-  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  depends_on        = [module.service_mesh_operator]
+  source            = "../../modules/sm-istio"
+  name              = "default"
+  namespace         = "istio-system"
+  create_namespace  = true
+  cluster_id        = var.existing_cluster_id
+  resource_group_id = module.resource_group.resource_group_id
 }
 
 resource "time_sleep" "wait_istio" {
@@ -103,7 +96,8 @@ module "default_workload_ingress" {
     }
   }
   ingress_termination_grace_period = 30
-  cluster_config_file_path         = data.ibm_container_cluster_config.cluster_config.config_file_path
+  cluster_id                       = var.existing_cluster_id
+  resource_group_id                = module.resource_group.resource_group_id
 }
 
 
@@ -132,5 +126,6 @@ module "default_workload_egress" {
       "proto" : "TCP"
     }
   ]
-  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  cluster_id        = var.existing_cluster_id
+  resource_group_id = module.resource_group.resource_group_id
 }

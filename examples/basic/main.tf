@@ -138,6 +138,7 @@ module "basic_workload_ingress" {
   ingress_service_type      = "LoadBalancer"
   ingress_ip_type           = "public"
   istio_mesh_enrollment     = "default"
+  ingress_affinity          = {}
   ingress_selectors = {
     "istio" : "ingress-gateway",
   }
@@ -161,6 +162,7 @@ module "default_workload_egress" {
   create_namespace       = true
   force_dataplane_update = true
   istio_mesh_enrollment  = "default"
+  egress_affinity        = {}
   egress_selectors = {
     "istio" : "egress-gateway",
   }
