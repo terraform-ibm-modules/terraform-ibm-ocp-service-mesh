@@ -126,7 +126,7 @@ resource "helm_release" "istio_egress" {
 
 }
 
-resource "null_resource" "confirm_ingress_operational" {
+resource "null_resource" "confirm_egress_operational" {
   depends_on = [helm_release.istio_egress]
   count      = var.cluster_config_file_path != null ? 1 : 0
   provisioner "local-exec" {

@@ -217,13 +217,10 @@ resource "helm_release" "istio_controlplane" {
     yamlencode(local.istio_mesh_config_mesh_mtls),
     yamlencode(local.istio_mesh_config_mesh_tls_defaults),
   ]
-
 }
-
 
 resource "null_resource" "confirm_istio_operational" {
   depends_on = [helm_release.istio_controlplane]
-  count      = var.cluster_config_file_path != null ? 1 : 0
   provisioner "local-exec" {
     command     = "${path.module}/scripts/confirm-istio-operational.sh \"${var.namespace}\" \"${var.name}\""
     interpreter = ["/bin/bash", "-c"]

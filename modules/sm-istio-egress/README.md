@@ -200,7 +200,7 @@ For all the configuration parameters details refer to the section below
 | Name | Type |
 |------|------|
 | [helm_release.istio_egress](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [null_resource.confirm_ingress_operational](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [null_resource.confirm_egress_operational](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 
 ### Inputs
 
