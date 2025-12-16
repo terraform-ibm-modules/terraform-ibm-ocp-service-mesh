@@ -186,6 +186,7 @@ For all the configuration parameters details refer to the section below
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0 |
+| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >= 1.59.0, < 2.0.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2.1, < 4.0.0 |
 
 ### Modules
@@ -201,12 +202,14 @@ For all the configuration parameters details refer to the section below
 | [helm_release.istio_ingress](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [null_resource.confirm_ingress_operational_alb](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.confirm_ingress_operational_nlb](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [ibm_container_cluster_config.cluster_config](https://registry.terraform.io/providers/ibm-cloud/ibm/latest/docs/data-sources/container_cluster_config) | data source |
 
 ### Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cluster_config_file_path"></a> [cluster\_config\_file\_path](#input\_cluster\_config\_file\_path) | Cluster config file path to use with kubernetes provider to run checks on the resources deployment. Set to null to skip this check. | `string` | n/a | yes |
+| <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
+| <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
 | <a name="input_create_namespace"></a> [create\_namespace](#input\_create\_namespace) | Flag to create the namespace where to install istio ingress dataplane. Default to true | `bool` | `true` | no |
 | <a name="input_force_dataplane_update"></a> [force\_dataplane\_update](#input\_force\_dataplane\_update) | Force dataplane to be updated | `bool` | `false` | no |
 | <a name="input_ingress_affinity"></a> [ingress\_affinity](#input\_ingress\_affinity) | Istio ingress affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Ingress pods are provided of a label with key "istio.io/gateway" and value "[DEPLOYMENT NAME].[DEPLOYMENT NAMESPACE]" in order to allow to set them as antiAffinity labels. | <pre>object({<br/>    podAntiAffinity : optional(any, null),<br/>    podAffinity : optional(any, null),<br/>    nodeAffinity : optional(any, null)<br/>  })</pre> | <pre>{<br/>  "nodeAffinity": {<br/>    "requiredDuringSchedulingIgnoredDuringExecution": {<br/>      "nodeSelectorTerms": [<br/>        {<br/>          "matchExpressions": [<br/>            {<br/>              "key": "ibm-cloud.kubernetes.io/worker-pool-name",<br/>              "operator": "In",<br/>              "values": [<br/>                "edge"<br/>              ]<br/>            }<br/>          ]<br/>        }<br/>      ]<br/>    }<br/>  }<br/>}</pre> | no |
@@ -232,6 +235,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_istio_mesh_enrollment"></a> [istio\_mesh\_enrollment](#input\_istio\_mesh\_enrollment) | Name of the Istio mesh controlplane to enroll this dataplane with. Default value to default. This value is used to generate discovery selectors, to override the computed values customise var.ingress\_discovery\_custom\_configuration. | `string` | `"default"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the Istio ingress deployment | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where to install istio ingress dataplane. | `string` | n/a | yes |
+| <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The ID of the resource group for the OpenShift Cluster. | `string` | n/a | yes |
 
 ### Outputs
 

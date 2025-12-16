@@ -1,3 +1,28 @@
+# cluster references
+
+variable "cluster_id" {
+  type        = string
+  description = "Id of the target IBM Cloud OpenShift Cluster"
+}
+
+variable "resource_group_id" {
+  type        = string
+  description = "The ID of the resource group for the OpenShift Cluster."
+}
+
+variable "cluster_config_endpoint_type" {
+  description = "Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster."
+  type        = string
+  default     = "default"
+  nullable    = false
+  validation {
+    error_message = "Invalid Endpoint Type. Valid values are 'default', 'private', 'vpe', or 'link'"
+    condition     = contains(["default", "private", "vpe", "link"], var.cluster_config_endpoint_type)
+  }
+}
+
+# egress configuration
+
 variable "name" {
   type        = string
   description = "Name of the Istio egress deployment"
@@ -207,9 +232,4 @@ variable "egress_tolerations" {
   type        = list(any)
   default     = []
   description = "Istio egress tolerations configuration. Default to tolerate 'dedicated: edge' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
-}
-
-variable "cluster_config_file_path" {
-  type        = string
-  description = "Cluster config file path to use with kubernetes provider to run checks on the resources deployment. Set to null to skip this check."
 }

@@ -1,3 +1,28 @@
+# cluster references
+
+variable "cluster_id" {
+  type        = string
+  description = "Id of the target IBM Cloud OpenShift Cluster"
+}
+
+variable "resource_group_id" {
+  type        = string
+  description = "The ID of the resource group for the OpenShift Cluster."
+}
+
+variable "cluster_config_endpoint_type" {
+  description = "Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster."
+  type        = string
+  default     = "default"
+  nullable    = false
+  validation {
+    error_message = "Invalid Endpoint Type. Valid values are 'default', 'private', 'vpe', or 'link'"
+    condition     = contains(["default", "private", "vpe", "link"], var.cluster_config_endpoint_type)
+  }
+}
+
+# istio controlplane configuration
+
 variable "name" {
   type        = string
   description = "Name of the Istio controlplane revision"
@@ -256,10 +281,4 @@ variable "mesh_config_access_log_format" {
   description = "Format for the Istio proxy access log. Set to empty or null to use proxy's default access log format."
   default     = "[%START_TIME%] [%REQ(:AUTHORITY)%] [%BYTES_RECEIVED%] [%BYTES_SENT%] [%DOWNSTREAM_LOCAL_ADDRESS%] [%DOWNSTREAM_LOCAL_ADDRESS%] [%DOWNSTREAM_REMOTE_ADDRESS%] [%DOWNSTREAM_TLS_VERSION%] [%DURATION%] [%REQUEST_DURATION%] [%RESPONSE_DURATION%] [%RESPONSE_TX_DURATION%] [%DYNAMIC_METADATA(istio.mixer:status)%] [%REQ(:METHOD)%] [%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%] [%PROTOCOL%] [%REQ(X-REQUEST-ID)%] [%REQUESTED_SERVER_NAME%] [%RESPONSE_CODE%] [%RESPONSE_CODE_DETAILS%] [%RESPONSE_FLAGS%] [%ROUTE_NAME%] [%START_TIME%] [%UPSTREAM_CLUSTER%] [%UPSTREAM_HOST%] [%UPSTREAM_LOCAL_ADDRESS%] [%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%] [%UPSTREAM_TRANSPORT_FAILURE_REASON%] [%REQ(USER-AGENT)%] [%REQ(X-FORWARDED-FOR)%] [%REQ(X-ENVOY-ATTEMPT-COUNT)%]"
   type        = string
-}
-
-variable "cluster_config_file_path" {
-  type        = string
-  nullable    = false
-  description = "Cluster config file path to use with kubernetes provider to run checks on the resources deployment"
 }

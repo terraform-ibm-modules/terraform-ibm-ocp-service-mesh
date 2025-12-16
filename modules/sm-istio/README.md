@@ -98,6 +98,7 @@ For all the configuration parameters details refer to the section below
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0 |
+| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >= 1.59.0, < 2.0.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2.1, < 4.0.0 |
 
 ### Modules
@@ -112,12 +113,14 @@ For all the configuration parameters details refer to the section below
 |------|------|
 | [helm_release.istio_controlplane](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [null_resource.confirm_istio_operational](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [ibm_container_cluster_config.cluster_config](https://registry.terraform.io/providers/ibm-cloud/ibm/latest/docs/data-sources/container_cluster_config) | data source |
 
 ### Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cluster_config_file_path"></a> [cluster\_config\_file\_path](#input\_cluster\_config\_file\_path) | Cluster config file path to use with kubernetes provider to run checks on the resources deployment | `string` | n/a | yes |
+| <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
+| <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
 | <a name="input_create_namespace"></a> [create\_namespace](#input\_create\_namespace) | Flag to create the namespace where to install istio controlplane. Default to true | `bool` | `true` | no |
 | <a name="input_force_controlplane_update"></a> [force\_controlplane\_update](#input\_force\_controlplane\_update) | Force controlplane to be recreated when updated. Default to false (may require to taint the resource to apply changes) | `bool` | `false` | no |
 | <a name="input_istio_discovery_custom_configuration"></a> [istio\_discovery\_custom\_configuration](#input\_istio\_discovery\_custom\_configuration) | Istio controlplane discovery label. Default to null to autogenerate the labels according to var.name value to matchLabels: {"istio-discovery" : "enabled"}. For more details https://istio.io/latest/blog/2021/discovery-selectors/ https://github.com/istio/api/blob/master/mesh/v1alpha1/config.proto#L1411 https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh#ossm-discoveryselectors-scope-service-mesh_ossm-installing-openshift-service-mesh | <pre>object({<br/>    matchLabels : optional(map(string), null),<br/>    matchExpressions : optional(list(object({<br/>      key : string<br/>      operator : string<br/>      values : list(string)<br/>    })), [])<br/>  })</pre> | `null` | no |
@@ -148,6 +151,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_pilot_replicas"></a> [pilot\_replicas](#input\_pilot\_replicas) | Sets the number of replicas to deploy the Istio Pilot. Valid only if var.pilot\_autoscaling\_enabled is false. Default to 1 | `number` | `1` | no |
 | <a name="input_pilot_resources"></a> [pilot\_resources](#input\_pilot\_resources) | Istio pilot pods resources requests and limits for memory and CPU. Default to requests CPU 10m memory 128M limits CPU 100m memory 256M, using the default Istio values. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcerequirements-v1-core | <pre>object({<br/>    limits : optional(map(string), null),<br/>    requests : optional(map(string), null)<br/>  })</pre> | <pre>{<br/>  "limits": {<br/>    "cpu": "100m",<br/>    "memory": "256M"<br/>  },<br/>  "requests": {<br/>    "cpu": "10m",<br/>    "memory": "128M"<br/>  }<br/>}</pre> | no |
 | <a name="input_pilot_tolerations"></a> [pilot\_tolerations](#input\_pilot\_tolerations) | Istio pilot pods tolerations configuration. Default to empty list. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core | `list(any)` | `[]` | no |
+| <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The ID of the resource group for the OpenShift Cluster. | `string` | n/a | yes |
 
 ### Outputs
 
