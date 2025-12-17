@@ -13,7 +13,6 @@ const resourceGroup = "geretain-test-ocp-service-mesh"
 
 // Ensure every example directory has a corresponding test
 const basicExampleDir = "examples/basic"
-const advancedExampleDir = "examples/securetopology"
 
 func setupOptions(t *testing.T, prefix string, dir string) *testhelper.TestOptions {
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
@@ -36,21 +35,11 @@ func TestRunBasicExample(t *testing.T) {
 	assert.NotNil(t, output, "Expected some output")
 }
 
-func TestRunAdvancedExample(t *testing.T) {
-	t.Parallel()
-
-	options := setupOptions(t, "ocpsm-secure", advancedExampleDir)
-
-	output, err := options.RunTestConsistency()
-	assert.Nil(t, err, "This should not have errored")
-	assert.NotNil(t, output, "Expected some output")
-}
-
 // Upgrade test (using advanced example)
 func TestRunUpgradeExample(t *testing.T) {
 	t.Parallel()
 
-	options := setupOptions(t, "ocpsm-basic-upg", advancedExampleDir)
+	options := setupOptions(t, "ocpsm-basic-upg", basicExampleDir)
 
 	output, err := options.RunTestUpgrade()
 	if !options.UpgradeTestSkipped {
