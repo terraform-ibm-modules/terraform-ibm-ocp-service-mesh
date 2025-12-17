@@ -48,11 +48,6 @@ variable "istio_discovery_custom_configuration" {
       values : list(string)
     })), [])
   })
-  # default = {
-  #   matchLabels : {
-  #     "istio-discovery" : "enabled"
-  #   }
-  # }
   default     = null
   description = "Istio controlplane discovery label. Default to null to autogenerate the labels according to var.name value to matchLabels: {\"istio-discovery\" : \"enabled\"}. For more details https://istio.io/latest/blog/2021/discovery-selectors/ https://github.com/istio/api/blob/master/mesh/v1alpha1/config.proto#L1411 https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh#ossm-discoveryselectors-scope-service-mesh_ossm-installing-openshift-service-mesh"
 }
@@ -142,28 +137,8 @@ variable "pilot_affinity" {
     podAffinity : optional(any, null),
     nodeAffinity : optional(any, null)
   })
-  default = {
-    podAntiAffinity : {
-      preferredDuringSchedulingIgnoredDuringExecution : [
-        {
-          weight : 100,
-          podAffinityTerm : {
-            labelSelector : {
-              matchExpressions : [
-                {
-                  key : "istio",
-                  operator : "In",
-                  values : ["istiod"]
-                }
-              ]
-            }
-            topologyKey : "topology.kubernetes.io/zone"
-          }
-        }
-      ]
-    }
-  }
-  description = "Istio pilot pods affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core."
+  default     = {}
+  description = "Istio pilot pods affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Default to empty configuration"
 }
 
 variable "pilot_tolerations" {

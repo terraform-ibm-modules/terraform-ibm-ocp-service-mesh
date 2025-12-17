@@ -32,6 +32,70 @@ module "deploy_istio" {
 }
 ```
 
+### Affinity and Antiaffinity configuration
+
+Through the input variable `pilot_affinity` it is possible to configure the following affinity attributes:
+
+- podAntiAffinity
+- podAffinity
+- nodeAffinity
+
+The content of each of these map keys is then converted to the yaml configuration. For example to make the pilot pods to avoid to run on the same worker you can use the following antiAffinity configuration:
+
+```
+podAntiAffinity : {
+  preferredDuringSchedulingIgnoredDuringExecution : [
+    {
+      weight : 100,
+      podAffinityTerm : {
+        labelSelector : {
+          matchExpressions : [
+            {
+              key : "istio",
+              operator : "In",
+              values : ["istiod"]
+            }
+          ]
+        }
+        topologyKey : "topology.kubernetes.io/zone"
+      }
+    }
+  ]
+}
+```
+
+### Pilot pods node selectors
+
+Through the input variable `pilot_node_selector` it is possible to configure the node selectors key and values that are used to configure the pods node selectors.
+For example to configure the pilot pods to run on the worker nodes labeled with label key `ibm-cloud.kubernetes.io/worker-pool-name` and with value `default` set the following content
+
+```
+{ "ibm-cloud.kubernetes.io/worker-pool-name" : "default" }
+```
+
+### Pilot pods resources requests and limits
+
+Through the input variable `pilot_resources` you can set the following pilot pods resources configuration:
+- cpu limits
+- memory limits
+- cpu initial request
+- memory initial request
+
+
+The default values are the below ones:
+```
+{
+  limits : {
+    cpu : "100m"
+    memory : "256M"
+  },
+  requests : {
+    cpu : "10m"
+    memory : "128M"
+  }
+}
+```
+
 ### Example: Advanced configuration
 
 The following controlplane is configured with the following attributes:
@@ -140,7 +204,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_name"></a> [name](#input\_name) | Name of the Istio controlplane revision | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where to install istio controlplane. | `string` | n/a | yes |
 | <a name="input_outboundtrafficpolicy"></a> [outboundtrafficpolicy](#input\_outboundtrafficpolicy) | Istio controlplane output traffic policy configuration. Default to ALLOW\_ANY. Values allowed ALLOW\_ANY or REGISTRY\_ONLY | `string` | `"ALLOW_ANY"` | no |
-| <a name="input_pilot_affinity"></a> [pilot\_affinity](#input\_pilot\_affinity) | Istio pilot pods affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. | <pre>object({<br/>    podAntiAffinity : optional(any, null),<br/>    podAffinity : optional(any, null),<br/>    nodeAffinity : optional(any, null)<br/>  })</pre> | <pre>{<br/>  "podAntiAffinity": {<br/>    "preferredDuringSchedulingIgnoredDuringExecution": [<br/>      {<br/>        "podAffinityTerm": {<br/>          "labelSelector": {<br/>            "matchExpressions": [<br/>              {<br/>                "key": "istio",<br/>                "operator": "In",<br/>                "values": [<br/>                  "istiod"<br/>                ]<br/>              }<br/>            ]<br/>          },<br/>          "topologyKey": "topology.kubernetes.io/zone"<br/>        },<br/>        "weight": 100<br/>      }<br/>    ]<br/>  }<br/>}</pre> | no |
+| <a name="input_pilot_affinity"></a> [pilot\_affinity](#input\_pilot\_affinity) | Istio pilot pods affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Default to empty configuration | <pre>object({<br/>    podAntiAffinity : optional(any, null),<br/>    podAffinity : optional(any, null),<br/>    nodeAffinity : optional(any, null)<br/>  })</pre> | `{}` | no |
 | <a name="input_pilot_autoscaling_enabled"></a> [pilot\_autoscaling\_enabled](#input\_pilot\_autoscaling\_enabled) | Enable Istio pilot autoscaling through HorizontalPodAutoscaler. Default to false | `bool` | `false` | no |
 | <a name="input_pilot_autoscaling_max_pods"></a> [pilot\_autoscaling\_max\_pods](#input\_pilot\_autoscaling\_max\_pods) | If var.pilot\_autoscaling\_enabled is enabled this sets the maximum amount of pods for Istio pilot HorizontalPodAutoscaler. Default to 5 | `number` | `5` | no |
 | <a name="input_pilot_autoscaling_min_pods"></a> [pilot\_autoscaling\_min\_pods](#input\_pilot\_autoscaling\_min\_pods) | If var.pilot\_autoscaling\_enabled is enabled this sets the minimum amount of pods for Istio pilot HorizontalPodAutoscaler. Default to 1 | `number` | `1` | no |

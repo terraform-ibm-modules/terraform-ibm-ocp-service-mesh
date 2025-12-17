@@ -188,44 +188,8 @@ variable "egress_affinity" {
     podAffinity : optional(any, null),
     nodeAffinity : optional(any, null)
   })
-  default = {
-    nodeAffinity : {
-      requiredDuringSchedulingIgnoredDuringExecution : {
-        nodeSelectorTerms : [
-          {
-            matchExpressions : [
-              {
-                key : "ibm-cloud.kubernetes.io/worker-pool-name",
-                operator : "In",
-                values : ["edge"]
-              }
-            ]
-          }
-        ]
-      }
-    }
-  }
-  description = "Istio egress affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Egress pods are provided of a label with key \"istio.io/gateway\" and value \"[DEPLOYMENT NAME].[DEPLOYMENT NAMESPACE]\" in order to allow to set them as antiAffinity labels."
-  # podAntiAffinity example
-  # podAntiAffinity : {
-  #   preferredDuringSchedulingIgnoredDuringExecution : [
-  #     {
-  #       podAffinityTerm : {
-  #         labelSelector : {
-  #           matchExpressions : [
-  #             {
-  #               key : "istio.io/gateway",
-  #               operator : "In",
-  #               values : ["def-workload-ingress.default-workload"]
-  #             }
-  #           ]
-  #         }
-  #       }
-  #       topologyKey : "topology.kubernetes.io/zone"
-  #       weight : 100
-  #     }
-  #   ]
-  # }
+  default     = {}
+  description = "Istio egress affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Egress pods are provided of a label with key \"istio.io/gateway\" and value \"[DEPLOYMENT NAME].[DEPLOYMENT NAMESPACE]\" in order to allow to set them as antiAffinity labels. Default to empty configuration."
 }
 
 variable "egress_tolerations" {
