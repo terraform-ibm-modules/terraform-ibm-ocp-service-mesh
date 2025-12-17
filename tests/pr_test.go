@@ -9,10 +9,9 @@ import (
 )
 
 // Use existing resource group
-const resourceGroup = "geretain-test-resources"
+const resourceGroup = "geretain-test-ocp-service-mesh"
 
 // Ensure every example directory has a corresponding test
-const advancedExampleDir = "examples/advanced"
 const basicExampleDir = "examples/basic"
 
 func setupOptions(t *testing.T, prefix string, dir string) *testhelper.TestOptions {
@@ -29,17 +28,7 @@ func setupOptions(t *testing.T, prefix string, dir string) *testhelper.TestOptio
 func TestRunBasicExample(t *testing.T) {
 	t.Parallel()
 
-	options := setupOptions(t, "mod-template-basic", basicExampleDir)
-
-	output, err := options.RunTestConsistency()
-	assert.Nil(t, err, "This should not have errored")
-	assert.NotNil(t, output, "Expected some output")
-}
-
-func TestRunAdvancedExample(t *testing.T) {
-	t.Parallel()
-
-	options := setupOptions(t, "mod-template-adv", advancedExampleDir)
+	options := setupOptions(t, "ocpsm-basic", basicExampleDir)
 
 	output, err := options.RunTestConsistency()
 	assert.Nil(t, err, "This should not have errored")
@@ -50,7 +39,7 @@ func TestRunAdvancedExample(t *testing.T) {
 func TestRunUpgradeExample(t *testing.T) {
 	t.Parallel()
 
-	options := setupOptions(t, "mod-template-adv-upg", advancedExampleDir)
+	options := setupOptions(t, "ocpsm-basic-upg", basicExampleDir)
 
 	output, err := options.RunTestUpgrade()
 	if !options.UpgradeTestSkipped {

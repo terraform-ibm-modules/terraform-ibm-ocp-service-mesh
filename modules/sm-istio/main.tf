@@ -92,6 +92,17 @@ locals {
   }
 }
 
+##############################################################################
+# Init cluster config
+##############################################################################
+
+data "ibm_container_cluster_config" "cluster_config" {
+  cluster_name_id   = var.cluster_id
+  resource_group_id = var.resource_group_id
+  config_dir        = "${path.module}/kubeconfig"
+  endpoint_type     = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
+}
+
 module "istio_namespace" {
   count   = var.create_namespace ? 1 : 0
   source  = "terraform-ibm-modules/namespace/ibm"
@@ -104,15 +115,6 @@ module "istio_namespace" {
         annotations = local.istio_namespace_discovery_labels
       }
     }
-
-    #     labels = {
-    #       "${var.istio_namespace_discovery_selector_label.label}" = "${var.istio_namespace_discovery_selector_label.value}"
-    #     },
-    #     annotations = {
-    #       "${var.istio_namespace_discovery_selector_label.label}" = "${var.istio_namespace_discovery_selector_label.value}"
-    #     }
-    #   },
-    # }
   ]
 }
 
@@ -217,9 +219,7 @@ resource "helm_release" "istio_controlplane" {
     yamlencode(local.istio_mesh_config_mesh_mtls),
     yamlencode(local.istio_mesh_config_mesh_tls_defaults),
   ]
-
 }
-
 
 resource "null_resource" "confirm_istio_operational" {
   depends_on = [helm_release.istio_controlplane]
@@ -227,7 +227,7 @@ resource "null_resource" "confirm_istio_operational" {
     command     = "${path.module}/scripts/confirm-istio-operational.sh \"${var.namespace}\" \"${var.name}\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
-      KUBECONFIG = var.cluster_config_file_path
+      KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
     }
   }
 }

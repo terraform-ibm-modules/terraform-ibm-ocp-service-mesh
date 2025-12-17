@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # This script is designed to verify that all key components of Istio control plane are up and running.
-# This is needs before workload is deployed and injected
+# This is needed before workload is deployed and injected
 
 set -e
 
@@ -9,7 +9,7 @@ name="${2}"
 fail=false
 initialsleep=15
 
-echo "Checking istiod ${name} successfull deployment in namespace ${namespace}"
+echo "Checking istiod ${name} successful deployment in namespace ${namespace}"
 
 echo "Initial sleep of ${initialsleep} seconds before starting to check"
 sleep "${initialsleep}"

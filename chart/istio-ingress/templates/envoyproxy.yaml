@@ -1,0 +1,40 @@
+# ingress-proxy-envoy-filter.yaml
+{{- if .Values.ingress.proxyProtocol }}
+{{- $ppwithout := .Values.ingress.proxyProtocol.allowWithoutProxyProtocol -}}
+{{- if eq (default .Values.ingress.proxyProtocol.enabled false) true }}
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: ingress-{{ .Values.ingress.name }}
+  namespace: {{ .Values.ingress.namespace }}
+spec:
+  configPatches:
+    {{- if .Values.ingress.ports }}
+    {{- range $ports := .Values.ingress.ports }}
+  - applyTo: LISTENER
+    match:
+      listener:
+        portNumber: {{ $ports.targetPort }}
+    patch:
+      operation: MERGE
+      value:
+        listener_filters:
+        - name: envoy.filters.listener.proxy_protocol
+          typed_config:
+            '@type': type.googleapis.com/envoy.extensions.filters.listener.proxy_protocol.v3.ProxyProtocol
+            {{- if eq (default $ppwithout false) true }}
+            allow_requests_without_proxy_protocol: true
+            {{- end }}
+        - name: envoy.filters.listener.tls_inspector
+          typed_config:
+            '@type': type.googleapis.com/envoy.extensions.filters.listener.tls_inspector.v3.TlsInspector
+      {{- end }}
+    {{- end }}
+  workloadSelector:
+    {{- if .Values.ingress.istioselectors }}
+    labels:
+    {{- toYaml .Values.ingress.istioselectors | nindent 6 }}
+    {{- end }}
+---
+{{- end }}
+{{- end }}

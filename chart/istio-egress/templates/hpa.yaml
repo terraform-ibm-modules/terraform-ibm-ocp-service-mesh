@@ -1,0 +1,40 @@
+{{- if (.Values.egress.autoscale).enabled | default false -}}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    {{- if .Values.egress.istioselectors }}
+    {{- toYaml .Values.egress.istioselectors | nindent 4 }}
+    {{- end }}
+    release: istio
+  name: egress-{{ .Values.egress.name }}
+  namespace: {{ .Values.egress.namespace }}
+spec:
+  metrics:
+  {{- if .Values.egress.autoscale.cpu }}
+  {{- if .Values.egress.autoscale.cpu.targetavgutil }}
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: {{ .Values.egress.autoscale.cpu.targetavgutil }}
+        type: Utilization
+    type: Resource
+  {{- end }}
+  {{- end }}
+  {{- if .Values.egress.autoscale.memory }}
+  {{- if .Values.egress.autoscale.memory.targetavgutil }}
+  - resource:
+      name: memory
+      target:
+        averageUtilization: {{ .Values.egress.autoscale.memory.targetavgutil }}
+        type: Utilization
+    type: Resource
+  {{- end }}
+  {{- end }}
+  minReplicas: {{ .Values.egress.autoscale.autoscaleMin }}
+  maxReplicas: {{ .Values.egress.autoscale.autoscaleMax }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: egress-{{ .Values.egress.name }}
+{{- end }}

@@ -1,5 +1,5 @@
 <!-- Update this title with a descriptive name. Use sentence case. -->
-# Terraform modules template project
+# Red Hat OpenShift Container Platform Service Mesh module
 
 <!--
 Update status and "latest release" badges:
@@ -12,26 +12,57 @@ Update status and "latest release" badges:
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
-<!--
-Add a description of modules in this repo.
-Expand on the repo short description in the .github/settings.yml file.
+This module deploys the [Red Hat OpenShift Service Mesh v3](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0) by configuring Istio and IstioCNI resources through Istio [Sail operator](###), allows to configure the Istio Pilot deployment, to configure two or more Istio controlplanes in the same cluster by setting up Service Mesh discovery selectors and sidecar injection, to deploy and configure Istio ingress and egress gateways for Istio dataplanes.
+You can also control placement of the gateways on the desired cluster's worker nodes to support, for example, a double DMZ architecture.
 
-For information, see "Module names and descriptions" at
-https://terraform-ibm-modules.github.io/documentation/#/implementation-guidelines?id=module-names-and-descriptions
--->
+For more details about the Red Hat OpenShift Service Mesh, see [Red Hat OpenShift Service Mesh 3.0](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0) and [Installing Red Hat OpenShift Service Mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh)
 
-TODO: Replace this with a description of the modules in this repo.
+### Service Mesh discovery selectors
 
+The submodule [modules/sm-istio](./modules/sm-istio) supports configuring Service Mesh discovery selectors, to configure each Istio controlplane workloads discovery attributes.
+
+For more details about Service Mesh discovery selectors, see [Scoping the Service Mesh with discovery selectors](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh#ossm-scoping-service-mesh-with-discoveryselectors_ossm-installing-openshift-service-mesh)
+
+### Service Mesh sidecar injection
+
+The submodule [modules/sm-istio](./modules/sm-istio) supports configuring Service Mesh sidecar injection, to configure each Istio controlplane to inject with sidecar proxies the workloads according to specific attributes
+
+This module supports sidecar inject at namespace level in this moment, following the rules below:
+
+| IstioRevision name | Enabled label & value	| Disabled value |
+| --- | --- | --- |
+| default | istio-injection=enabled | istio-injection=disabled |
+| not default - i.e. `my-mesh-1` | istio.io/rev=my-mesh-1 | istio-injection=disabled |
+
+For more details about Service Mesh sidecar injection, see [Sidecar injection](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-sidecar-injection#ossm-sidecar-injection)
+
+For more details about excluding single workload from the Service Mesh, see [Exclude a workload from the mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-sidecar-injection#ossm-enabling-sidecar-injection-exclude-workload-from-mesh_ossm-sidecar-injection)
+
+### Multiple Service Mesh controlplanes deployment on the same cluster
+
+By appropriately configuring the controlplanes discovery selectors and sidecar injection properties with multiple instances of [modules/sm-istio](./modules/sm-istio) this module allows to deploy multiple controlplanes on the sidecar, each one discovering the appropriate workloads and injecting the related sidecars.
+
+https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-deploying-multiple-service-meshes-on-single-cluster#ossm-about-deploying-multiple-control-planes_ossm-deploying-multiple-service-meshes-on-single-cluster
+
+#### Gateway injection
+
+The submodule [modules/sm-istio-ingress](./modules/sm-istio-ingress) and [modules/sm-istio-egress](./modules/sm-istio-egress), through allows to deploy ingress and egress istio gateways into the cluster through the Gateway injection. Gateway injection relies upon the same mechanism as sidecar injection to inject the Envoy proxy into gateway pods. To install a gateway using gateway injection, you create a Kubernetes Deployment object and an associated Kubernetes Service object in a namespace that is visible to the Istio control plane. When creating the Deployment object you label and annotate it so that the Istio control plane injects a proxy, and the proxy is configured as a gateway. After installing the gateway, you configure it to control ingress and egress traffic using the Istio Gateway and VirtualService resources.
+
+For more details about Gateway injection, see [Gateways](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/gateways/index) and [About gateway injection](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/gateways/ossm-about-gateways#ossm-about-gateway-injection_ossm-about-gateways)
 
 <!-- The following content is automatically populated by the pre-commit hook -->
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
 * [terraform-ibm-ocp-service-mesh](#terraform-ibm-ocp-service-mesh)
 * [Submodules](./modules)
+    * [sm-istio-egress](./modules/sm-istio-egress)
+    * [sm-istio-ingress](./modules/sm-istio-ingress)
+    * [sm-istio](./modules/sm-istio)
 * [Examples](./examples)
+    * <div style="display: inline-block;"><a href="./examples/basic">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a></div> <div style="display: inline-block; vertical-align: middle;"><a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=osm-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic" target="_blank"><img src="https://cloud.ibm.com/media/docs/images/icons/Deploy_to_cloud.svg" alt="Deploy to IBM Cloud button"></a></div>
+    * <div style="display: inline-block;"><a href="./examples/existing_cluster">RedHat ServiceMesh v3 on existing cluster</a></div> <div style="display: inline-block; vertical-align: middle;"><a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=osm-existing_cluster-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/existing_cluster" target="_blank"><img src="https://cloud.ibm.com/media/docs/images/icons/Deploy_to_cloud.svg" alt="Deploy to IBM Cloud button"></a></div>
 * [Contributing](#contributing)
 <!-- END OVERVIEW HOOK -->
-
 
 <!--
 If this repo contains any reference architectures, uncomment the heading below and link to them.
@@ -46,13 +77,6 @@ https://terraform-ibm-modules.github.io/documentation/#/implementation-guideline
 ## terraform-ibm-ocp-service-mesh
 
 ### Usage
-
-<!--
-Add an example of the use of the module in the following code block.
-
-Use real values instead of "var.<var_name>" or other placeholder values
-unless real values don't help users know what to change.
--->
 
 ```hcl
 terraform {
@@ -74,45 +98,131 @@ provider "ibm" {
   region           = local.region
 }
 
-module "module_template" {
-  source            = "terraform-ibm-modules/<replace>/ibm"
-  version           = "X.Y.Z" # Replace "X.Y.Z" with a release version to lock into a specific release
-  region            = local.region
-  name              = "instance-name"
-  resource_group_id = "xxXXxxXXxXxXXXXxxXxxxXXXXxXXXXX" # Replace with the actual ID of resource group to use
+provider "helm" {
+  kubernetes = {
+    host                   = data.ibm_container_cluster_config.cluster_config.host
+    token                  = data.ibm_container_cluster_config.cluster_config.token
+    cluster_ca_certificate = data.ibm_container_cluster_config.cluster_config.ca_certificate
+  }
+}
+
+provider "kubernetes" {
+  host                   = data.ibm_container_cluster_config.cluster_config.host
+  token                  = data.ibm_container_cluster_config.cluster_config.token
+  cluster_ca_certificate = data.ibm_container_cluster_config.cluster_config.ca_certificate
+}
+
+data "ibm_container_cluster_config" "cluster_config" {
+  cluster_name_id   = var.cluster_id
+  resource_group_id = var.resource_group_id
+  endpoint_type     = "default"
+}
+
+# deploy servicemesh operator
+module "service_mesh_operator" {
+  source                       = "terraform-ibm-modules/ocp-service-mesh/ibm"
+  version                      = "X.Y.Z"
+  cluster_id                   = var.cluster_id
+  develop_mode                 = var.develop_mode
+  cluster_config_endpoint_type = var.cluster_config_endpoint_type
+}
+
+# deploy servicemesh controlplane with istio resource
+module "deploy_istio" {
+  depends_on               = [module.service_mesh_operator]
+  source                   = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio"
+  version                  = "X.Y.Z"
+  name                     = "default"
+  namespace                = "istio-system"
+  create_namespace         = true
+  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+}
+
+# deploy servicemesh cni with istiocni resource
+module "deploy_istio_cni" {
+  depends_on       = [module.service_mesh_operator]
+  source           = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio-cni"
+  version          = "X.Y.Z"
+  namespace        = "istio-system-cni"
+  create_namespace = true
+}
+
+# wait for istio components to complete deployment and start
+resource "time_sleep" "wait_istio" {
+  depends_on = [module.deploy_istio, module.deploy_istio_cni]
+
+  create_duration  = "300s"
+  destroy_duration = "60s"
+}
+
+# deploy standard ingress gateway
+module "basic_workload_ingress" {
+  depends_on                = [time_sleep.wait_istio]
+  source                   = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio-ingress"
+  version                  = "X.Y.Z"
+  name                      = "basic-ingress"
+  namespace                 = "basic-ingress"
+  create_namespace          = true
+  force_dataplane_update    = true
+  ingress_loadbalancer_type = "alb"
+  ingress_service_type      = "LoadBalancer"
+  ingress_ip_type           = "public"
+  istio_mesh_enrollment     = "default"
+  ingress_selectors = {
+    "istio" : "ingress-gateway",
+  }
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    }
+  ]
+  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+}
+
+# deploy standard egress gateway
+module "default_workload_egress" {
+  depends_on             = [time_sleep.wait_istio]
+  source                 = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio-egress"
+  version                = "X.Y.Z"
+  name                   = "basic-egress"
+  namespace              = "basic-egress"
+  create_namespace       = false
+  force_dataplane_update = true
+  istio_mesh_enrollment  = "default"
+  egress_selectors = {
+    "istio" : "egress-gateway",
+  }
+  egress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    },
+    {
+      "name" : "https"
+      "port" : "443"
+      "targetPort" : "443"
+      "proto" : "TCP"
+    }
+  ]
+  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
 ```
 
 ### Required access policies
 
-<!-- PERMISSIONS REQUIRED TO RUN MODULE
-If this module requires permissions, uncomment the following block and update
-the sample permissions, following the format.
-Replace the 'Sample IBM Cloud' service and roles with applicable values.
-The required information can usually be found in the services official
-IBM Cloud documentation.
-To view all available service permissions, you can go in the
-console at Manage > Access (IAM) > Access groups and click into an existing group
-(or create a new one) and in the 'Access' tab click 'Assign access'.
--->
+You need the following permissions to run this module.
 
-<!--
-You need the following permissions to run this module:
+- IAM Services
+  - **Kubernetes** service
+      - `Viewer` platform access
+      - `Manager` service access
 
-- Service
-    - **Resource group only**
-        - `Viewer` access on the specific resource group
-    - **Sample IBM Cloud** service
-        - `Editor` platform access
-        - `Manager` service access
--->
-
-<!-- NO PERMISSIONS FOR MODULE
-If no permissions are required for the module, uncomment the following
-statement instead the previous block.
--->
-
-<!-- No permissions are needed to run this module.-->
+For more information about the access you need to run Terraform IBM modules, see [IBM Cloud IAM roles](https://cloud.ibm.com/docs/account?topic=account-userroles).
 
 
 <!-- The following content is automatically populated by the pre-commit hook -->
@@ -146,8 +256,8 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
 | <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
-| <a name="input_deploy_operator"></a> [deploy\_operator](#input\_deploy\_operator) | Enable installing RedHat Service Mesh Operator | `bool` | `true` | no |
-| <a name="input_develop_mode"></a> [develop\_mode](#input\_develop\_mode) | If true, output more logs, and reduce some wait periods | `bool` | `false` | no |
+| <a name="input_develop_mode"></a> [develop\_mode](#input\_develop\_mode) | If true raise time waited for operator deployment and undeployment to allow to debug the cluster | `bool` | `false` | no |
+| <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The ID of the resource group for the OpenShift Cluster. | `string` | n/a | yes |
 
 ### Outputs
 

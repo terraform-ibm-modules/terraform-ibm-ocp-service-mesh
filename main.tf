@@ -29,13 +29,14 @@ locals {
 
 ##############################################################################
 # Retrieve information about all the Cluster configuration files and
-# certificates to access the cluster through the kubernets provider
+# certificates to access the cluster through the kubernetes provider
 ##############################################################################
 
 data "ibm_container_cluster_config" "cluster_config" {
-  cluster_name_id = var.cluster_id
-  config_dir      = "${path.module}/kubeconfig"
-  endpoint_type   = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
+  cluster_name_id   = var.cluster_id
+  resource_group_id = var.resource_group_id
+  config_dir        = "${path.module}/kubeconfig"
+  endpoint_type     = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
 }
 
 ##############################################################################
@@ -45,7 +46,6 @@ data "ibm_container_cluster_config" "cluster_config" {
 # installing helm chart to enable subscriptions for openshift servicemesh v3 operator
 resource "helm_release" "service_mesh_operator" {
   depends_on = [data.ibm_container_cluster_config.cluster_config, null_resource.undeploy_servicemesh]
-  count      = var.deploy_operator == true ? 1 : 0
 
   name              = local.sm_operator_release_name
   chart             = "${path.module}/chart/${local.sm_operator_chart_path}"
@@ -104,8 +104,7 @@ resource "null_resource" "undeploy_servicemesh" {
 # On delete: give time for the crd sm instance to be removed (which depends on running finalizer)
 # Cheap for now - replace with polling of specific resources
 resource "time_sleep" "wait_operators" {
-  depends_on = [helm_release.service_mesh_operator[0]]
-  count      = var.deploy_operator == true ? 1 : 0
+  depends_on = [helm_release.service_mesh_operator]
 
   create_duration  = "${local.sleep_create}s"
   destroy_duration = "${local.sleep_destroy}s"

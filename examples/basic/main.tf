@@ -92,24 +92,24 @@ module "ocp_base" {
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
-  endpoint_type     = "default"
+  endpoint_type     = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
 }
 
 module "service_mesh_operator" {
-  source                       = "../.."
-  cluster_id                   = module.ocp_base.cluster_id
-  deploy_operator              = var.deploy_operator
-  develop_mode                 = var.develop_mode
-  cluster_config_endpoint_type = var.cluster_config_endpoint_type
+  source            = "../.."
+  cluster_id        = module.ocp_base.cluster_id
+  develop_mode      = var.develop_mode
+  resource_group_id = module.resource_group.resource_group_id
 }
 
 module "deploy_istio" {
-  depends_on               = [module.service_mesh_operator]
-  source                   = "../../modules/sm-istio"
-  name                     = "default"
-  namespace                = "istio-system"
-  create_namespace         = true
-  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  depends_on        = [module.service_mesh_operator]
+  source            = "../../modules/sm-istio"
+  name              = "default"
+  namespace         = "istio-system"
+  create_namespace  = true
+  cluster_id        = module.ocp_base.cluster_id
+  resource_group_id = module.resource_group.resource_group_id
 }
 
 module "deploy_istio_cni" {
@@ -124,4 +124,62 @@ resource "time_sleep" "wait_istio" {
 
   create_duration  = "300s"
   destroy_duration = "60s"
+}
+
+
+module "basic_workload_ingress" {
+  depends_on                = [time_sleep.wait_istio]
+  source                    = "../../modules/sm-istio-ingress"
+  name                      = "basic-ingress"
+  namespace                 = "basic-ingress"
+  create_namespace          = true
+  force_dataplane_update    = false
+  ingress_loadbalancer_type = "alb"
+  ingress_service_type      = "LoadBalancer"
+  ingress_ip_type           = "public"
+  istio_mesh_enrollment     = "default"
+  ingress_affinity          = {}
+  ingress_selectors = {
+    "istio" : "ingress-gateway",
+  }
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    }
+  ]
+  cluster_id        = module.ocp_base.cluster_id
+  resource_group_id = module.resource_group.resource_group_id
+}
+
+module "default_workload_egress" {
+  depends_on             = [time_sleep.wait_istio]
+  source                 = "../../modules/sm-istio-egress"
+  name                   = "basic-egress"
+  namespace              = "basic-egress"
+  create_namespace       = true
+  force_dataplane_update = true
+  istio_mesh_enrollment  = "default"
+  egress_affinity        = {}
+  egress_selectors = {
+    "istio" : "egress-gateway",
+  }
+  egress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "proto" : "TCP"
+    },
+    {
+      "name" : "https"
+      "port" : "443"
+      "targetPort" : "443"
+      "proto" : "TCP"
+    }
+  ]
+  cluster_id        = module.ocp_base.cluster_id
+  resource_group_id = module.resource_group.resource_group_id
 }

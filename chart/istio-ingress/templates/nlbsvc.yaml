@@ -1,0 +1,31 @@
+{{- if (eq .Values.ingress.lbtype "nlb") }}
+{{- range $lb_subnet, $lb_subnet_zone := .Values.ingress.nlbzonessubnets }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-{{ $.Values.ingress.name }}-{{ $lb_subnet_zone }}
+  namespace: {{ $.Values.ingress.namespace }}
+  annotations:
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features: "nlb"
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-vpc-subnets: {{ $lb_subnet | quote}}
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-ip-type: {{ $.Values.ingress.lbiptype }}
+spec:
+  type: {{ $.Values.ingress.svctype }}
+  externalTrafficPolicy: {{ $.Values.ingress.externalTrafficPolicy }}
+  internalTrafficPolicy: {{ $.Values.ingress.internalTrafficPolicy }}
+  selector:
+  {{- if $.Values.ingress.istioselectors }}
+  {{- toYaml $.Values.ingress.istioselectors | nindent 4 }}
+  {{- end }}
+  ports:
+  {{- if $.Values.ingress.ports }}
+  {{- range $.Values.ingress.ports }}
+  - port: {{ .port }}
+    protocol: {{ .proto | toString }}
+    name: {{ .name | toString }}
+    targetPort: {{ .targetPort }}
+  {{- end }}
+  {{- end }}
+---
+{{- end }}
+{{- end }}

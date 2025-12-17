@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: egress-{{ .Values.egress.name }}
+  namespace: {{ .Values.egress.namespace }}
+spec:
+  {{- if .Values.egress.replicacount }}
+  replicas: {{ .Values.egress.replicacount }}
+  {{- end }}
+  {{- if .Values.egress.istioselectors }}
+  selector:
+    matchLabels:
+      {{- toYaml .Values.egress.istioselectors | nindent 6 }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        inject.istio.io/templates: gateway
+      labels:
+        {{- if .Values.egress.istioselectors }}
+        {{- toYaml .Values.egress.istioselectors | nindent 8 }}
+        {{- end }}
+        sidecar.istio.io/inject: "true"
+        istio.io/gateway: "{{ .Values.egress.name }}.{{ .Values.egress.namespace }}"
+    spec:
+      {{- if .Values.egress.affinity }}
+      affinity:
+        {{- if .Values.egress.affinity.podAffinity }}
+        podAffinity:
+          {{- toYaml .Values.egress.affinity.podAffinity | nindent 10 }}
+        {{- end }}
+        {{- if .Values.egress.affinity.nodeAffinity }}
+        nodeAffinity:
+          {{- toYaml .Values.egress.affinity.nodeAffinity | nindent 10 }}
+        {{- end }}
+        {{- if .Values.egress.affinity.podAntiAffinity }}
+        podAntiAffinity:
+          {{- toYaml .Values.egress.affinity.podAntiAffinity | nindent 10 }}
+        {{- end }}
+      {{- end }}
+      serviceAccountName: egress-{{ .Values.egress.name }}
+      {{- if .Values.egress.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.egress.terminationGracePeriodSeconds }}
+      {{- end }}
+      tolerations:
+      {{- if .Values.egress.tolerations }}
+      {{- toYaml .Values.egress.tolerations | nindent 6 }}
+      {{- end }}
+      containers:
+      - name: istio-proxy
+        image: auto # The image will automatically update each time the pod starts.
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+        resources:
+        {{- if .Values.egress.resources }}
+        {{- toYaml .Values.egress.resources | nindent 10 }}
+        {{- end }}
+        ports:
+        - containerPort: 15090
+          protocol: TCP
+          name: http-envoy-prom
+        {{- if .Values.egress.ports }}
+        {{- range .Values.egress.ports }}
+        - containerPort: {{ .port }}
+          protocol: {{ .proto | toString }}
+          name: {{ .name }}
+        {{- end }}
+        {{- end }}
+#---
+# Allow outside traffic to access the gateway
+# This is optional, only needed in case your cluster contains restrictive NetworkPolicies
+#apiVersion: networking.k8s.io/v1
+#kind: NetworkPolicy
+#metadata:
+#  name: gatewayegress
+#spec:
+#  podSelector:
+#    matchLabels:
+#      istio: egressgateway
+#  egress:
+#    - {}
+#  policyTypes:
+#  - Egress

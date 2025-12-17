@@ -27,12 +27,6 @@ variable "resource_tags" {
   default     = []
 }
 
-variable "deploy_operator" {
-  type        = bool
-  description = "Enable installing RedHat Service Mesh Operator"
-  default     = true
-}
-
 variable "develop_mode" {
   type        = bool
   description = "If true, output more logs, and reduce some wait periods"
@@ -45,7 +39,7 @@ variable "cluster_config_endpoint_type" {
   default     = "default"
   nullable    = false
   validation {
-    error_message = "Invalid Endpoint Type! Valid values are 'default', 'private', 'vpe', or 'link'"
+    error_message = "Invalid Endpoint Type. Valid values are 'default', 'private', 'vpe', or 'link'"
     condition     = contains(["default", "private", "vpe", "link"], var.cluster_config_endpoint_type)
   }
 }
