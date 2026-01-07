@@ -74,5 +74,7 @@ terraform.rc
 go.work
 
 # ge examples
-examples/ge_topology
 examples/securetopology
+examples/ge_topology
+
+kubeconfig/*
