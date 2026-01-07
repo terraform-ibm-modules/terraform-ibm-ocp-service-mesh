@@ -68,6 +68,17 @@ locals {
 
 }
 
+##############################################################################
+# Init cluster config
+##############################################################################
+
+data "ibm_container_cluster_config" "cluster_config" {
+  cluster_name_id   = var.cluster_id
+  resource_group_id = var.resource_group_id
+  config_dir        = "${path.module}/kubeconfig"
+  endpoint_type     = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
+}
+
 module "ingress_namespace" {
   count   = var.create_namespace ? 1 : 0
   source  = "terraform-ibm-modules/namespace/ibm"
@@ -173,12 +184,12 @@ resource "helm_release" "istio_ingress" {
 
 resource "null_resource" "confirm_ingress_operational_alb" {
   depends_on = [helm_release.istio_ingress]
-  count      = var.ingress_loadbalancer_type == "alb" && var.cluster_config_file_path != null ? 1 : 0
+  count      = var.ingress_loadbalancer_type == "alb" ? 1 : 0
   provisioner "local-exec" {
     command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"ingress-${var.name}\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
-      KUBECONFIG = var.cluster_config_file_path
+      KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
     }
   }
 }
@@ -186,12 +197,12 @@ resource "null_resource" "confirm_ingress_operational_alb" {
 # for nlb the ingress svc are created for each zone so there are a set of svc to check named "ingress-[svc name]-[zone]"
 resource "null_resource" "confirm_ingress_operational_nlb" {
   depends_on = [helm_release.istio_ingress]
-  for_each   = var.ingress_loadbalancer_type == "nlb" && var.cluster_config_file_path != null ? var.ingress_nlb_zones_subnets : {}
+  for_each   = var.ingress_loadbalancer_type == "nlb" ? var.ingress_nlb_zones_subnets : {}
   provisioner "local-exec" {
     command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"ingress-${var.name}-${each.value}\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
-      KUBECONFIG = var.cluster_config_file_path
+      KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
     }
   }
 }

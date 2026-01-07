@@ -7,7 +7,7 @@
 # it cleans up
 # 1. the custom service version resources
 # 2. the custom resource definitions
-# 3. the opearator itself
+# 3. the operator itself
 
 # enabling exit on errors
 set -e

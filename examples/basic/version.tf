@@ -4,19 +4,19 @@ terraform {
     # Pin to the lowest provider version of the range defined in the main module to ensure lowest version still works
     ibm = {
       source  = "IBM-Cloud/ibm"
-      version = "1.79.2"
+      version = "= 1.79.2"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 3.0.0, <4.0.0"
+      version = "= 3.0.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.16.1, < 3.0.0"
+      version = "= 2.16.1"
     }
     time = {
       source  = "hashicorp/time"
-      version = ">= 0.9.1, < 1.0.0"
+      version = "= 0.9.1"
     }
   }
 }

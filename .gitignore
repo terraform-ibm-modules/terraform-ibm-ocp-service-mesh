@@ -77,4 +77,4 @@ go.work
 examples/securetopology
 examples/ge_topology
 
-kubeconfig/*
+*/kubeconfig/*

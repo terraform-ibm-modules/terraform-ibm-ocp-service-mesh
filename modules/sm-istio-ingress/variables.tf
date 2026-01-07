@@ -1,3 +1,28 @@
+# cluster references
+
+variable "cluster_id" {
+  type        = string
+  description = "Id of the target IBM Cloud OpenShift Cluster"
+}
+
+variable "resource_group_id" {
+  type        = string
+  description = "The ID of the resource group for the OpenShift Cluster."
+}
+
+variable "cluster_config_endpoint_type" {
+  description = "Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster."
+  type        = string
+  default     = "default"
+  nullable    = false
+  validation {
+    error_message = "Invalid Endpoint Type. Valid values are 'default', 'private', 'vpe', or 'link'"
+    condition     = contains(["default", "private", "vpe", "link"], var.cluster_config_endpoint_type)
+  }
+}
+
+# ingress configuration
+
 variable "name" {
   type        = string
   description = "Name of the Istio ingress deployment"
@@ -217,55 +242,14 @@ variable "ingress_affinity" {
     podAffinity : optional(any, null),
     nodeAffinity : optional(any, null)
   })
-  default = {
-    nodeAffinity : {
-      requiredDuringSchedulingIgnoredDuringExecution : {
-        nodeSelectorTerms : [
-          {
-            matchExpressions : [
-              {
-                key : "ibm-cloud.kubernetes.io/worker-pool-name",
-                operator : "In",
-                values : ["edge"]
-              }
-            ]
-          }
-        ]
-      }
-    }
-  }
-  description = "Istio ingress affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Ingress pods are provided of a label with key \"istio.io/gateway\" and value \"[DEPLOYMENT NAME].[DEPLOYMENT NAMESPACE]\" in order to allow to set them as antiAffinity labels."
-  # podAntiAffinity example
-  # podAntiAffinity : {
-  #   preferredDuringSchedulingIgnoredDuringExecution : [
-  #     {
-  #       podAffinityTerm : {
-  #         labelSelector : {
-  #           matchExpressions : [
-  #             {
-  #               key : "istio.io/gateway",
-  #               operator : "In",
-  #               values : ["def-workload-ingress.default-workload"]
-  #             }
-  #           ]
-  #         }
-  #       }
-  #       topologyKey : "topology.kubernetes.io/zone"
-  #       weight : 100
-  #     }
-  #   ]
-  # }
+  default     = {}
+  description = "Istio ingress affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Ingress pods are provided of a label with key \"istio.io/gateway\" and value \"[DEPLOYMENT NAME].[DEPLOYMENT NAMESPACE]\" in order to allow to set them as antiAffinity labels. Default to empty configuration."
 }
 
 variable "ingress_tolerations" {
   type        = list(any)
   default     = []
   description = "Istio ingress tolerations configuration. Default to tolerate 'dedicated: edge' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
-}
-
-variable "cluster_config_file_path" {
-  type        = string
-  description = "Cluster config file path to use with kubernetes provider to run checks on the resources deployment. Set to null to skip this check."
 }
 
 variable "ingress_enable_proxy_protocol" {

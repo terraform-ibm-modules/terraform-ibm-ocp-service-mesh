@@ -93,23 +93,24 @@ module "ocp_base" {
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
-  endpoint_type     = "default"
+  endpoint_type     = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
 }
 
 module "service_mesh_operator" {
-  source                       = "../.."
-  cluster_id                   = module.ocp_base.cluster_id
-  develop_mode                 = var.develop_mode
-  cluster_config_endpoint_type = var.cluster_config_endpoint_type
+  source            = "../.."
+  cluster_id        = module.ocp_base.cluster_id
+  develop_mode      = var.develop_mode
+  resource_group_id = module.resource_group.resource_group_id
 }
 
 module "deploy_istio" {
-  depends_on               = [module.service_mesh_operator]
-  source                   = "../../modules/sm-istio"
-  name                     = "default"
-  namespace                = "istio-system"
-  create_namespace         = true
-  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  depends_on        = [module.service_mesh_operator]
+  source            = "../../modules/sm-istio"
+  name              = "default"
+  namespace         = "istio-system"
+  create_namespace  = true
+  cluster_id        = module.ocp_base.cluster_id
+  resource_group_id = module.resource_group.resource_group_id
 }
 
 module "deploy_istio_cni" {
@@ -138,6 +139,7 @@ module "basic_workload_ingress" {
   ingress_service_type      = "LoadBalancer"
   ingress_ip_type           = "public"
   istio_mesh_enrollment     = "default"
+  ingress_affinity          = {}
   ingress_selectors = {
     "istio" : "ingress-gateway",
   }
@@ -149,7 +151,8 @@ module "basic_workload_ingress" {
       "proto" : "TCP"
     }
   ]
-  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  cluster_id        = module.ocp_base.cluster_id
+  resource_group_id = module.resource_group.resource_group_id
 }
 
 module "default_workload_egress" {
@@ -160,6 +163,7 @@ module "default_workload_egress" {
   create_namespace       = true
   force_dataplane_update = true
   istio_mesh_enrollment  = "default"
+  egress_affinity        = {}
   egress_selectors = {
     "istio" : "egress-gateway",
   }
@@ -177,5 +181,6 @@ module "default_workload_egress" {
       "proto" : "TCP"
     }
   ]
-  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  cluster_id        = module.ocp_base.cluster_id
+  resource_group_id = module.resource_group.resource_group_id
 }

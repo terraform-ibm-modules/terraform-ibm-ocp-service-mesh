@@ -7,6 +7,11 @@ variable "cluster_id" {
   description = "Id of the target IBM Cloud OpenShift Cluster"
 }
 
+variable "resource_group_id" {
+  type        = string
+  description = "The ID of the resource group for the OpenShift Cluster."
+}
+
 variable "develop_mode" {
   type        = bool
   description = "If true raise time waited for operator deployment and undeployment to allow to debug the cluster"
