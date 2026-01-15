@@ -1,0 +1,25 @@
+{{- if .Values.catalog }}
+{{- if not (.Values.catalog.name | empty)}}
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: {{ .Values.catalog.name }}
+  namespace: {{ .Values.catalog.namespace }}
+  annotations:
+    openshift.io/required-scc: restricted-v2
+spec:
+  image: "{{ .Values.catalog.registryUrl }}/{{ .Values.catalog.catagalogIndexName }}@{{ .Values.catalog.catalogIndexDigest }}"
+  sourceType: grpc
+  {{- if not (quote .Values.catalog.registryPullSecretValue | empty) }}
+  secrets:
+  - "{{ .Values.catalog.registryPullSecretName }}"
+  {{- end }}
+  grpcPodConfig:
+    securityContextConfig: restricted
+  displayName: {{ .Values.catalog.description }}
+  publisher: {{ .Values.catalog.publisher }}
+  updateStrategy:
+    registryPoll:
+      interval: 30m
+{{- end }}
+{{- end }}

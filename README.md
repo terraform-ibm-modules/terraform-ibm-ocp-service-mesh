@@ -258,6 +258,15 @@ No modules.
 | <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
 | <a name="input_develop_mode"></a> [develop\_mode](#input\_develop\_mode) | If true raise time waited for operator deployment and undeployment to allow to debug the cluster | `bool` | `false` | no |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The ID of the resource group for the OpenShift Cluster. | `string` | n/a | yes |
+| <a name="input_sm_operator_custom_catalog_description"></a> [sm\_operator\_custom\_catalog\_description](#input\_sm\_operator\_custom\_catalog\_description) | Description of the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
+| <a name="input_sm_operator_custom_catalog_image_digest"></a> [sm\_operator\_custom\_catalog\_image\_digest](#input\_sm\_operator\_custom\_catalog\_image\_digest) | Digest of the catalog index image for the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
+| <a name="input_sm_operator_custom_catalog_index_name"></a> [sm\_operator\_custom\_catalog\_index\_name](#input\_sm\_operator\_custom\_catalog\_index\_name) | Name of the catalog index for the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
+| <a name="input_sm_operator_custom_catalog_name"></a> [sm\_operator\_custom\_catalog\_name](#input\_sm\_operator\_custom\_catalog\_name) | Name of the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
+| <a name="input_sm_operator_custom_catalog_namespace"></a> [sm\_operator\_custom\_catalog\_namespace](#input\_sm\_operator\_custom\_catalog\_namespace) | Namespace of the custom Catalog Source for the Service Mesh Operator | `string` | `"openshit-marketplace"` | no |
+| <a name="input_sm_operator_custom_catalog_publisher"></a> [sm\_operator\_custom\_catalog\_publisher](#input\_sm\_operator\_custom\_catalog\_publisher) | Publisher of the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
+| <a name="input_sm_operator_custom_catalog_registry_pullsecret_name"></a> [sm\_operator\_custom\_catalog\_registry\_pullsecret\_name](#input\_sm\_operator\_custom\_catalog\_registry\_pullsecret\_name) | Name to use for the pull secret to access the registry for the mirrored Service Mesh Operator images | `string` | `null` | no |
+| <a name="input_sm_operator_custom_catalog_registry_pullsecret_value"></a> [sm\_operator\_custom\_catalog\_registry\_pullsecret\_value](#input\_sm\_operator\_custom\_catalog\_registry\_pullsecret\_value) | Base64 encoded value of the pull secret to access the registry for the mirrored Service Mesh Operator images | `string` | `null` | no |
+| <a name="input_sm_operator_custom_catalog_registry_url"></a> [sm\_operator\_custom\_catalog\_registry\_url](#input\_sm\_operator\_custom\_catalog\_registry\_url) | Registry URL for the mirrored Service Mesh Operator images | `string` | `"icr.io"` | no |
 
 ### Outputs
 

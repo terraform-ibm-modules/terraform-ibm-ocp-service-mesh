@@ -12,8 +12,9 @@ locals {
   operators_namespace      = "openshift-operators"
   sm_operator_release_name = "helm-release-smv3-subscription"
   sm_operator_chart_path   = "servicemeshoperator"
-  sm_operator_version      = "v3.0.3"
-  sm_operator_name         = "servicemeshoperator3"
+  # sm_operator_version              = "v3.0.3" # commented as not used in this moment
+  sm_operator_name                 = "servicemeshoperator3"
+  sm_operator_installplan_approval = "Manual"
 
   # timeout in seconds for operators helm releases to be ready
   operators_timeout = 600
@@ -43,6 +44,84 @@ data "ibm_container_cluster_config" "cluster_config" {
 # RedHat Service Mesh Operator, and its dependencies
 ##############################################################################
 
+locals {
+  service_mesh_operator_set_list = [
+    {
+      name  = "operator.namespace"
+      type  = "string"
+      value = local.operators_namespace
+      }, {
+      # name  = "operator.version"
+      # type  = "string"
+      # value = local.sm_operator_version
+      # }, {
+      name  = "operator.name"
+      type  = "string"
+      value = local.sm_operator_name
+      }, {
+      name  = "operator.installplanapproval"
+      type  = "string"
+      value = local.sm_operator_installplan_approval
+    }
+  ]
+
+  sm_operator_custom_catalog_registry_pullsecret_value = var.sm_operator_custom_catalog_registry_pullsecret_value == null || var.sm_operator_custom_catalog_registry_pullsecret_value == "" ? null : {
+    auths = {
+      # tflint-ignore: terraform_deprecated_interpolation
+      "${var.sm_operator_custom_catalog_registry_url}" = {
+        "auth" = base64encode(var.sm_operator_custom_catalog_registry_pullsecret_value)
+      }
+    }
+  }
+
+  service_mesh_operator_set_list_extended = concat(
+    local.service_mesh_operator_set_list,
+    var.sm_operator_custom_catalog_name != null ? [
+      {
+        name  = "operator.source"
+        type  = "string"
+        value = var.sm_operator_custom_catalog_name
+        }, {
+        name  = "operator.sourcenamespace"
+        type  = "string"
+        value = var.sm_operator_custom_catalog_namespace
+        }, {
+        name  = "catalog.name"
+        type  = "string"
+        value = var.sm_operator_custom_catalog_name
+        }, {
+        name  = "catalog.namespace"
+        type  = "string"
+        value = var.sm_operator_custom_catalog_namespace
+        }, {
+        name  = "catalog.description"
+        type  = "string"
+        value = var.sm_operator_custom_catalog_description
+        }, {
+        name  = "catalog.publisher"
+        type  = "string"
+        value = var.sm_operator_custom_catalog_publisher
+        }, {
+        name  = "catalog.registryUrl"
+        type  = "string"
+        value = var.sm_operator_custom_catalog_registry_url
+        }, {
+        name  = "catalog.registryPullSecretName"
+        type  = "string"
+        value = var.sm_operator_custom_catalog_registry_pullsecret_name
+        }, {
+        name  = "catalog.catagalogIndexName"
+        type  = "string"
+        value = var.sm_operator_custom_catalog_index_name
+        }, {
+        name  = "catalog.catalogIndexDigest"
+        type  = "string"
+        value = var.sm_operator_custom_catalog_image_digest
+      }
+    ] : []
+  )
+}
+
 # installing helm chart to enable subscriptions for openshift servicemesh v3 operator
 resource "helm_release" "service_mesh_operator" {
   depends_on = [data.ibm_container_cluster_config.cluster_config, null_resource.undeploy_servicemesh]
@@ -59,20 +138,14 @@ resource "helm_release" "service_mesh_operator" {
 
   disable_openapi_validation = false
 
-  set = [
-    {
-      name  = "smoperator.namespace"
-      type  = "string"
-      value = local.operators_namespace
-      }, {
-      name  = "smoperator.version"
-      type  = "string"
-      value = local.sm_operator_version
-      }, {
-      name  = "smoperator.name"
-      type  = "string"
-      value = local.sm_operator_name
-    }
+  set = local.service_mesh_operator_set_list_extended
+
+  values = [
+    yamlencode({
+      "catalog" = {
+        "registryPullSecretValue" = local.sm_operator_custom_catalog_registry_pullsecret_value
+      }
+    })
   ]
 
   provisioner "local-exec" {
@@ -82,7 +155,6 @@ resource "helm_release" "service_mesh_operator" {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
     }
   }
-
 }
 
 # trigger on destroy the removal of operator custom resources

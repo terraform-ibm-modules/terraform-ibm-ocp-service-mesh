@@ -1,8 +1,17 @@
 # Default values for service-mesh.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
-operators:
+catalog:
+  name:
+  namespace:
+  description:
+  publisher:
+  registryUrl:
+  registryPullSecretName:
+  registryPullSecretValue:
+  catagalogIndexName:
+  catalogIndexDigest:
+operator:
   namespace: openshift-operators
   name: servicemeshoperator3
   version: v3.0.2
