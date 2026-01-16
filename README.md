@@ -234,7 +234,6 @@ For more information about the access you need to run Terraform IBM modules, see
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 | <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >= 1.59.0, < 2.0.0 |
-| <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2.1, < 4.0.0 |
 | <a name="requirement_time"></a> [time](#requirement\_time) | >= 0.9.1, < 1.0.0 |
 
 ### Modules
@@ -246,7 +245,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [helm_release.service_mesh_operator](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [null_resource.undeploy_servicemesh](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [terraform_data.undeploy_servicemesh](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
 | [time_sleep.wait_operators](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [ibm_container_cluster_config.cluster_config](https://registry.terraform.io/providers/ibm-cloud/ibm/latest/docs/data-sources/container_cluster_config) | data source |
 

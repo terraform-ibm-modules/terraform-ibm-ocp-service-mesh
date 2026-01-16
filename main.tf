@@ -124,7 +124,7 @@ locals {
 
 # installing helm chart to enable subscriptions for openshift servicemesh v3 operator
 resource "helm_release" "service_mesh_operator" {
-  depends_on = [data.ibm_container_cluster_config.cluster_config, null_resource.undeploy_servicemesh]
+  depends_on = [data.ibm_container_cluster_config.cluster_config]
 
   name              = local.sm_operator_release_name
   chart             = "${path.module}/chart/${local.sm_operator_chart_path}"
@@ -157,18 +157,59 @@ resource "helm_release" "service_mesh_operator" {
   }
 }
 
+# # trigger on destroy the removal of operator custom resources
+# resource "null_resource" "undeploy_servicemesh" {
+#   depends_on = [helm_release.service_mesh_operator]
+#   triggers = {
+#     kubeconfig   = data.ibm_container_cluster_config.cluster_config.config_file_path
+#     namespace    = local.operators_namespace
+#     operatorname = local.sm_operator_name
+#   }
+
+#   provisioner "local-exec" {
+#     when       = destroy
+#     command    = "${path.module}/scripts/deprovision-sm-operator.sh \"${self.triggers.kubeconfig}\" \"${self.triggers.namespace}\" ${self.triggers.operatorname}"
+#     on_failure = continue
+#   }
+# }
+
 # trigger on destroy the removal of operator custom resources
-resource "null_resource" "undeploy_servicemesh" {
-  triggers = {
-    kubeconfig   = data.ibm_container_cluster_config.cluster_config.config_file_path
-    namespace    = local.operators_namespace
-    operatorname = local.sm_operator_name
+# resource "null_resource" "undeploy_servicemesh" {
+#   triggers = {
+#     kubeconfig   = data.ibm_container_cluster_config.cluster_config.config_file_path
+#     namespace    = local.operators_namespace
+#     operatorname = local.sm_operator_name
+#   }
+
+#   provisioner "local-exec" {
+#     when       = destroy
+#     command    = "${path.module}/scripts/deprovision-sm-operator.sh \"${self.triggers.kubeconfig}\" \"${self.triggers.namespace}\" ${self.triggers.operatorname}"
+#     on_failure = continue
+#   }
+# }
+
+locals {
+  scripts_location = "${path.module}/scripts/"
+  kubeconfig_path  = data.ibm_container_cluster_config.cluster_config.config_file_path
+}
+
+resource "terraform_data" "undeploy_servicemesh" {
+  depends_on = [helm_release.service_mesh_operator]
+  triggers_replace = {
+    scripts_location = local.scripts_location
+    namespace        = local.operators_namespace
+    operatorname     = local.sm_operator_name
+    kubeconfig_path  = local.kubeconfig_path
   }
 
+  # Removes patch from Console Operator in openshift-console-operator
   provisioner "local-exec" {
-    when       = destroy
-    command    = "${path.module}/scripts/deprovision-sm-operator.sh \"${self.triggers.kubeconfig}\" \"${self.triggers.namespace}\" ${self.triggers.operatorname}"
-    on_failure = continue
+    command     = "${self.triggers_replace.scripts_location}/deprovision-sm-operator.sh \"${self.triggers_replace.namespace}\" \"${self.triggers_replace.operatorname}\""
+    interpreter = ["/bin/bash", "-c"]
+    when        = destroy
+    environment = {
+      KUBECONFIG = self.triggers_replace.kubeconfig_path
+    }
   }
 }
 

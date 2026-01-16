@@ -12,11 +12,17 @@
 # enabling exit on errors
 set -e
 
-echo "Start deprovision-sm-operator.sh with ${1} ${2} ${3}"
-kubeconfig="${1}"
-export KUBECONFIG="${kubeconfig}"
-operator_namespace="${2:-openshift-operators}"
-operator_name="${3:-servicemeshoperator3}"
+# echo "Start deprovision-sm-operator.sh with ${1} ${2} ${3}"
+# kubeconfig="${1}"
+# export KUBECONFIG="${kubeconfig}"
+# operator_namespace="${2:-openshift-operators}"
+# operator_name="${3:-servicemeshoperator3}"
+
+echo "Start deprovision-sm-operator.sh with ${1} ${2} at $(date '+%Y-%m-%d %H:%M:%S')"
+# kubeconfig="${1}"
+# export KUBECONFIG="${kubeconfig}"
+operator_namespace="${1:-openshift-operators}"
+operator_name="${2:-servicemeshoperator3}"
 
 echo "Fetching and deleting CSVs for ${operator_name} operator subscription in namespace ${operator_namespace}"
 
@@ -38,6 +44,6 @@ kubectl delete operator "${operator_name}"."${operator_namespace}"
 
 echo "Deprovisioning of ${operator_name} from namespace ${operator_namespace} completed"
 
-echo "Exit deprovision-sm-operator.sh"
+echo "Completed deprovision-sm-operator.sh at $(date '+%Y-%m-%d %H:%M:%S')"
 
 set +e
