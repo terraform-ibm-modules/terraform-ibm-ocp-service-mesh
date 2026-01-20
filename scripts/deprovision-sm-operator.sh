@@ -25,6 +25,7 @@ operator_namespace="${1:-openshift-operators}"
 operator_name="${2:-servicemeshoperator3}"
 
 echo "Fetching and deleting CSVs for ${operator_name} operator subscription in namespace ${operator_namespace}"
+echo "KUBECONFIG ${KUBECONFIG}"
 
 CSV="$(kubectl get clusterserviceversion -n "${operator_namespace}" | grep servicemeshoperator3 | awk '{print $1}')"
 
