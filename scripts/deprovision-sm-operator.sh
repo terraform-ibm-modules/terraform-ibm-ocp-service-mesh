@@ -12,15 +12,11 @@
 # enabling exit on errors
 set -e
 
-# echo "Start deprovision-sm-operator.sh with ${1} ${2} ${3}"
-# kubeconfig="${1}"
-# export KUBECONFIG="${kubeconfig}"
-# operator_namespace="${2:-openshift-operators}"
-# operator_name="${3:-servicemeshoperator3}"
-
 echo "Start deprovision-sm-operator.sh with ${1} ${2} at $(date '+%Y-%m-%d %H:%M:%S')"
-# kubeconfig="${1}"
-# export KUBECONFIG="${kubeconfig}"
+
+echo "Sleeping for 60s before starting deprovisioning to allow previous resources to complete undeployment"
+sleep 60
+
 operator_namespace="${1:-openshift-operators}"
 operator_name="${2:-servicemeshoperator3}"
 
