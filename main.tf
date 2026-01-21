@@ -172,14 +172,9 @@ resource "terraform_data" "undeploy_servicemesh" {
     operatorname     = local.sm_operator_name
   }
 
-  provisioner "local-exec" {
-    command     = "echo 'Starting deprovisioner for Service Mesh Operator...' && sleep 10 && echo 'Deprovisioner started.' >> /tmp/smoperatordeprovisioning.log"
-    interpreter = ["/bin/bash", "-c"]
-  }
-
   # removing servicemesh operator csv from the cluster at deprovision time
   provisioner "local-exec" {
-    command     = "${self.triggers_replace.scripts_location}/deprovision-sm-operator.sh \"${self.triggers_replace.namespace}\" \"${self.triggers_replace.operatorname}\" >> /tmp/debugdeprovision_2.log"
+    command     = "${self.triggers_replace.scripts_location}/deprovision-sm-operator.sh \"${self.triggers_replace.namespace}\" \"${self.triggers_replace.operatorname}\""
     interpreter = ["/bin/bash", "-c"]
     when        = destroy
     on_failure  = continue
