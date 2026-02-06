@@ -107,6 +107,16 @@ variable "ingress_selectors" {
   description = "Istio ingress selectors to route inbound ingress traffic to the expected istio gateway and to the expected workload. Default to \"app\": \"istio-ingress\" \"istio\": \"istio-ingress\". Null not allowed"
 }
 
+variable "ingress_alb_idle_timeout" {
+  type        = number
+  default     = null
+  description = "The idle connection timeout of the IBM Cloud Application Loadbalancer listener in seconds. Default to null to adopt platform default configuration. The value cannot be less than 50s and more than 7200s. For more details refer to https://cloud.ibm.com/docs/containers?topic=containers-setup_vpc_alb."
+  validation {
+    condition     = var.ingress_alb_idle_timeout != null ? (var.ingress_alb_idle_timeout >= 50 && var.ingress_alb_idle_timeout <= 7200) : true
+    error_message = "The ALB listener idle connection timeout is a number between 50 and 7200 seconds."
+  }
+}
+
 variable "ingress_alb_subnets" {
   type        = list(string)
   default     = []

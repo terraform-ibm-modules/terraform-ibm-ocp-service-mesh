@@ -151,6 +151,11 @@ resource "helm_release" "istio_ingress" {
       value = var.ingress_replicas
     },
     {
+      name  = "albtimeout"
+      type  = "string"
+      value = var.ingress_alb_idle_timeout
+    },
+    {
       name  = "ingress.terminationGracePeriodSeconds"
       type  = "string"
       value = var.ingress_termination_grace_period
