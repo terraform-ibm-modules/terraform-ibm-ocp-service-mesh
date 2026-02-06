@@ -15,7 +15,7 @@ metadata:
     {{- end }}
     {{- end }}
     {{- if .Values.ingress.albtimeout }}
-    service.kubernetes.io/ibm-load-balancer-cloud-provider-vpc-idle-connection-timeout: {{ .Values.ingress.albtimeout }}
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-vpc-idle-connection-timeout: {{ .Values.ingress.albtimeout | quote }}
     {{- end }}
     {{- end }}
     {{- if (eq .Values.ingress.lbtype "sdnlb") }}
