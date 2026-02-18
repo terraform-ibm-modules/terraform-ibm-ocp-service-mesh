@@ -60,6 +60,7 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
     * [sm-istio](./modules/sm-istio)
 * [Examples](./examples)
     * <div style="display: inline-block;"><a href="./examples/basic">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a></div> <div style="display: inline-block; vertical-align: middle;"><a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=osm-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic" target="_blank"><img src="https://cloud.ibm.com/media/docs/images/icons/Deploy_to_cloud.svg" alt="Deploy to IBM Cloud button"></a></div>
+    * <div style="display: inline-block;"><a href="./examples/existing_cluster">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a></div> <div style="display: inline-block; vertical-align: middle;"><a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=osm-existing_cluster-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/existing_cluster" target="_blank"><img src="https://cloud.ibm.com/media/docs/images/icons/Deploy_to_cloud.svg" alt="Deploy to IBM Cloud button"></a></div>
 * [Contributing](#contributing)
 <!-- END OVERVIEW HOOK -->
 
@@ -252,6 +253,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_clean_servicemesh_on_undeploy"></a> [clean\_servicemesh\_on\_undeploy](#input\_clean\_servicemesh\_on\_undeploy) | Flag to perform a cleanup of ServiceMesh operator custom resources when undeploying the module. Default to true. For more details refer to https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index . | `bool` | `true` | no |
 | <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
 | <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
 | <a name="input_develop_mode"></a> [develop\_mode](#input\_develop\_mode) | If true raise time waited for operator deployment and undeployment to allow to debug the cluster | `bool` | `false` | no |
@@ -262,8 +264,8 @@ No modules.
 | <a name="input_sm_operator_custom_catalog_name"></a> [sm\_operator\_custom\_catalog\_name](#input\_sm\_operator\_custom\_catalog\_name) | Name of the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
 | <a name="input_sm_operator_custom_catalog_namespace"></a> [sm\_operator\_custom\_catalog\_namespace](#input\_sm\_operator\_custom\_catalog\_namespace) | Namespace of the custom Catalog Source for the Service Mesh Operator | `string` | `"openshit-marketplace"` | no |
 | <a name="input_sm_operator_custom_catalog_publisher"></a> [sm\_operator\_custom\_catalog\_publisher](#input\_sm\_operator\_custom\_catalog\_publisher) | Publisher of the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
-| <a name="input_sm_operator_custom_catalog_registry_pullsecret_name"></a> [sm\_operator\_custom\_catalog\_registry\_pullsecret\_name](#input\_sm\_operator\_custom\_catalog\_registry\_pullsecret\_name) | Name to use for the pull secret to access the registry for the mirrored Service Mesh Operator images | `string` | `null` | no |
-| <a name="input_sm_operator_custom_catalog_registry_pullsecret_value"></a> [sm\_operator\_custom\_catalog\_registry\_pullsecret\_value](#input\_sm\_operator\_custom\_catalog\_registry\_pullsecret\_value) | Base64 encoded value of the pull secret to access the registry for the mirrored Service Mesh Operator images | `string` | `null` | no |
+| <a name="input_sm_operator_custom_catalog_registry_pullsecret_name"></a> [sm\_operator\_custom\_catalog\_registry\_pullsecret\_name](#input\_sm\_operator\_custom\_catalog\_registry\_pullsecret\_name) | Name of the cluster secret to store the pull secret to access the registry for the mirrored Service Mesh Operator images | `string` | `null` | no |
+| <a name="input_sm_operator_custom_catalog_registry_pullsecret_value"></a> [sm\_operator\_custom\_catalog\_registry\_pullsecret\_value](#input\_sm\_operator\_custom\_catalog\_registry\_pullsecret\_value) | Value of the pull secret to access the registry for the mirrored Service Mesh Operator images | `string` | `null` | no |
 | <a name="input_sm_operator_custom_catalog_registry_url"></a> [sm\_operator\_custom\_catalog\_registry\_url](#input\_sm\_operator\_custom\_catalog\_registry\_url) | Registry URL for the mirrored Service Mesh Operator images | `string` | `"icr.io"` | no |
 
 ### Outputs

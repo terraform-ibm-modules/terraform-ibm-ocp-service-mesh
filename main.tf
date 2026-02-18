@@ -110,7 +110,7 @@ locals {
         type  = "string"
         value = var.sm_operator_custom_catalog_registry_pullsecret_name
         }, {
-        name  = "catalog.catagalogIndexName"
+        name  = "catalog.catalogIndexName"
         type  = "string"
         value = var.sm_operator_custom_catalog_index_name
         }, {
@@ -164,6 +164,7 @@ locals {
 }
 
 resource "terraform_data" "undeploy_servicemesh" {
+  count      = var.clean_servicemesh_on_undeploy ? 1 : 0
   depends_on = [helm_release.service_mesh_operator]
   input      = local.kubeconfig_path
   triggers_replace = {

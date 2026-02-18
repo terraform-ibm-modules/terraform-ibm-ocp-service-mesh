@@ -1,0 +1,9 @@
+apiVersion: v2
+name: httpbin-sample-app
+description: Sample app leveraging istio
+
+type: application
+
+version: 0.0.1
+
+appVersion: "1.0.0"

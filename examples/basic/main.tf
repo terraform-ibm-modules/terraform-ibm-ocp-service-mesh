@@ -184,3 +184,51 @@ module "default_workload_egress" {
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
 }
+
+resource "kubernetes_namespace_v1" "sample_app_namespace" {
+  depends_on = [time_sleep.wait_istio]
+  metadata {
+    name = "httpbin"
+    # istio injection annotations for default dataplane
+    labels = {
+      "istio-discovery" : "enabled"
+      "istio-injection" : "enabled"
+    }
+    annotations = {
+      "istio-discovery" : "enabled"
+      "istio-injection" : "enabled"
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations,
+      metadata[0].labels
+    ]
+  }
+}
+
+resource "helm_release" "sample_app" {
+  depends_on = [kubernetes_namespace_v1.sample_app_namespace]
+
+  name                       = "httpbin-sample-app"
+  chart                      = "../charts/sample-app/httpbin"
+  namespace                  = "httpbin"
+  create_namespace           = false
+  timeout                    = 300
+  cleanup_on_fail            = true
+  wait                       = true
+  disable_openapi_validation = false
+
+  set = [{
+    name  = "namespace"
+    value = "httpbin"
+    }, {
+    name  = "gateway.istioSelector"
+    value = "ingress-gateway"
+    },
+    {
+      name  = "gateway.istioPort"
+      value = "80"
+  }]
+}

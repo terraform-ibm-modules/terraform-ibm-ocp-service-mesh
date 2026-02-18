@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: httpbin-gateway
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    istio: {{ .Values.gateway.istioSelector | quote }}
+  servers:
+  - port:
+      number: {{ .Values.gateway.istioPort }}
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"

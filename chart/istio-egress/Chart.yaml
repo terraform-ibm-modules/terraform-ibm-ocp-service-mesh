@@ -1,6 +1,6 @@
 apiVersion: v2
-name: istio-ingress
-description: A Helm chart for Kubernetes to deploy dataplane ingress resources for istio
+name: istio-egress
+description: A Helm chart for Kubernetes to deploy dataplane egress resources for istio
 type: application
 version: 0.0.1
 appVersion: "0.0.1"

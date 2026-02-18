@@ -9,12 +9,12 @@ catalog:
   registryUrl:
   registryPullSecretName:
   registryPullSecretValue:
-  catagalogIndexName:
+  catalogIndexName:
   catalogIndexDigest:
 operator:
   namespace: openshift-operators
   name: servicemeshoperator3
-  version: v3.0.2
+  version: v3.2.1
   source: redhat-operators
   sourcenamespace: openshift-marketplace
   installplanapproval: Manual

@@ -63,14 +63,15 @@ variable "sm_operator_custom_catalog_registry_url" {
 
 variable "sm_operator_custom_catalog_registry_pullsecret_name" {
   type        = string
-  description = "Name to use for the pull secret to access the registry for the mirrored Service Mesh Operator images"
+  description = "Name of the cluster secret to store the pull secret to access the registry for the mirrored Service Mesh Operator images"
   default     = null
 }
 
 variable "sm_operator_custom_catalog_registry_pullsecret_value" {
   type        = string
-  description = "Base64 encoded value of the pull secret to access the registry for the mirrored Service Mesh Operator images"
+  description = "Value of the pull secret to access the registry for the mirrored Service Mesh Operator images"
   default     = null
+  sensitive   = true
 }
 
 variable "sm_operator_custom_catalog_index_name" {
@@ -83,4 +84,11 @@ variable "sm_operator_custom_catalog_image_digest" {
   type        = string
   description = "Digest of the catalog index image for the custom Catalog Source for the Service Mesh Operator"
   default     = null
+}
+
+variable "clean_servicemesh_on_undeploy" {
+  type        = bool
+  description = "Flag to perform a cleanup of ServiceMesh operator custom resources when undeploying the module. Default to true. For more details refer to https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index ."
+  default     = true
+  nullable    = false
 }

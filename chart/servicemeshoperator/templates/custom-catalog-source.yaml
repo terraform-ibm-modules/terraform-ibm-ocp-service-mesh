@@ -8,7 +8,7 @@ metadata:
   annotations:
     openshift.io/required-scc: restricted-v2
 spec:
-  image: "{{ .Values.catalog.registryUrl }}/{{ .Values.catalog.catagalogIndexName }}@{{ .Values.catalog.catalogIndexDigest }}"
+  image: "{{ .Values.catalog.registryUrl }}/{{ .Values.catalog.catalogIndexName }}@{{ .Values.catalog.catalogIndexDigest }}"
   sourceType: grpc
   {{- if not (quote .Values.catalog.registryPullSecretValue | empty) }}
   secrets:
