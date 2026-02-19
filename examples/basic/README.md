@@ -5,7 +5,7 @@
 <!-- END SCHEMATICS DEPLOY HOOK -->
 
 
-This sample deploys the RedHat Service Mesh operators, and a Service Mesh / istio control plane, a basic ingress and a basic egress in different namespaces, and a sample app serving the httpbin microservice for testing purposes.
+This sample deploys a VPC and its infrastructure resources and an OpenShift Cluster on IBM Cloud, then deploys on the cluster the RedHat Service Mesh v3 operator, a Service Mesh / istio control plane, a basic ingress and a basic egress in different namespaces, and a sample app serving the httpbin microservice for testing purposes.
 
 <!-- BEGIN SCHEMATICS DEPLOY TIP HOOK -->
 :information_source: Ctrl/Cmd+Click or right-click on the Schematics deploy button to open in a new tab
