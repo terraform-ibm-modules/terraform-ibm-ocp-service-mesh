@@ -45,16 +45,17 @@ data "ibm_container_cluster_config" "cluster_config" {
 ##############################################################################
 
 locals {
+  sm_operator_version = "servicemeshoperator3.v3.2.1"
   service_mesh_operator_set_list = [
     {
       name  = "operator.namespace"
       type  = "string"
       value = local.operators_namespace
       }, {
-      # name  = "operator.version"
-      # type  = "string"
-      # value = local.sm_operator_version
-      # }, {
+      name  = "operator.version"
+      type  = "string"
+      value = local.sm_operator_version
+      }, {
       name  = "operator.name"
       type  = "string"
       value = local.sm_operator_name

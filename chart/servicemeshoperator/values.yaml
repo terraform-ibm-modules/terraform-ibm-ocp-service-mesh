@@ -14,7 +14,7 @@ catalog:
 operator:
   namespace: openshift-operators
   name: servicemeshoperator3
-  version: v3.2.1
+  version: servicemeshoperator3.v3.2.1
   source: redhat-operators
   sourcenamespace: openshift-marketplace
   installplanapproval: Manual

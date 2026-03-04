@@ -11,6 +11,6 @@ spec:
   name: {{ .Values.operator.name }}
   source: {{ .Values.operator.source }}
   sourceNamespace: {{ .Values.operator.sourcenamespace }}
-  # startingCSV:           servicemeshoperator3.v3.1.3
-  # startingCSV: servicemeshoperator3.v3.0.1
-  # startingCSV: servicemeshoperator3.v3.0.3
+  {{- if .Values.operator.version }}
+  startingCSV: {{ .Values.operator.version }}
+  {{- end }}
