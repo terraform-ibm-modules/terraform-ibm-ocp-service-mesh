@@ -18,6 +18,12 @@ locals {
     }
   }
 
+  ingress_custom_annotations = {
+    "ingress" : {
+      "customAnnotations" : var.ingress_custom_annotations
+    }
+  }
+
   ingress_alb_subnets = {
     "ingress" : {
       "albsubnets" : var.ingress_alb_subnets
@@ -128,7 +134,7 @@ resource "helm_release" "istio_ingress" {
     {
       name  = "ingress.lbtype"
       type  = "string"
-      value = var.ingress_loadbalancer_type # alb nlb sdnlb
+      value = var.ingress_loadbalancer_type # alb nlb other
     },
     {
       name  = "ingress.lbiptype"
@@ -175,6 +181,7 @@ resource "helm_release" "istio_ingress" {
   values = [
     yamlencode(local.ingress_selectors),
     yamlencode(local.ingress_alb_subnets),
+    yamlencode(local.ingress_custom_annotations),
     yamlencode(local.ingress_nlb_zones_subnets),
     yamlencode(local.ingress_ports),
     yamlencode(local.ingress_autoscale_configuration),

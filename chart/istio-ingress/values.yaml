@@ -7,6 +7,7 @@ ingress:
   svctype: LoadBalancer
   lbtype: alb # nlb sdnlb
   lbiptype: public # private
+  customAnnotations: {}
   istioNamespaceEnrollmentLabels: {}
   istioselectors: {}
   albsubnets:

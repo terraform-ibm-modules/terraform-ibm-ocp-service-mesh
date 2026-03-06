@@ -127,107 +127,119 @@ resource "time_sleep" "wait_istio" {
   destroy_duration = "60s"
 }
 
-module "basic_workload_ingress" {
-  depends_on                = [time_sleep.wait_istio]
-  source                    = "../../modules/sm-istio-ingress"
-  name                      = "alb-ingress"
-  namespace                 = "alb-ingress"
-  create_namespace          = true
-  force_dataplane_update    = false
-  ingress_loadbalancer_type = "alb"
-  ingress_service_type      = "LoadBalancer"
-  ingress_ip_type           = "public"
-  istio_mesh_enrollment     = "default"
-  ingress_affinity          = {} # local.alb_affinity
-  ingress_selectors = {
-    "istio" : "ingress-gateway",
-  }
-  ingress_ports = [
-    {
-      "name" : "http2"
-      "port" : "80"
-      "targetPort" : "8000"
-      "proto" : "TCP"
-    }
-  ]
-  cluster_id        = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
-}
+module "basic_with_mtls_profile" {
+  depends_on              = [module.deploy_istio_cni, time_sleep.wait_istio]
+  source                  = "../../modules/sm-profiles/basic_with_mtls"
+  existing_cluster_id     = module.ocp_base.cluster_id
+  existing_resource_group = module.resource_group.resource_group_id
 
-module "default_workload_egress" {
-  depends_on             = [time_sleep.wait_istio]
-  source                 = "../../modules/sm-istio-egress"
-  name                   = "basic-egress"
-  namespace              = "basic-egress"
-  create_namespace       = true
-  force_dataplane_update = true
-  istio_mesh_enrollment  = "default"
-  egress_affinity        = {}
-  egress_selectors = {
-    "istio" : "egress-gateway",
+  public_ingress_name      = "public-ingress"
+  public_ingress_namespace = "basic-profile"
+  istio_mesh_enrollment    = "default"
+
+  # ingress_custom_annotations
+
+  public_ingress_traffic_selectors = {
+    "app" : "istio-ingress",
+    "istio" : "istio-ingress",
   }
-  egress_ports = [
-    {
-      "name" : "http2"
-      "port" : "80"
-      "targetPort" : "8000"
-      "proto" : "TCP"
+
+  public_ingress_alb_idle_timeout = 75
+
+  public_ingress_alb_subnets = [] # [ for subnet in module.vpc.subnets["default"] : subnet["id"] ]
+  public_ingress_ports = [{
+    port : 443,
+    name : "https",
+    proto : "TCP",
+    targetPort : 8443
     },
     {
-      "name" : "https"
-      "port" : "443"
-      "targetPort" : "443"
-      "proto" : "TCP"
-    }
-  ]
-  cluster_id        = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
-}
-
-resource "kubernetes_namespace_v1" "sample_app_namespace" {
-  depends_on = [time_sleep.wait_istio]
-  metadata {
-    name = "httpbin"
-    # istio injection annotations for default dataplane
-    labels = {
-      "istio-discovery" : "enabled"
-      "istio-injection" : "enabled"
-    }
-    annotations = {
-      "istio-discovery" : "enabled"
-      "istio-injection" : "enabled"
-    }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      metadata[0].annotations,
-      metadata[0].labels
-    ]
-  }
-}
-
-resource "helm_release" "sample_app" {
-  depends_on = [kubernetes_namespace_v1.sample_app_namespace]
-
-  name                       = "httpbin-sample-app"
-  chart                      = "../charts/sample-app/httpbin"
-  namespace                  = "httpbin"
-  create_namespace           = false
-  timeout                    = 300
-  cleanup_on_fail            = true
-  wait                       = true
-  disable_openapi_validation = false
-
-  set = [{
-    name  = "namespace"
-    value = "httpbin"
-    }, {
-    name  = "gateway.istioSelector"
-    value = "ingress-gateway"
-    },
-    {
-      name  = "gateway.istioPort"
-      value = "80"
+      port : 80,
+      name : "http2",
+      proto : "TCP",
+      targetPort : 8080
   }]
+
+  public_ingress_external_traffic_policy = "Cluster"
+
+  public_ingress_internal_traffic_policy = "Local"
+
+  public_ingress_replicas = 4
+
+  # public_ingress_resources_configuration
+
+  # public_ingress_termination_grace_period
+
+  # public_ingress_pods_affinity
+
+  # public_ingress_tolerations
+
+  # public_ingress_enable_proxy_protocol = false
+
+  # public_ingress_proxy_protocol_allow_without = false
+
+  public_egress_name = "public-egress"
+
+  public_egress_namespace = "basic-profile"
+
+  public_egress_traffic_selectors = {
+    "app" : "istio-egress",
+    "istio" : "istio-egress",
+  }
+
+
+  public_egress_ports = [{
+    port : 443,
+    name : "https",
+    proto : "TCP",
+    targetPort : 443
+  }]
+
+  public_egress_internal_traffic_policy = "Cluster"
+
+  public_egress_autoscale_configuration = {
+    enabled : true,
+    autoscaleMin : 1,
+    autoscaleMax : 4,
+    cpu : {
+      targetavgutil : 85
+    },
+    memory : {
+      targetavgutil : 85
+    }
+  }
+
+  # public_egress_resources_configuration
+
+  # public_egress_termination_grace_period
+
+  # public_egress_pods_affinity = {}
+
+  # public_egress_tolerations = []
+
 }
+
+# resource "helm_release" "sample_app" {
+#   depends_on = [kubernetes_namespace_v1.sample_app_namespace]
+
+#   name                       = "httpbin-sample-app"
+#   chart                      = "../charts/sample-app/httpbin"
+#   namespace                  = "httpbin"
+#   create_namespace           = false
+#   timeout                    = 300
+#   cleanup_on_fail            = true
+#   wait                       = true
+#   disable_openapi_validation = false
+
+#   set = [{
+#     name  = "namespace"
+#     value = "httpbin"
+#     }, {
+#     name  = "gateway.istioSelector"
+#     value = "ingress-gateway"
+#     },
+#     {
+#       name  = "gateway.istioPort"
+#       value = "80"
+#   }]
+# }

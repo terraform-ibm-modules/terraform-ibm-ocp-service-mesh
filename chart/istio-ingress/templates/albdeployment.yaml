@@ -1,4 +1,4 @@
-{{- if or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "sdnlb") }}
+{{- if or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "other") }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,12 +26,6 @@ spec:
         sidecar.istio.io/inject: "true"
         istio.io/gateway: "{{ .Values.ingress.name }}.{{ .Values.ingress.namespace }}"
     spec:
-      {{- if .Values.ingress.nlbzones }}
-      nodeSelector:
-        {{- range $zone := .Values.ingress.nlbzones }}
-        ibm-cloud.kubernetes.io/zone: {{ $zone | quote }}
-        {{- end }}
-      {{- end }}
       {{- if .Values.ingress.affinity }}
       affinity:
         {{- if .Values.ingress.affinity.podAffinity }}
