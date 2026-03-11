@@ -34,7 +34,7 @@ variable "public_ingress_loadbalancer_type" {
   nullable    = false
   description = "IBM Cloud LoadBalancer type bound to the ingress: valid values are \"alb\" for Application Load Balancer, \"nlb\" for Network Load Balancer, and \"other\" to define your LoadBalancer with your custom annotations. If var.ingress_service_type == \"ClusterIP\" this value hasn't effect. For more details refer to https://cloud.ibm.com/docs/vpc?topic=vpc-nlb-vs-elb. Default to ALB."
   validation {
-    condition     = contains(["alb", "nlb", "other"], var.ingress_loadbalancer_type)
+    condition     = contains(["alb", "nlb", "other"], var.public_ingress_loadbalancer_type)
     error_message = "The allowed values for var.ingress_service_type are alb, nlb or other."
   }
 }
@@ -49,7 +49,7 @@ variable "ingress_custom_annotations" {
   type        = map(string)
   default     = {}
   nullable    = false
-  description = "Istio ingress to customise your ingress LoadBalaner set with var.ingress_loadbalancer_type = \"other\". Null not allowed"
+  description = "Istio ingress to customise your ingress LoadBalaner set with var.public_ingress_loadbalancer_type = \"other\". Null not allowed"
 }
 
 variable "public_ingress_traffic_selectors" {
@@ -189,14 +189,14 @@ variable "public_ingress_pods_affinity" {
     podAffinity : optional(any, null),
     nodeAffinity : optional(any, null)
   })
-  default     = {}
-  description = "Istio ingress affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Ingress pods are provided of a label with key \"istio.io/gateway\" and value \"[DEPLOYMENT NAME].[DEPLOYMENT NAMESPACE]\" in order to allow to set them as antiAffinity labels. Default to empty configuration."
+  default     = null
+  description = "Istio ingress affinity configuration. Default null setting by default the ingress pods on edge labeled worker nodes. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Ingress pods are provided of a label with key \"istio.io/gateway\" and value \"[DEPLOYMENT NAME].[DEPLOYMENT NAMESPACE]\" in order to allow to set them as antiAffinity labels. Default to empty configuration."
 }
 
 variable "public_ingress_tolerations" {
   type        = list(any)
-  default     = []
-  description = "Istio ingress tolerations configuration. Default to tolerate 'dedicated: edge' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
+  default     = null
+  description = "Istio ingress tolerations configuration. Default null setting toleration to 'dedicated: edge' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
 }
 
 variable "public_ingress_enable_proxy_protocol" {
@@ -328,12 +328,12 @@ variable "public_egress_pods_affinity" {
     podAffinity : optional(any, null),
     nodeAffinity : optional(any, null)
   })
-  default     = {}
-  description = "Istio egress affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Egress pods are provided of a label with key \"istio.io/gateway\" and value \"[DEPLOYMENT NAME].[DEPLOYMENT NAMESPACE]\" in order to allow to set them as antiAffinity labels. Default to empty configuration."
+  default     = null
+  description = "Istio egress affinity configuration. Default null setting by default the ingress pods on edge labeled worker nodes. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Egress pods are provided of a label with key \"istio.io/gateway\" and value \"[DEPLOYMENT NAME].[DEPLOYMENT NAMESPACE]\" in order to allow to set them as antiAffinity labels. Default to empty configuration."
 }
 
 variable "public_egress_tolerations" {
   type        = list(any)
-  default     = []
-  description = "Istio egress tolerations configuration. Default to tolerate 'dedicated: edge' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
+  default     = null
+  description = "Istio egress tolerations configuration. Default null setting toleration to 'dedicated: edge' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core"
 }
