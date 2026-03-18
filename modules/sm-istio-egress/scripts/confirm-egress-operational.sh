@@ -59,6 +59,6 @@ if [ ${fail} == true ]; then
   kubectl get deployment "${service}" -n "${namespace}" -o wide
   kubectl get pods -n "${namespace}" -o wide
   kubectl describe svc "${service}" -n "${namespace}"
-  kubectl describe deployments -n "${service}" "${namespace}"
+  kubectl describe deployments "${service}" -n "${namespace}"
   # exit 1
 fi
