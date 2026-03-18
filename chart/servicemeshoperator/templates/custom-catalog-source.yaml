@@ -10,7 +10,7 @@ metadata:
 spec:
   image: "{{ .Values.catalog.registryUrl }}/{{ .Values.catalog.catalogIndexName }}@{{ .Values.catalog.catalogIndexDigest }}"
   sourceType: grpc
-  {{- if not (quote .Values.catalog.registryPullSecretValue | empty) }}
+  {{- if not (quote .Values.catalog.registryPullSecretName | empty) }}
   secrets:
   - "{{ .Values.catalog.registryPullSecretName }}"
   {{- end }}
