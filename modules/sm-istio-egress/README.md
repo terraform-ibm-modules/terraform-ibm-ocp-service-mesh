@@ -36,7 +36,6 @@ This configuration deploys a Istio egress gateway with the default configuration
 The gateway is created in the `basic-egress` namespace which is created at gateway deployment time, and opens the ports TCP/80 (mapped internally to port 8000) and TCP/443 (mapped internally to port 443). Traffic routing selector is `"istio" : "egress-gateway"`
 
 ```
-
 module "default_workload_egress" {
   source                 = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio-egress"
   version                = "X.Y.Z"
