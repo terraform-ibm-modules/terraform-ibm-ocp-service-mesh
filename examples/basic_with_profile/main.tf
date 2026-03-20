@@ -130,12 +130,12 @@ resource "time_sleep" "wait_istio" {
 module "basic_with_mtls_profile" {
   depends_on              = [module.deploy_istio_cni, time_sleep.wait_istio]
   source                  = "../../modules/sm-profiles/basic_with_mtls"
+  profile_namespace       = "basic-mtls-profile"
   existing_cluster_id     = module.ocp_base.cluster_id
   existing_resource_group = module.resource_group.resource_group_id
 
-  public_ingress_name      = "public-ingress"
-  public_ingress_namespace = "basic-profile"
-  istio_mesh_enrollment    = "default"
+  public_ingress_name   = "public-ingress"
+  istio_mesh_enrollment = "default"
 
   # ingress_custom_annotations
 
@@ -179,8 +179,6 @@ module "basic_with_mtls_profile" {
   # public_ingress_proxy_protocol_allow_without = false
 
   public_egress_name = "public-egress"
-
-  public_egress_namespace = "basic-profile"
 
   public_egress_traffic_selectors = {
     "app" : "istio-egress",
