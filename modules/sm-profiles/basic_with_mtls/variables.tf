@@ -34,7 +34,7 @@ variable "public_ingress_loadbalancer_type" {
   nullable    = false
   description = "IBM Cloud LoadBalancer type bound to the ingress: valid values are \"alb\" for Application Load Balancer, \"nlb\" for Network Load Balancer, and \"other\" to define your LoadBalancer with your custom annotations. If var.ingress_service_type == \"ClusterIP\" this value hasn't effect. For more details refer to https://cloud.ibm.com/docs/vpc?topic=vpc-nlb-vs-elb. Default to ALB."
   validation {
-    condition     = contains(["alb", "nlb", "other"], var.ingress_loadbalancer_type)
+    condition     = contains(["alb", "nlb", "other"], var.public_ingress_loadbalancer_type)
     error_message = "The allowed values for var.ingress_service_type are alb, nlb or other."
   }
 }
