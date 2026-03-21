@@ -70,7 +70,7 @@ data "ibm_container_cluster_config" "cluster_config" {
 module "egress_namespace" {
   count   = var.create_namespace ? 1 : 0
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "v1.0.3"
+  version = "v2.0.1"
   namespaces = [
     {
       name = var.namespace
