@@ -130,7 +130,7 @@ provider "kubernetes" {
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = var.cluster_id
   resource_group_id = var.resource_group_id
-  endpoint_type     = "default"
+  endpoint_type     = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
 }
 
 # deploy servicemesh operator
@@ -139,21 +139,20 @@ module "service_mesh_operator" {
   version                      = "X.Y.Z"
   cluster_id                   = var.cluster_id
   develop_mode                 = var.develop_mode
-  cluster_config_endpoint_type = var.cluster_config_endpoint_type
+  resource_group_id            = var.resource_group_id
 }
 
-# deploy servicemesh controlplane with istio resource
 module "deploy_istio" {
-  depends_on               = [module.service_mesh_operator]
-  source                   = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio"
-  version                  = "X.Y.Z"
-  name                     = "default"
-  namespace                = "istio-system"
-  create_namespace         = true
-  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  depends_on        = [module.service_mesh_operator]
+  source            = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio"
+  version           = "X.Y.Z"
+  name              = "default"
+  namespace         = "istio-system"
+  create_namespace  = true
+  cluster_id        = var.cluster_id
+  resource_group_id = var.resource_group_id
 }
 
-# deploy servicemesh cni with istiocni resource
 module "deploy_istio_cni" {
   depends_on       = [module.service_mesh_operator]
   source           = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio-cni"
@@ -226,6 +225,7 @@ module "default_workload_egress" {
   ]
   cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
+
 ```
 
 ### Required access policies
