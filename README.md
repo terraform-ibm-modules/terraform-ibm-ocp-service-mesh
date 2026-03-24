@@ -60,30 +60,13 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
       <li><a href="./modules/sm-istio">sm-istio</a></li>
       <li><a href="./modules/sm-istio-egress">sm-istio-egress</a></li>
       <li><a href="./modules/sm-istio-ingress">sm-istio-ingress</a></li>
-      <li><a href="./modules/sm-profiles/basic_with_mtls">sm-profiles/basic_with_mtls</a></li>
-      <li><a href="./modules/sm-profiles/private_only_ingress_egress_with_sdnlb_transit">sm-profiles/private_only_ingress_egress_with_sdnlb_transit</a></li>
-      <li><a href="./modules/sm-profiles/public_ingress_egress_no_transit">sm-profiles/public_ingress_egress_no_transit</a></li>
-      <li><a href="./modules/sm-profiles/public_ingress_egress_with_sdnlb_transit">sm-profiles/public_ingress_egress_with_sdnlb_transit</a></li>
-      <li><a href="./modules/sm-profiles/public_ingress_egress_with_sdnlb_transit_cse_proxy_enabled">sm-profiles/public_ingress_egress_with_sdnlb_transit_cse_proxy_enabled</a></li>
     </ul>
   </li>
   <li><a href="./examples">Examples</a>
     <ul>
       <li>
-        <a href="./examples/advanced">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
-        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-advanced-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/advanced"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-      </li>
-      <li>
         <a href="./examples/basic">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-      </li>
-      <li>
-        <a href="./examples/basic_with_profile">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
-        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-basic_with_profile-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic_with_profile"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
-      </li>
-      <li>
-        <a href="./examples/basic_with_transit_profile">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
-        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-basic_with_transit_profile-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic_with_transit_profile"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
         <a href="./examples/existing_cluster">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
@@ -147,7 +130,7 @@ provider "kubernetes" {
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = var.cluster_id
   resource_group_id = var.resource_group_id
-  endpoint_type     = "default"
+  endpoint_type     = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
 }
 
 # deploy servicemesh operator
@@ -156,21 +139,20 @@ module "service_mesh_operator" {
   version                      = "X.Y.Z"
   cluster_id                   = var.cluster_id
   develop_mode                 = var.develop_mode
-  cluster_config_endpoint_type = var.cluster_config_endpoint_type
+  resource_group_id            = var.resource_group_id
 }
 
-# deploy servicemesh controlplane with istio resource
 module "deploy_istio" {
-  depends_on               = [module.service_mesh_operator]
-  source                   = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio"
-  version                  = "X.Y.Z"
-  name                     = "default"
-  namespace                = "istio-system"
-  create_namespace         = true
-  cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
+  depends_on        = [module.service_mesh_operator]
+  source            = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio"
+  version           = "X.Y.Z"
+  name              = "default"
+  namespace         = "istio-system"
+  create_namespace  = true
+  cluster_id        = var.cluster_id
+  resource_group_id = var.resource_group_id
 }
 
-# deploy servicemesh cni with istiocni resource
 module "deploy_istio_cni" {
   depends_on       = [module.service_mesh_operator]
   source           = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio-cni"
@@ -243,6 +225,7 @@ module "default_workload_egress" {
   ]
   cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
+
 ```
 
 ### Required access policies
