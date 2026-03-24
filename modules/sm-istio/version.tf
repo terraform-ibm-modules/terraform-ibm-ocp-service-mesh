@@ -14,5 +14,10 @@ terraform {
       source  = "hashicorp/null"
       version = ">= 3.2.1, < 4.0.0"
     }
+    # tflint-ignore: terraform_unused_required_providers
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 3.0.1, < 4.0.0"
+    }
   }
 }

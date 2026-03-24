@@ -12,8 +12,7 @@ locals {
   operators_namespace      = "openshift-operators"
   sm_operator_release_name = "helm-release-smv3-subscription"
   sm_operator_chart_path   = "servicemeshoperator"
-  # sm_operator_version              = "v3.0.3" # commented as not used in this moment
-  sm_operator_name = "servicemeshoperator3"
+  sm_operator_name         = "servicemeshoperator3"
 
   # timeout in seconds for operators helm releases to be ready
   operators_timeout = 600
@@ -44,7 +43,6 @@ data "ibm_container_cluster_config" "cluster_config" {
 ##############################################################################
 
 locals {
-  # sm_operator_version = "servicemeshoperator3.v3.2.1"
   service_mesh_operator_set_list_initial = [
     {
       name  = "operator.namespace"
