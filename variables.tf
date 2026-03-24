@@ -29,6 +29,23 @@ variable "cluster_config_endpoint_type" {
   }
 }
 
+variable "sm_operator_installplan_approval" {
+  description = "OpenShift OLM install plan approval strategy. Valid values are 'Automatic', to automatically perform installation and upgrades, or 'Manual' to required manual approval "
+  type        = string
+  default     = "Automatic"
+  nullable    = false
+  validation {
+    error_message = "Invalid plan installation approval. Valid values are 'Manual' or 'Automatic'"
+    condition     = contains(["Automatic", "Manual"], var.sm_operator_installplan_approval)
+  }
+}
+
+variable "sm_operator_version" {
+  description = "OpenShift ServiceMesh Operator v3 version to install. Default to null to use the latest version available in the catalog."
+  type        = string
+  default     = null
+}
+
 # CUSTOM CATALOG SOURCE VARIABLES FOR SERVICE MESH OPERATOR
 
 variable "sm_operator_custom_catalog_name" {
@@ -40,7 +57,7 @@ variable "sm_operator_custom_catalog_name" {
 variable "sm_operator_custom_catalog_namespace" {
   type        = string
   description = "Namespace of the custom Catalog Source for the Service Mesh Operator"
-  default     = "openshit-marketplace"
+  default     = "openshift-marketplace"
 }
 
 variable "sm_operator_custom_catalog_description" {

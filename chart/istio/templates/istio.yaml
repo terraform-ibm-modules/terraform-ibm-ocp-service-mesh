@@ -7,7 +7,7 @@ spec:
   namespace: {{ .Values.istioconfiguration.namespace }}
   updateStrategy:
     inactiveRevisionDeletionGracePeriodSeconds: 30
-    type: InPlace
+    type: {{ .Values.istioconfiguration.updateStrategyType }}
   global:
     logAsJson: true
     istioNamespace: {{ .Values.istioconfiguration.namespace }}

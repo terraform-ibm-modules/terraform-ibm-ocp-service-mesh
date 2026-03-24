@@ -70,12 +70,20 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
   <li><a href="./examples">Examples</a>
     <ul>
       <li>
+        <a href="./examples/advanced">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-advanced-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/advanced"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+      <li>
         <a href="./examples/basic">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
         <a href="./examples/basic_with_profile">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-basic_with_profile-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic_with_profile"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+      <li>
+        <a href="./examples/basic_with_transit_profile">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-basic_with_transit_profile-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic_with_transit_profile"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
         <a href="./examples/existing_cluster">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
@@ -286,11 +294,13 @@ No modules.
 | <a name="input_sm_operator_custom_catalog_image_digest"></a> [sm\_operator\_custom\_catalog\_image\_digest](#input\_sm\_operator\_custom\_catalog\_image\_digest) | Digest of the catalog index image for the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
 | <a name="input_sm_operator_custom_catalog_index_name"></a> [sm\_operator\_custom\_catalog\_index\_name](#input\_sm\_operator\_custom\_catalog\_index\_name) | Name of the catalog index for the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
 | <a name="input_sm_operator_custom_catalog_name"></a> [sm\_operator\_custom\_catalog\_name](#input\_sm\_operator\_custom\_catalog\_name) | Name of the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
-| <a name="input_sm_operator_custom_catalog_namespace"></a> [sm\_operator\_custom\_catalog\_namespace](#input\_sm\_operator\_custom\_catalog\_namespace) | Namespace of the custom Catalog Source for the Service Mesh Operator | `string` | `"openshit-marketplace"` | no |
+| <a name="input_sm_operator_custom_catalog_namespace"></a> [sm\_operator\_custom\_catalog\_namespace](#input\_sm\_operator\_custom\_catalog\_namespace) | Namespace of the custom Catalog Source for the Service Mesh Operator | `string` | `"openshift-marketplace"` | no |
 | <a name="input_sm_operator_custom_catalog_publisher"></a> [sm\_operator\_custom\_catalog\_publisher](#input\_sm\_operator\_custom\_catalog\_publisher) | Publisher of the custom Catalog Source for the Service Mesh Operator | `string` | `null` | no |
 | <a name="input_sm_operator_custom_catalog_registry_pullsecret_name"></a> [sm\_operator\_custom\_catalog\_registry\_pullsecret\_name](#input\_sm\_operator\_custom\_catalog\_registry\_pullsecret\_name) | Name of the cluster secret to store the pull secret to access the registry for the mirrored Service Mesh Operator images | `string` | `null` | no |
 | <a name="input_sm_operator_custom_catalog_registry_pullsecret_value"></a> [sm\_operator\_custom\_catalog\_registry\_pullsecret\_value](#input\_sm\_operator\_custom\_catalog\_registry\_pullsecret\_value) | Value of the pull secret to access the registry for the mirrored Service Mesh Operator images | `string` | `null` | no |
 | <a name="input_sm_operator_custom_catalog_registry_url"></a> [sm\_operator\_custom\_catalog\_registry\_url](#input\_sm\_operator\_custom\_catalog\_registry\_url) | Registry URL for the mirrored Service Mesh Operator images | `string` | `"icr.io"` | no |
+| <a name="input_sm_operator_installplan_approval"></a> [sm\_operator\_installplan\_approval](#input\_sm\_operator\_installplan\_approval) | OpenShift OLM install plan approval strategy. Valid values are 'Automatic', to automatically perform installation and upgrades, or 'Manual' to required manual approval | `string` | `"Automatic"` | no |
+| <a name="input_sm_operator_version"></a> [sm\_operator\_version](#input\_sm\_operator\_version) | OpenShift ServiceMesh Operator v3 version to install. Default to null to use the latest version available in the catalog. | `string` | `null` | no |
 
 ### Outputs
 
