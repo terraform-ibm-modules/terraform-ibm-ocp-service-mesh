@@ -69,6 +69,10 @@ variable "istio_update_strategy_type" {
   description = "Type of strategy to use. Allowed values are InPlace or RevisionBased. When InPlace strategy is used, the existing Istio control plane is updated in-place. When the RevisionBased strategy is used, a new Istio control plane instance is created for every change to the Istio.spec.version field. For more details refer to https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#updatestrategytype. Default to InPlace"
   default     = "InPlace"
   nullable    = false
+  validation {
+    error_message = "Invalid update strategy type for Istio. Valid values are 'InPlace' or 'RevisionBased'"
+    condition     = contains(["InPlace", "RevisionBased"], var.istio_update_strategy_type)
+  }
 }
 
 variable "pilot_enabled" {
