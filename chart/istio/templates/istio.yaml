@@ -13,6 +13,8 @@ spec:
     istioNamespace: {{ .Values.istioconfiguration.namespace }}
     defaultPodDisruptionBudget:
       enabled: {{ .Values.istioconfiguration.defaultpdb }}
+    networkPolicy:
+      enabled: {{ .Values.istioconfiguration.enableNetworkPolicy }}
   values:
     outboundTrafficPolicy: {{ .Values.istioconfiguration.outboundTrafficPolicy }}
     pilot:

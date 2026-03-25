@@ -4,6 +4,7 @@ istioconfiguration:
   outboundTrafficPolicy: REGISTRY_ONLY
   defaultpdb: false
   updateStrategyType: InPlace
+  enableNetworkPolicy: true
   pilot:
     enabled: true
     autoscale:

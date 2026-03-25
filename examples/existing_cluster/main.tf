@@ -150,7 +150,7 @@ module "default_workload_egress" {
 # Deploy BookInfo sample app
 ##############################################################################
 
-resource "kubernetes_namespace_v1" "bookinfo_v3" {
+resource "kubernetes_namespace_v1" "sample_app_namespace" {
   metadata {
     name = "bookinfo-v3"
     labels = {
@@ -171,12 +171,12 @@ resource "kubernetes_namespace_v1" "bookinfo_v3" {
   }
 }
 
-resource "helm_release" "bookinfo" {
-  depends_on = [kubernetes_namespace_v1.bookinfo_v3]
+resource "helm_release" "sample_app" {
+  depends_on = [kubernetes_namespace_v1.sample_app_namespace]
 
-  name                       = "bookinfo-sample-istio-app"
-  chart                      = "../sample-app/bookinfo"
-  namespace                  = "bookinfo-v3"
+  name                       = "httpbin-sample-app"
+  chart                      = "../charts/sample-app/httpbin"
+  namespace                  = "httpbin"
   create_namespace           = false
   timeout                    = 300
   cleanup_on_fail            = true
@@ -184,8 +184,11 @@ resource "helm_release" "bookinfo" {
   disable_openapi_validation = false
 
   set = [{
+    name  = "namespace"
+    value = "httpbin"
+    }, {
     name  = "gateway.istioSelector"
-    value = "ingress-gw"
+    value = "ingress-gateway"
     },
     {
       name  = "gateway.istioPort"

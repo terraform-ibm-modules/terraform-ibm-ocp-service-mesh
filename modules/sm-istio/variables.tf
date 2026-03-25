@@ -82,6 +82,13 @@ variable "pilot_enabled" {
   default     = true
 }
 
+variable "istio_enable_network_policy" {
+  type        = bool
+  description = "Enable Istio to deploy its Network Policy. Default to true. For more details refer to https://istio.io/latest/docs/setup/additional-setup/network-policy/"
+  nullable    = false
+  default     = true
+}
+
 variable "pilot_autoscaling_enabled" {
   type        = bool
   description = "Enable Istio pilot autoscaling through HorizontalPodAutoscaler. Default to false"
