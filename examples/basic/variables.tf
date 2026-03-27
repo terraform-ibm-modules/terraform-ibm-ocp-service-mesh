@@ -43,3 +43,9 @@ variable "cluster_config_endpoint_type" {
     condition     = contains(["default", "private", "vpe", "link"], var.cluster_config_endpoint_type)
   }
 }
+
+variable "service_mesh_operator_version" {
+  description = "Version of the ServiceMesh v3 operator to deploy. If null the default one will be installed"
+  type        = string
+  default     = null
+}
