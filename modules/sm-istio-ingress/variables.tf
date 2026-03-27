@@ -66,6 +66,10 @@ variable "ingress_loadbalancer_type" {
     condition     = contains(["alb", "nlb", "other"], var.ingress_loadbalancer_type)
     error_message = "The allowed values for var.ingress_service_type are alb, nlb or other."
   }
+  validation {
+    condition     = var.ingress_loadbalancer_type == "other" && var.ingress_custom_annotations != {}
+    error_message = "If var.ingress_loadbalancer_type is set to other var.ingress_custom_annotations cannot be empty"
+  }
 }
 
 variable "ingress_ip_type" {
@@ -101,7 +105,7 @@ variable "ingress_custom_annotations" {
   type        = map(string)
   default     = {}
   nullable    = false
-  description = "Istio ingress to customise your ingress LoadBalaner set with var.ingress_loadbalancer_type = \"other\". Null not allowed"
+  description = "Istio ingress key-value map to customise your ingress LoadBalaner annotations set. Cannot be empty if var.ingress_loadbalancer_type = \"other\". Default to empty. Null not allowed"
 }
 
 variable "ingress_selectors" {
