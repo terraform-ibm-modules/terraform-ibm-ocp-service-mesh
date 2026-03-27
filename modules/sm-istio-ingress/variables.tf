@@ -67,8 +67,8 @@ variable "ingress_loadbalancer_type" {
     error_message = "The allowed values for var.ingress_service_type are alb, nlb or other."
   }
   validation {
-    condition     = var.ingress_loadbalancer_type == "other" && var.ingress_custom_annotations != {}
-    error_message = "If var.ingress_loadbalancer_type is set to other var.ingress_custom_annotations cannot be empty"
+    condition     = var.ingress_loadbalancer_type != "other" || var.ingress_custom_annotations != {}
+    error_message = "If var.ingress_loadbalancer_type is set to \"other\" var.ingress_custom_annotations cannot be empty"
   }
 }
 
