@@ -147,12 +147,12 @@ module "default_workload_egress" {
 }
 
 ##############################################################################
-# Deploy BookInfo sample app
+# Deploy httpbin sample app
 ##############################################################################
 
 resource "kubernetes_namespace_v1" "sample_app_namespace" {
   metadata {
-    name = "bookinfo-v3"
+    name = "httpbin"
     labels = {
       "istio-discovery" : var.istio_controlplane_name
       "istio.io/rev" : var.istio_controlplane_name
@@ -176,7 +176,7 @@ resource "helm_release" "sample_app" {
 
   name                       = "httpbin-sample-app"
   chart                      = "../charts/sample-app/httpbin"
-  namespace                  = "httpbin"
+  namespace                  = kubernetes_namespace_v1.sample_app_namespace.metadata[0].name
   create_namespace           = false
   timeout                    = 300
   cleanup_on_fail            = true
