@@ -81,7 +81,6 @@ Through the input variable `pilot_resources` you can set the following pilot pod
 - cpu initial request
 - memory initial request
 
-
 The default values are the below ones:
 ```
 {
