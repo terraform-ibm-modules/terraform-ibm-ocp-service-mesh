@@ -188,7 +188,7 @@ resource "helm_release" "sample_app" {
     value = "httpbin"
     }, {
     name  = "gateway.istioSelector"
-    value = "ingress-gateway"
+    value = "ingress-gw"
     },
     {
       name  = "gateway.istioPort"
