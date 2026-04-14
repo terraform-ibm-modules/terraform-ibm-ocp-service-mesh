@@ -129,6 +129,7 @@ resource "helm_release" "istio_controlplane" {
   dependency_update = true
   force_update      = var.force_controlplane_update
   cleanup_on_fail   = false
+  atomic            = true
   wait              = true
 
   disable_openapi_validation = false
