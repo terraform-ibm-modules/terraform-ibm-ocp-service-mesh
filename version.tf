@@ -4,7 +4,7 @@ terraform {
     # Use a range in modules
     ibm = {
       source  = "ibm-cloud/ibm"
-      version = ">= 1.59.0, < 2.0.0"
+      version = ">= 1.59.0, < 3.0.0"
     }
     helm = {
       source  = "hashicorp/helm"
