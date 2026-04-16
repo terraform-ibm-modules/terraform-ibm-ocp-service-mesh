@@ -4,7 +4,7 @@
 
 module "existing_resource_group" {
   source                       = "terraform-ibm-modules/resource-group/ibm"
-  version                      = "1.5.0"
+  version                      = "1.6.0"
   existing_resource_group_name = var.existing_resource_group
 }
 
@@ -147,12 +147,12 @@ module "default_workload_egress" {
 }
 
 ##############################################################################
-# Deploy BookInfo sample app
+# Deploy httpbin sample app
 ##############################################################################
 
 resource "kubernetes_namespace_v1" "sample_app_namespace" {
   metadata {
-    name = "bookinfo-v3"
+    name = "httpbin"
     labels = {
       "istio-discovery" : var.istio_controlplane_name
       "istio.io/rev" : var.istio_controlplane_name
@@ -176,7 +176,7 @@ resource "helm_release" "sample_app" {
 
   name                       = "httpbin-sample-app"
   chart                      = "../charts/sample-app/httpbin"
-  namespace                  = "httpbin"
+  namespace                  = kubernetes_namespace_v1.sample_app_namespace.metadata[0].name
   create_namespace           = false
   timeout                    = 300
   cleanup_on_fail            = true
@@ -188,7 +188,7 @@ resource "helm_release" "sample_app" {
     value = "httpbin"
     }, {
     name  = "gateway.istioSelector"
-    value = "ingress-gateway"
+    value = "ingress-gw"
     },
     {
       name  = "gateway.istioPort"
