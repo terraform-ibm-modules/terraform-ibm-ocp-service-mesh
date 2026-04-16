@@ -64,6 +64,13 @@ variable "istio_namespace_discovery_custom_labels" {
   description = "Istio controlplane discovery label to apply to controlplane namespace. Default to null to autogenerate the labels according to var.name to {\"istio-discovery\" : \"enabled\"}. If overridden consider it to be coherent with selectors of var.istio_discovery_configuration. For more details https://istio.io/latest/blog/2021/discovery-selectors/"
 }
 
+variable "istio_namespace_add_discovery_for_workload" {
+  type        = bool
+  default     = false
+  nullable    = false
+  description = "Flag to automatically generate and add the labels and annotations for the workload enrollment and istio injection to the Istio namespace. This would allow to enable istio injection into the istio namespace in order to run the workload gateways and the workload itself in the same namespace. If var.istio_namespace_discovery_custom_labels is not empty this value is ignored. Default to false."
+}
+
 variable "istio_enable_default_pod_disruption_budget" {
   type        = bool
   description = "Controls whether a PodDisruptionBudget with a default minAvailable value of 1 is created for each deployment. Default to null, using Istio default configuration. More details at https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#defaultpoddisruptionbudgetconfig"
