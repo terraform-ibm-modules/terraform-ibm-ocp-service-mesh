@@ -20,6 +20,11 @@ func setupOptions(t *testing.T, prefix string, dir string) *testhelper.TestOptio
 		TerraformDir:  dir,
 		Prefix:        prefix,
 		ResourceGroup: resourceGroup,
+		IgnoreUpdates: testhelper.Exemptions{ // Ignore for consistency check
+			List: []string{
+				"module.service_mesh_operator.terraform_data.undeploy_servicemesh[0]",
+			},
+		},
 	})
 	return options
 }
