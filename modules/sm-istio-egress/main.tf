@@ -93,7 +93,7 @@ resource "helm_release" "istio_egress" {
   dependency_update = true
   force_update      = var.force_dataplane_update
   cleanup_on_fail   = false
-  atomic            = true
+  atomic            = var.rollback_on_failure
   wait              = true
 
   disable_openapi_validation = false

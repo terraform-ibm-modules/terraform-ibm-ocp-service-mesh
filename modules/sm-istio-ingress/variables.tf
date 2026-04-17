@@ -284,3 +284,9 @@ variable "ingress_proxy_protocol_allow_without" {
   type        = bool
   default     = false
 }
+
+variable "rollback_on_failure" {
+  description = "Flag to automatically rollback the helm chart on installation failure."
+  type        = bool
+  default     = true
+}

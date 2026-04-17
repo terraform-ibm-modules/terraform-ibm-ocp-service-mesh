@@ -221,6 +221,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_pilot_resources"></a> [pilot\_resources](#input\_pilot\_resources) | Istio pilot pods resources requests and limits for memory and CPU. Default to requests CPU 10m memory 128M limits CPU 100m memory 256M, using the default Istio values. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcerequirements-v1-core | <pre>object({<br/>    limits : optional(map(string), null),<br/>    requests : optional(map(string), null)<br/>  })</pre> | <pre>{<br/>  "limits": {<br/>    "cpu": "100m",<br/>    "memory": "256M"<br/>  },<br/>  "requests": {<br/>    "cpu": "10m",<br/>    "memory": "128M"<br/>  }<br/>}</pre> | no |
 | <a name="input_pilot_tolerations"></a> [pilot\_tolerations](#input\_pilot\_tolerations) | Istio pilot pods tolerations configuration. Default to empty list. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core | `list(any)` | `[]` | no |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The ID of the resource group for the OpenShift Cluster. | `string` | n/a | yes |
+| <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
 
 ### Outputs
 
