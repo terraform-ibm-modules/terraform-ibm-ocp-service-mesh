@@ -127,7 +127,10 @@ locals {
 # installing helm chart to enable subscriptions for openshift servicemesh v3 operator
 resource "helm_release" "service_mesh_operator" {
   # depends_on to ensure undeploy script runs after this helm_release is destroyed
-  depends_on = [data.ibm_container_cluster_config.cluster_config]
+  depends_on = [
+    data.ibm_container_cluster_config.cluster_config,
+    terraform_data.undeploy_servicemesh
+  ]
 
   name              = local.sm_operator_release_name
   chart             = "${path.module}/chart/${local.sm_operator_chart_path}"
@@ -166,23 +169,22 @@ locals {
 }
 
 resource "terraform_data" "undeploy_servicemesh" {
-  count      = var.clean_servicemesh_on_undeploy ? 1 : 0
-  depends_on = [helm_release.service_mesh_operator]
-  input      = local.kubeconfig_path
+  count = var.clean_servicemesh_on_undeploy ? 1 : 0
+
   triggers_replace = {
     scripts_location = local.scripts_location
     namespace        = local.operators_namespace
     operatorname     = local.sm_operator_name
+    kubeconfig_path  = local.kubeconfig_path
   }
 
-  # removing servicemesh operator csv from the cluster at deprovision time
   provisioner "local-exec" {
     command     = "${self.triggers_replace.scripts_location}/deprovision-sm-operator.sh \"${self.triggers_replace.namespace}\" \"${self.triggers_replace.operatorname}\""
     interpreter = ["/bin/bash", "-c"]
     when        = destroy
     on_failure  = continue
     environment = {
-      KUBECONFIG = self.input
+      KUBECONFIG = self.triggers_replace.kubeconfig_path
     }
   }
 }
