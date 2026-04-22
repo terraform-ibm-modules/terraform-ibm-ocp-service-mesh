@@ -20,6 +20,28 @@ variable "cluster_config_endpoint_type" {
     condition     = contains(["default", "private", "vpe", "link"], var.cluster_config_endpoint_type)
   }
 }
+variable "prefix" {
+  type        = string
+  nullable    = true
+  description = "Prefix value to append to the name of the resources. The name of the ingress resources created with this module will be in format of <prefix>-<name>."
+  default     = null
+
+  validation {
+    # - null and empty string is allowed
+    # - Must not contain consecutive hyphens (--): length(regexall("--", var.prefix)) == 0
+    # - Starts with a lowercase letter: [a-z]
+    # - Contains only lowercase letters (a–z), digits (0–9), and hyphens (-)
+    # - Must not end with a hyphen (-): [a-z0-9]
+    condition = (var.prefix == null || var.prefix == "" ? true :
+      alltrue([
+        can(regex("^[a-z][-a-z0-9]*[a-z0-9]$", var.prefix)),
+        length(regexall("--", var.prefix)) == 0
+      ])
+    )
+    error_message = "Prefix must begin with a lowercase letter and may contain only lowercase letters, digits, and hyphens '-'. It must not end with a hyphen('-'), and cannot contain consecutive hyphens ('--')."
+  }
+}
+
 
 # ingress configuration
 

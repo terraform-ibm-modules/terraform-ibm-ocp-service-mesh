@@ -238,6 +238,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_istio_mesh_enrollment"></a> [istio\_mesh\_enrollment](#input\_istio\_mesh\_enrollment) | Name of the Istio mesh controlplane to enroll this dataplane with. Default value to "default". This value is used to generate discovery selectors, to override the computed values customise var.ingress\_discovery\_custom\_configuration. | `string` | `"default"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the Istio ingress deployment | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where to install istio ingress dataplane. | `string` | n/a | yes |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix value to append to the name of the resources. The name of the ingress resources created with this module will be in format of <prefix>-<name>. | `string` | `null` | no |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The ID of the resource group for the OpenShift Cluster. | `string` | n/a | yes |
 | <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
 

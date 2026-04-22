@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ingress-{{ $.Values.ingress.name }}-{{ $lb_subnet_zone }}
+  name: {{ $.Values.ingress.name }}-{{ $lb_subnet_zone }}
   namespace: {{ $.Values.ingress.namespace }}
   annotations:
     service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features: "nlb"
