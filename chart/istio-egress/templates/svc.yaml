@@ -6,8 +6,7 @@ metadata:
   annotations:
 spec:
   type: {{ .Values.egress.svctype }}
-  # externalTrafficPolicy: {{ .Values.egress.externalTrafficPolicy }}
-  # internalTrafficPolicy: {{ .Values.egress.internalTrafficPolicy }}
+  internalTrafficPolicy: {{ .Values.egress.internalTrafficPolicy }}
   selector:
   {{- if .Values.egress.istioselectors }}
   {{- toYaml .Values.egress.istioselectors | nindent 4 }}
