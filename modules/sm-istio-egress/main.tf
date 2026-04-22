@@ -1,4 +1,6 @@
 locals {
+
+  prefix                    = var.prefix != null ? trimspace(var.prefix) != "" ? "${var.prefix}-" : "" : ""
   istio_egress_release_name = "${var.namespace}-${var.name}"
   istio_egress_chart_path   = "istio-egress"
 
@@ -101,7 +103,7 @@ resource "helm_release" "istio_egress" {
     {
       name  = "egress.name"
       type  = "string"
-      value = var.name
+      value = "${local.prefix}${var.name}"
     },
     {
       name  = "egress.namespace"
@@ -140,7 +142,7 @@ resource "helm_release" "istio_egress" {
 resource "null_resource" "confirm_egress_operational" {
   depends_on = [helm_release.istio_egress]
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"egress-${var.name}\""
+    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path

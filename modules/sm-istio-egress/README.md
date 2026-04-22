@@ -227,6 +227,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_istio_mesh_enrollment"></a> [istio\_mesh\_enrollment](#input\_istio\_mesh\_enrollment) | Name of the Istio mesh controlplane to enroll this dataplane with. Default value to default. This value is used to generate discovery selectors, to override the computed values customise var.egress\_discovery\_custom\_configuration. | `string` | `"default"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the Istio egress deployment | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where to install istio egress dataplane. | `string` | n/a | yes |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | The prefix to add to all resources that this solution creates (e.g `prod`, `test`, `dev`). To skip using a prefix, set this value to null or an empty string. [Learn more](https://terraform-ibm-modules.github.io/documentation/#/prefix.md). **Important:** When deploying VPC using VPC deployable architecture, updating the prefix after the initial deployment may require recreating certain resources. Learn more about this limitation [here](https://cloud.ibm.com/docs/secure-infrastructure-vpc?topic=secure-infrastructure-vpc-known-issues#ki-vpc-prefix-change-recreate). | `string` | `null` | no |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The ID of the resource group for the OpenShift Cluster. | `string` | n/a | yes |
 
 ### Outputs

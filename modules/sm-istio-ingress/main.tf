@@ -1,4 +1,5 @@
 locals {
+  prefix                     = var.prefix != null ? trimspace(var.prefix) != "" ? "${var.prefix}-" : "" : ""
   istio_ingress_release_name = "${var.namespace}-${var.name}"
   istio_ingress_chart_path   = "istio-ingress"
 
@@ -119,7 +120,7 @@ resource "helm_release" "istio_ingress" {
     {
       name  = "ingress.name"
       type  = "string"
-      value = var.name
+      value = "${local.prefix}${var.name}"
     },
     {
       name  = "ingress.namespace"
@@ -198,7 +199,7 @@ resource "null_resource" "confirm_ingress_operational_alb" {
   depends_on = [helm_release.istio_ingress]
   count      = var.ingress_loadbalancer_type == "alb" ? 1 : 0
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"ingress-${var.name}\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -211,7 +212,7 @@ resource "null_resource" "confirm_ingress_operational_nlb" {
   depends_on = [helm_release.istio_ingress]
   for_each   = var.ingress_loadbalancer_type == "nlb" ? var.ingress_nlb_zones_subnets : {}
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"ingress-${var.name}-${each.value}\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}-${each.value}\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path

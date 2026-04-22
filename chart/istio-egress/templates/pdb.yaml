@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- toYaml .Values.egress.istioselectors | nindent 4 }}
     release: istio
-  name: egress-{{ .Values.egress.name }}
+  name: {{ .Values.egress.name }}
   namespace: {{ .Values.egress.namespace }}
 spec:
   {{- if .Values.egress.pdb.minAvailable }}

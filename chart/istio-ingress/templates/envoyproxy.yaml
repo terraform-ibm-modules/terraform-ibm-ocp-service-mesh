@@ -5,7 +5,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: ingress-{{ .Values.ingress.name }}
+  name: {{ .Values.ingress.name }}
   namespace: {{ .Values.ingress.namespace }}
 spec:
   configPatches:
