@@ -10,7 +10,7 @@ metadata:
     service.kubernetes.io/ibm-load-balancer-cloud-provider-vpc-subnets: {{ $lb_subnet | quote}}
     service.kubernetes.io/ibm-load-balancer-cloud-provider-ip-type: {{ $.Values.ingress.lbiptype }}
     {{- if .Values.ingress.customAnnotations }}
-    {{- toYaml .Values.ingress.customAnnotations | nindent 6 }}
+    {{- toYaml .Values.ingress.customAnnotations | nindent 4 }}
     {{- end }}
 spec:
   type: {{ $.Values.ingress.svctype }}
