@@ -14,7 +14,7 @@ variable "resource_group_id" {
 
 variable "develop_mode" {
   type        = bool
-  description = "If true raise time waited for operator deployment and undeployment to allow to debug the cluster"
+  description = "If set to true, increases the wait time for operator deployment and undeployment to facilitate cluster debugging, and prevents the `helm_release` resource from automatically rolling back changes if the helm deployment fails."
   default     = false
 }
 

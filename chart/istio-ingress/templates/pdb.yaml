@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- toYaml .Values.ingress.istioselectors | nindent 4 }}
     release: istio
-  name: ingress-{{ .Values.ingress.name }}
+  name: {{ .Values.ingress.name }}
   namespace: {{ .Values.ingress.namespace }}
 spec:
   {{- if .Values.ingress.pdb.minAvailable }}

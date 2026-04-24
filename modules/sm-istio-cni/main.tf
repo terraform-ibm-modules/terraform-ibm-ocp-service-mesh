@@ -15,6 +15,7 @@ resource "helm_release" "istiocni" {
   dependency_update = true
   force_update      = false
   cleanup_on_fail   = false
+  atomic            = var.rollback_on_failure
   wait              = true
 
   disable_openapi_validation = false
