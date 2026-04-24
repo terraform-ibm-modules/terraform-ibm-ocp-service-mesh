@@ -7,7 +7,7 @@ metadata:
     {{- toYaml .Values.ingress.istioselectors | nindent 4 }}
     {{- end }}
     release: istio
-  name: ingress-{{ .Values.ingress.name }}
+  name: {{ .Values.ingress.name }}
   namespace: {{ .Values.ingress.namespace }}
 spec:
   metrics:
@@ -36,5 +36,5 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: ingress-{{ .Values.ingress.name }}
+    name: {{ .Values.ingress.name }}
 {{- end }}

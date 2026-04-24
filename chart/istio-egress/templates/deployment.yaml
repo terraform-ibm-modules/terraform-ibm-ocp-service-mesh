@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: egress-{{ .Values.egress.name }}
+  name: {{ .Values.egress.name }}
   namespace: {{ .Values.egress.namespace }}
 spec:
   {{- if .Values.egress.replicacount }}
@@ -38,7 +38,7 @@ spec:
           {{- toYaml .Values.egress.affinity.podAntiAffinity | nindent 10 }}
         {{- end }}
       {{- end }}
-      serviceAccountName: egress-{{ .Values.egress.name }}
+      serviceAccountName: {{ .Values.egress.name }}
       {{- if .Values.egress.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.egress.terminationGracePeriodSeconds }}
       {{- end }}

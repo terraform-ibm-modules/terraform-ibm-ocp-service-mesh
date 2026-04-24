@@ -218,6 +218,7 @@ resource "helm_release" "sample_app" {
   timeout                    = 300
   cleanup_on_fail            = true
   wait                       = true
+  atomic                     = true
   disable_openapi_validation = false
 
   set = [{

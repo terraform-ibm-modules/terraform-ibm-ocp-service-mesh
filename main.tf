@@ -138,6 +138,7 @@ resource "helm_release" "service_mesh_operator" {
   force_update      = false
   cleanup_on_fail   = false
   wait              = true
+  atomic            = !var.develop_mode
 
   disable_openapi_validation = false
 
