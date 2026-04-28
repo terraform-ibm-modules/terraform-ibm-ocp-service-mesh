@@ -151,6 +151,8 @@ module "default_workload_egress" {
 ##############################################################################
 
 resource "kubernetes_namespace_v1" "sample_app_namespace" {
+
+  depends_on = [time_sleep.wait_istio]
   metadata {
     name = "httpbin"
     labels = {
@@ -172,8 +174,6 @@ resource "kubernetes_namespace_v1" "sample_app_namespace" {
 }
 
 resource "helm_release" "sample_app" {
-  depends_on = [kubernetes_namespace_v1.sample_app_namespace]
-
   name                       = "httpbin-sample-app"
   chart                      = "../charts/sample-app/httpbin"
   namespace                  = kubernetes_namespace_v1.sample_app_namespace.metadata[0].name
