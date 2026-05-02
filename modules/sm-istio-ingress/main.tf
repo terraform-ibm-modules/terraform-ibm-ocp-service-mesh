@@ -244,12 +244,12 @@ locals {
   # For ALB/other: single service
   ingress_services_map = var.ingress_loadbalancer_type == "nlb" ? {
     for subnet_id, zone in var.ingress_nlb_zones_subnets :
-    "${var.namespace}/${local.prefix}${var.name}-${zone}" => {
+    "${local.prefix}${var.name}-${zone}" => {
       namespace = var.namespace
       service   = "${local.prefix}${var.name}-${zone}"
     }
     } : {
-    "${var.namespace}/${local.prefix}${var.name}" = {
+    "${local.prefix}${var.name}" = {
       namespace = var.namespace
       service   = "${local.prefix}${var.name}"
     }
