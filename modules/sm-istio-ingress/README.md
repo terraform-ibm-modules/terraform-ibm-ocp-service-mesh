@@ -203,7 +203,9 @@ For all the configuration parameters details refer to the section below
 | [helm_release.istio_ingress](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [null_resource.confirm_ingress_operational_alb](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.confirm_ingress_operational_nlb](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [null_resource.confirm_ingress_operational_other](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [ibm_container_cluster_config.cluster_config](https://registry.terraform.io/providers/ibm-cloud/ibm/latest/docs/data-sources/container_cluster_config) | data source |
+| [kubernetes_service_v1.ingress_services](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/service_v1) | data source |
 
 ### Inputs
 
@@ -246,5 +248,7 @@ For all the configuration parameters details refer to the section below
 
 | Name | Description |
 |------|-------------|
-| <a name="output_istio_ingress_metadata"></a> [istio\_ingress\_metadata](#output\_istio\_ingress\_metadata) | istio\_ingress definition metadata |
+| <a name="output_ingress_loadbalancer_hostname"></a> [ingress\_loadbalancer\_hostname](#output\_ingress\_loadbalancer\_hostname) | Load balancer hostname(s). For ALB: returns map with single hostname. For NLB: returns map of service name to hostname per zone. For other types: returns empty map. |
+| <a name="output_ingress_loadbalancer_ips"></a> [ingress\_loadbalancer\_ips](#output\_ingress\_loadbalancer\_ips) | Load balancer IP addresses. For NLB: returns map of service name to IP. For other types: returns map with indexed keys (ip-0, ip-1, etc). Returns empty map for ALB. |
+| <a name="output_istio_ingress_metadata"></a> [istio\_ingress\_metadata](#output\_istio\_ingress\_metadata) | Istio ingress helm release metadata |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
