@@ -68,7 +68,7 @@ spec:
         {{- if .Values.egress.ports }}
         {{- range .Values.egress.ports }}
         - containerPort: {{ .port }}
-          protocol: {{ .proto | toString }}
+          protocol: {{ .protocol | toString }}
           name: {{ .name }}
         {{- end }}
         {{- end }}

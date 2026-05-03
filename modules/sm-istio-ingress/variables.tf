@@ -169,14 +169,14 @@ variable "ingress_ports" {
     {
       port : number,
       name : string
-      proto : string,
+      protocol : string,
       targetPort : number
     }
   ))
   default = [{
     port : 443,
     name : "https",
-    proto : "TCP",
+    protocol : "TCP",
     targetPort : 8443
   }]
   description = "List of ports to configured on ingress and LoadBalancer to list for inbound traffic. Default to port 443:8443 on TCP."

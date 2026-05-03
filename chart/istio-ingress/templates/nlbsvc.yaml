@@ -24,7 +24,7 @@ spec:
   {{- if $.Values.ingress.ports }}
   {{- range $.Values.ingress.ports }}
   - port: {{ .port }}
-    protocol: {{ .proto | toString }}
+    protocol: {{ .protocol | toString }}
     name: {{ .name | toString }}
     targetPort: {{ .targetPort }}
   {{- end }}

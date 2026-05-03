@@ -51,13 +51,13 @@ module "default_workload_egress" {
       "name" : "http2"
       "port" : "80"
       "targetPort" : "8000"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     },
     {
       "name" : "https"
       "port" : "443"
       "targetPort" : "443"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     }
   ]
   cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -135,19 +135,19 @@ module "default_workload_egress" {
       "name" : "http2"
       "port" : "80"
       "targetPort" : "8000"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     },
     {
       "name" : "https"
       "port" : "443"
       "targetPort" : "443"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     },
     {
       "name" : "tcp"
       "port" : "5432"
       "targetPort" : "5432"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     }
   ]
   egress_autoscale_configuration = {
@@ -216,7 +216,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_egress_discovery_custom_configuration"></a> [egress\_discovery\_custom\_configuration](#input\_egress\_discovery\_custom\_configuration) | Map of key-value entries to set custom istio discovery labels. Default to null to autogenerate the labels according to var.istio\_mesh\_enrollment value. For more details about istio discovery configuration refer to https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-sidecar-injection#ossm-about-sidecar-injection_ossm-sidecar-injection and https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-deploying-multiple-service-meshes-on-single-cluster. | `map(string)` | `null` | no |
 | <a name="input_egress_internal_traffic_policy"></a> [egress\_internal\_traffic\_policy](#input\_egress\_internal\_traffic\_policy) | Internal traffic policy configuration for the egress. Allowed values are Cluster and Local. Default to Cluster. For more details refer to https://istio.io/latest/docs/tasks/security/authorization/authz-egress/. | `string` | `"Cluster"` | no |
 | <a name="input_egress_pdb_configuration"></a> [egress\_pdb\_configuration](#input\_egress\_pdb\_configuration) | Configuration of the PodDisruptionBudget for the istio egress definition. Default to null to leverage on Istio default configuration. | <pre>object({<br/>    minAvailable   = optional(string, null)<br/>    maxUnavailable = optional(string, null)<br/>  })</pre> | `null` | no |
-| <a name="input_egress_ports"></a> [egress\_ports](#input\_egress\_ports) | List of ports to configured on egress for outbound traffic. Default to port 443:443 on TCP. | <pre>list(object(<br/>    {<br/>      port : number,<br/>      name : string<br/>      proto : string,<br/>      targetPort : number<br/>    }<br/>  ))</pre> | <pre>[<br/>  {<br/>    "name": "https",<br/>    "port": 443,<br/>    "proto": "TCP",<br/>    "targetPort": 443<br/>  }<br/>]</pre> | no |
+| <a name="input_egress_ports"></a> [egress\_ports](#input\_egress\_ports) | List of ports to configured on egress for outbound traffic. Default to port 443:443 on TCP. | <pre>list(object(<br/>    {<br/>      port : number,<br/>      name : string<br/>      protocol : string,<br/>      targetPort : number<br/>    }<br/>  ))</pre> | <pre>[<br/>  {<br/>    "name": "https",<br/>    "port": 443,<br/>    "protocol": "TCP",<br/>    "targetPort": 443<br/>  }<br/>]</pre> | no |
 | <a name="input_egress_replicas"></a> [egress\_replicas](#input\_egress\_replicas) | Istio egress deployment replicaset configuration. If the var.egress\_autoscale\_configuration.enabled is true this value is ignored. Default to 3. | `number` | `3` | no |
 | <a name="input_egress_resources_configuration"></a> [egress\_resources\_configuration](#input\_egress\_resources\_configuration) | Istio egress resources deployment configuration. Default configuration is null and leverages on Istio default setting. | <pre>object(<br/>    {<br/>      limits : optional(object(<br/>        {<br/>          cpu : optional(string, null),<br/>          memory : optional(string, null)<br/>      }), null),<br/>      requests : optional(object(<br/>        {<br/>          cpu : optional(string, null)<br/>          memory : optional(string, null)<br/>      }), null)<br/>    }<br/>  )</pre> | `null` | no |
 | <a name="input_egress_selectors"></a> [egress\_selectors](#input\_egress\_selectors) | Istio egress selectors to route outbound egress traffic to the expected istio gateway and to the expected workload. Default to "app": "istio-egress" "istio": "istio-egress" "gateway-instance": "istio-egressgateway". Null not allowed | `map(string)` | <pre>{<br/>  "app": "istio-egress",<br/>  "istio": "istio-egress"<br/>}</pre> | no |

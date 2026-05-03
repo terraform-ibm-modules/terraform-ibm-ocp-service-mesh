@@ -100,14 +100,14 @@ variable "egress_ports" {
     {
       port : number,
       name : string
-      proto : string,
+      protocol : string,
       targetPort : number
     }
   ))
   default = [{
     port : 443,
     name : "https",
-    proto : "TCP",
+    protocol : "TCP",
     targetPort : 443
   }]
   description = "List of ports to configured on egress for outbound traffic. Default to port 443:443 on TCP."

@@ -148,7 +148,7 @@ module "basic_workload_ingress" {
       "name" : "http2"
       "port" : "80"
       "targetPort" : "8000"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     }
   ]
   cluster_id        = module.ocp_base.cluster_id
@@ -172,13 +172,13 @@ module "default_workload_egress" {
       "name" : "http2"
       "port" : "80"
       "targetPort" : "8000"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     },
     {
       "name" : "https"
       "port" : "443"
       "targetPort" : "443"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     }
   ]
   cluster_id        = module.ocp_base.cluster_id
