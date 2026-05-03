@@ -15,7 +15,7 @@ spec:
   {{- if .Values.egress.ports }}
   {{- range .Values.egress.ports }}
   - port: {{ .port }}
-    protocol: {{ .proto | toString }}
+    protocol: {{ .protocol | toString }}
     name: {{ .name | toString }}
     targetPort: {{ .targetPort }}
   {{- end }}

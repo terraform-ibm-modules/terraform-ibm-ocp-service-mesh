@@ -190,7 +190,7 @@ module "basic_workload_ingress" {
       "name" : "http2"
       "port" : "80"
       "targetPort" : "8000"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     }
   ]
   cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -214,13 +214,13 @@ module "default_workload_egress" {
       "name" : "http2"
       "port" : "80"
       "targetPort" : "8000"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     },
     {
       "name" : "https"
       "port" : "443"
       "targetPort" : "443"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     }
   ]
   cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
