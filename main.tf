@@ -164,7 +164,6 @@ resource "helm_release" "service_mesh_operator" {
 
 locals {
   scripts_location = "${path.module}/scripts/"
-  kubeconfig_path  = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
 
 resource "terraform_data" "undeploy_servicemesh" {

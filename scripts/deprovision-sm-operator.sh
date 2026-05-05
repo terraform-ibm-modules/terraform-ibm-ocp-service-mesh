@@ -22,18 +22,21 @@ generate_kubeconfig() {
   local CLIENT_CERTIFICATE=$2
   local CLIENT_KEY=$3
   local CLUSTER_CA_CERTIFICATE=$4
-  
+
   # Generate a random hash for the kubeconfig filename
-  local RANDOM_HASH=$(openssl rand -hex 8)
+  local RANDOM_HASH
+  RANDOM_HASH=$(openssl rand -hex 8)
   local KUBECONFIG_FILE="/tmp/kubeconfig-${RANDOM_HASH}"
-  
+
   echo "Generating temporary kubeconfig file: $KUBECONFIG_FILE"
   echo "Generating temporary kubeconfig file: $KUBECONFIG_FILE" >> "${LOGFILE}"
-  
+
   # Convert PEM certificates to base64
-  local CLIENT_CERT_B64=$(echo "$CLIENT_CERTIFICATE" | base64 | tr -d '\n')
-  local CLIENT_KEY_B64=$(echo "$CLIENT_KEY" | base64 | tr -d '\n')
-  
+  local CLIENT_CERT_B64
+  CLIENT_CERT_B64=$(echo "$CLIENT_CERTIFICATE" | base64 | tr -d '\n')
+  local CLIENT_KEY_B64
+  CLIENT_KEY_B64=$(echo "$CLIENT_KEY" | base64 | tr -d '\n')
+
   # Create the kubeconfig file
   if [ -z "$CLUSTER_CA_CERTIFICATE" ]; then
     # If CA certificate is empty, use insecure-skip-tls-verify
@@ -59,7 +62,8 @@ users:
 EOF
   else
     # If CA certificate exists, use it
-    local CA_CERT_B64=$(echo "$CLUSTER_CA_CERTIFICATE" | base64 | tr -d '\n')
+    local CA_CERT_B64
+    CA_CERT_B64=$(echo "$CLUSTER_CA_CERTIFICATE" | base64 | tr -d '\n')
     cat > "$KUBECONFIG_FILE" <<EOF
 apiVersion: v1
 kind: Config
@@ -81,7 +85,7 @@ users:
     client-key-data: $CLIENT_KEY_B64
 EOF
   fi
-  
+
   # Export the kubeconfig
   export KUBECONFIG="$KUBECONFIG_FILE"
   echo "KUBECONFIG set to: $KUBECONFIG_FILE"
