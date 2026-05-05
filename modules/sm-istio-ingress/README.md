@@ -55,7 +55,7 @@ module "default_workload_ingress" {
       "name" : "http2"
       "port" : "80"
       "targetPort" : "8000"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     }
   ]
   cluster_config_file_path = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -136,13 +136,13 @@ module "default_workload_ingress" {
       "name" : "http2"
       "port" : "80"
       "targetPort" : "8000"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     },
     {
       "name" : "istio-health"
       "port" : "15021"
       "targetPort" : "15021"
-      "proto" : "TCP"
+      "protocol" : "TCP"
     }
   ]
   ingress_autoscale_configuration = {
@@ -205,7 +205,9 @@ For all the configuration parameters details refer to the section below
 | [kubernetes_labels.istio_namespace_labels](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/labels) | resource |
 | [null_resource.confirm_ingress_operational_alb](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.confirm_ingress_operational_nlb](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [null_resource.confirm_ingress_operational_other](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [ibm_container_cluster_config.cluster_config](https://registry.terraform.io/providers/ibm-cloud/ibm/latest/docs/data-sources/container_cluster_config) | data source |
+| [kubernetes_service_v1.ingress_services](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/service_v1) | data source |
 
 ### Inputs
 
@@ -229,7 +231,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_ingress_loadbalancer_type"></a> [ingress\_loadbalancer\_type](#input\_ingress\_loadbalancer\_type) | IBM Cloud LoadBalancer type bound to the ingress: valid values are "alb" for Application Load Balancer, "nlb" for Network Load Balancer, and "other" to define your LoadBalancer with your custom annotations. If var.ingress\_service\_type == "ClusterIP" this value hasn't effect. For more details refer to https://cloud.ibm.com/docs/vpc?topic=vpc-nlb-vs-elb. Default to ALB. | `string` | `"alb"` | no |
 | <a name="input_ingress_nlb_zones_subnets"></a> [ingress\_nlb\_zones\_subnets](#input\_ingress\_nlb\_zones\_subnets) | Map of tuples "subnetID": "VPC zone" to configure IBM Cloud Network LoadBalancer instances on the expected zone and subnet. Null value is not allowed. Default to empty map. | `map(string)` | `{}` | no |
 | <a name="input_ingress_pdb_configuration"></a> [ingress\_pdb\_configuration](#input\_ingress\_pdb\_configuration) | Configuration of the PodDisruptionBudget for the istio ingress definition. Default to null to leverage on Istio default configuration. | <pre>object({<br/>    minAvailable   = optional(string, null)<br/>    maxUnavailable = optional(string, null)<br/>  })</pre> | `null` | no |
-| <a name="input_ingress_ports"></a> [ingress\_ports](#input\_ingress\_ports) | List of ports to configured on ingress and LoadBalancer to list for inbound traffic. Default to port 443:8443 on TCP. | <pre>list(object(<br/>    {<br/>      port : number,<br/>      name : string<br/>      proto : string,<br/>      targetPort : number<br/>    }<br/>  ))</pre> | <pre>[<br/>  {<br/>    "name": "https",<br/>    "port": 443,<br/>    "proto": "TCP",<br/>    "targetPort": 8443<br/>  }<br/>]</pre> | no |
+| <a name="input_ingress_ports"></a> [ingress\_ports](#input\_ingress\_ports) | List of ports to configured on ingress and LoadBalancer to list for inbound traffic. Default to port 443:8443 on TCP. | <pre>list(object(<br/>    {<br/>      port : number,<br/>      name : string<br/>      protocol : string,<br/>      targetPort : number<br/>    }<br/>  ))</pre> | <pre>[<br/>  {<br/>    "name": "https",<br/>    "port": 443,<br/>    "protocol": "TCP",<br/>    "targetPort": 8443<br/>  }<br/>]</pre> | no |
 | <a name="input_ingress_proxy_protocol_allow_without"></a> [ingress\_proxy\_protocol\_allow\_without](#input\_ingress\_proxy\_protocol\_allow\_without) | Flag to support traffic with or without Proxy Protocol on ingress LoadBalancer (only ALB type) and on the EnvoyFilter that implements Proxy Protocol on ingress gateway | `bool` | `false` | no |
 | <a name="input_ingress_replicas"></a> [ingress\_replicas](#input\_ingress\_replicas) | Istio ingress deployment replicaset configuration. If the var.ingress\_autoscale\_configuration.enabled is true this value is ignored. Default to 3. | `number` | `3` | no |
 | <a name="input_ingress_resources_configuration"></a> [ingress\_resources\_configuration](#input\_ingress\_resources\_configuration) | Istio ingress resources deployment configuration. Default configuration is null and leverages on Istio default setting. | <pre>object(<br/>    {<br/>      limits : optional(object(<br/>        {<br/>          cpu : optional(string, null),<br/>          memory : optional(string, null)<br/>      }), null),<br/>      requests : optional(object(<br/>        {<br/>          cpu : optional(string, null)<br/>          memory : optional(string, null)<br/>      }), null)<br/>    }<br/>  )</pre> | `null` | no |
@@ -249,5 +251,91 @@ For all the configuration parameters details refer to the section below
 
 | Name | Description |
 |------|-------------|
-| <a name="output_istio_ingress_metadata"></a> [istio\_ingress\_metadata](#output\_istio\_ingress\_metadata) | istio\_ingress definition metadata |
+| <a name="output_ingress_loadbalancer_hostname"></a> [ingress\_loadbalancer\_hostname](#output\_ingress\_loadbalancer\_hostname) | Load balancer hostname(s). For ALB: returns map with single hostname. For NLB: returns map of service name to hostname per zone. For other types: returns empty map. |
+| <a name="output_ingress_loadbalancer_ips"></a> [ingress\_loadbalancer\_ips](#output\_ingress\_loadbalancer\_ips) | Load balancer IP addresses. For NLB: returns map of service name to IP. For other types: returns map with indexed keys (ip-0, ip-1, etc). Returns empty map for ALB. |
+| <a name="output_istio_ingress_metadata"></a> [istio\_ingress\_metadata](#output\_istio\_ingress\_metadata) | Istio ingress helm release metadata |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+## Understanding Load Balancer Outputs
+
+The module outputs differ based on the `ingress_loadbalancer_type` configuration. This section explains the output format for each load balancer type.
+
+### Application Load Balancer (ALB)
+
+When `ingress_loadbalancer_type = "alb"`, a single Application Load Balancer is created and only the hostname is returned.
+
+**Input Configuration:**
+```hcl
+ingress_loadbalancer_type = "alb"
+ingress_alb_subnets = [
+  "0717-efe5c9b5-37e9-48c8-9d2e-a0a0a0a0a0a0",
+  "0727-b1f2c3d4-48e9-59d9-0e1f-b1b1b1b1b1b1",
+  "0737-c2g3d4e5-59f0-60e0-1f2g-c2c2c2c2c2c2"
+]
+```
+
+**Output Example:**
+```hcl
+ingress_loadbalancer_hostname = {
+  "public-ingress" = "04a736c5-us-south.lb.appdomain.cloud"
+}
+
+ingress_loadbalancer_ips = {}
+```
+
+### Network Load Balancer (NLB)
+
+When `ingress_loadbalancer_type = "nlb"`, one Network Load Balancer is created per zone specified in `ingress_nlb_zones_subnets`. Both hostnames and IP addresses are returned for each zone.
+
+**Input Configuration:**
+```hcl
+ingress_loadbalancer_type = "nlb"
+ingress_nlb_zones_subnets = {
+  "0717-efe5c9b5-37e9-48c8-9d2e-a0a0a0a0a0a0" = "us-south-1"
+  "0727-b1f2c3d4-48e9-59d9-0e1f-b1b1b1b1b1b1" = "us-south-2"
+  "0737-c2g3d4e5-59f0-60e0-1f2g-c2c2c2c2c2c2" = "us-south-3"
+}
+```
+
+**Output Example:**
+```hcl
+ingress_loadbalancer_hostname = {
+  "public-ingress-us-south-1" = "b363a563-us-south.lb.appdomain.cloud"
+  "public-ingress-us-south-2" = "e84cfa58-us-south.lb.appdomain.cloud"
+  "public-ingress-us-south-3" = "7185448c-us-south.lb.appdomain.cloud"
+}
+
+ingress_loadbalancer_ips = {
+  "public-ingress-us-south-1" = "52.118.188.140"
+  "public-ingress-us-south-2" = "52.118.205.19"
+  "public-ingress-us-south-3" = "52.118.102.88"
+}
+```
+
+### Custom Load Balancer (other)
+
+When `ingress_loadbalancer_type = "other"`, you provide custom annotations via `ingress_custom_annotations`. The module reserves IP addresses in each zone, but does not create hostnames. IPs are indexed sequentially.
+
+**Input Configuration:**
+```hcl
+ingress_loadbalancer_type = "other"
+ingress_custom_annotations = {
+  "service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features" = "service-dnlb"
+  "service.kubernetes.io/ibm-load-balancer-cloud-provider-ip-type"         = "private"
+  "service.kubernetes.io/ibm-load-balancer-cloud-provider-vpc-node-selector" = "transit"
+}
+```
+
+**Output Example:**
+```hcl
+ingress_loadbalancer_hostname = {}
+
+ingress_loadbalancer_ips = {
+  "ip-0" = "10.119.60.25"
+  "ip-1" = "10.12.129.159"
+  "ip-2" = "10.12.130.48"
+  "ip-3" = "10.51.208.41"
+}
+```
+
+**Note:** The number of IPs reserved corresponds to the number of zones used in the cluster. The IPs are not necessarily returned in zone order.

@@ -6,7 +6,7 @@ egress:
   ports:
   - port: 80
     name: svc-http
-    proto: TCP # UDP
+    protocol: TCP # UDP
     targetPort: 8080
   internalTrafficPolicy: Cluster
   autoscale:

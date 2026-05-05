@@ -222,7 +222,7 @@ resource "null_resource" "confirm_ingress_operational_alb" {
   depends_on = [helm_release.istio_ingress]
   count      = var.ingress_loadbalancer_type == "alb" ? 1 : 0
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}\" \"alb\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -230,15 +230,65 @@ resource "null_resource" "confirm_ingress_operational_alb" {
   }
 }
 
-# for nlb the ingress svc are created for each zone so there are a set of svc to check named "ingress-[svc name]-[zone]"
+# for nlb the ingress svc are created for each zone so there are a set of svc to check named "ingress-[svc name]-[zone]"
 resource "null_resource" "confirm_ingress_operational_nlb" {
   depends_on = [helm_release.istio_ingress]
   for_each   = var.ingress_loadbalancer_type == "nlb" ? var.ingress_nlb_zones_subnets : {}
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}-${each.value}\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}-${each.value}\" \"nlb\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
     }
+  }
+}
+
+# for other types (internal use) - single service with potentially multiple IPs
+resource "null_resource" "confirm_ingress_operational_other" {
+  depends_on = [helm_release.istio_ingress]
+  count      = var.ingress_loadbalancer_type == "other" ? 1 : 0
+  provisioner "local-exec" {
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}\" \"other\""
+    interpreter = ["/bin/bash", "-c"]
+    environment = {
+      KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
+    }
+  }
+}
+
+##############################################################################
+# Lookup ingress service details
+##############################################################################
+
+locals {
+  # Build map of service names to query based on LB type
+  # For NLB: multiple services (one per zone)
+  # For ALB/other: single service
+  ingress_services_map = var.ingress_loadbalancer_type == "nlb" ? {
+    for subnet_id, zone in var.ingress_nlb_zones_subnets :
+    "${local.prefix}${var.name}-${zone}" => {
+      namespace = var.namespace
+      service   = "${local.prefix}${var.name}-${zone}"
+    }
+    } : {
+    "${local.prefix}${var.name}" = {
+      namespace = var.namespace
+      service   = "${local.prefix}${var.name}"
+    }
+  }
+}
+
+# Query all ingress services (works for ALB, NLB, and other types)
+data "kubernetes_service_v1" "ingress_services" {
+  depends_on = [
+    null_resource.confirm_ingress_operational_alb,
+    null_resource.confirm_ingress_operational_nlb,
+    null_resource.confirm_ingress_operational_other
+  ]
+  for_each = local.ingress_services_map
+
+  metadata {
+    name      = each.value.service
+    namespace = each.value.namespace
   }
 }
