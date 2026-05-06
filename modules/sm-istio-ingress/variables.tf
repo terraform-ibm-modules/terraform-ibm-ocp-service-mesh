@@ -174,7 +174,7 @@ variable "ingress_ports" {
   type = list(object(
     {
       port : number,
-      name : string
+      name : string,
       protocol : string,
       targetPort : number
     }

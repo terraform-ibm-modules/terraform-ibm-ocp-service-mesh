@@ -34,6 +34,7 @@ locals {
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = var.cluster_id
   resource_group_id = var.resource_group_id
+  admin             = true
   config_dir        = "${path.module}/kubeconfig"
   endpoint_type     = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
 }
@@ -163,28 +164,27 @@ resource "helm_release" "service_mesh_operator" {
 
 locals {
   scripts_location = "${path.module}/scripts/"
-  kubeconfig_path  = data.ibm_container_cluster_config.cluster_config.config_file_path
 }
 
 resource "terraform_data" "undeploy_servicemesh" {
   count      = var.clean_servicemesh_on_undeploy ? 1 : 0
   depends_on = [helm_release.service_mesh_operator]
-  input      = local.kubeconfig_path
   triggers_replace = {
-    scripts_location = local.scripts_location
-    namespace        = local.operators_namespace
-    operatorname     = local.sm_operator_name
+    scripts_location       = local.scripts_location
+    namespace              = local.operators_namespace
+    operatorname           = local.sm_operator_name
+    host                   = data.ibm_container_cluster_config.cluster_config.host
+    client_certificate     = data.ibm_container_cluster_config.cluster_config.admin_certificate
+    client_key             = data.ibm_container_cluster_config.cluster_config.admin_key
+    cluster_ca_certificate = data.ibm_container_cluster_config.cluster_config.ca_certificate
   }
 
   # removing servicemesh operator csv from the cluster at deprovision time
   provisioner "local-exec" {
-    command     = "${self.triggers_replace.scripts_location}/deprovision-sm-operator.sh \"${self.triggers_replace.namespace}\" \"${self.triggers_replace.operatorname}\""
+    command     = "${self.triggers_replace.scripts_location}/deprovision-sm-operator.sh \"${self.triggers_replace.namespace}\" \"${self.triggers_replace.operatorname}\" \"${self.triggers_replace.host}\" \"${self.triggers_replace.client_certificate}\" \"${self.triggers_replace.client_key}\" \"${self.triggers_replace.cluster_ca_certificate}\""
     interpreter = ["/bin/bash", "-c"]
     when        = destroy
     on_failure  = continue
-    environment = {
-      KUBECONFIG = self.input
-    }
   }
 }
 
