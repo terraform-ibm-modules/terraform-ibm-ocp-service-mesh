@@ -90,6 +90,19 @@ locals {
       }
     }
   }
+
+  istio_mesh_config_dns_capture = var.enable_dns_capture ? {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "defaultConfig" : {
+          "proxyMetadata" : {
+            "ISTIO_META_DNS_AUTO_ALLOCATE" : "true"
+            "ISTIO_META_DNS_CAPTURE" : "true"
+          }
+        }
+      }
+    }
+  } : {}
 }
 
 ##############################################################################
@@ -248,6 +261,7 @@ resource "helm_release" "istio_controlplane" {
     yamlencode(local.istio_pilot_node_selector),
     yamlencode(local.istio_mesh_config_mesh_mtls),
     yamlencode(local.istio_mesh_config_mesh_tls_defaults),
+    yamlencode(local.istio_mesh_config_dns_capture),
   ]
 }
 

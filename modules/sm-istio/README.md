@@ -95,6 +95,32 @@ The default values are the below ones:
 }
 ```
 
+### DNS Capture Configuration for ServiceEntry Resources
+
+OpenShift Service Mesh 3.0 disables DNS capture by default, aligning with upstream Istio. This differs from Service Mesh 2.6, which enabled DNS capture by default to support federation.
+
+To maintain access to external services that rely on DNS resolution through ServiceEntry resources, you must explicitly enable DNS capture using the `enable_dns_capture` variable. When enabled, this sets the `ISTIO_META_DNS_AUTO_ALLOCATE` and `ISTIO_META_DNS_CAPTURE` fields to `true` in the proxy metadata configuration.
+
+**Important:** Failure to enable DNS capture when using ServiceEntry resources that rely on DNS resolution will result in application errors such as "Name or service not known".
+
+Example configuration with DNS capture enabled:
+
+```hcl
+module "deploy_istio" {
+  depends_on               = [module.service_mesh_operator]
+  source                   = "terraform-ibm-modules/ocp-service-mesh/ibm//modules/sm-istio"
+  version                  = "X.Y.Z"
+  name                     = "default"
+  namespace                = "istio-system"
+  create_namespace         = true
+  enable_dns_capture       = true  # Enable DNS capture for ServiceEntry resources
+  cluster_id               = var.cluster_id
+  resource_group_id        = var.resource_group_id
+}
+```
+
+For more details, refer to the [Red Hat OpenShift Service Mesh 3.0 migration documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me).
+
 ### Example: Advanced configuration
 
 The following controlplane is configured with the following attributes:

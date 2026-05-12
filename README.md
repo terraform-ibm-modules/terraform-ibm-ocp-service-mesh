@@ -38,6 +38,14 @@ For more details about Service Mesh sidecar injection, see [Sidecar injection](h
 
 For more details about excluding single workload from the Service Mesh, see [Exclude a workload from the mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-sidecar-injection#ossm-enabling-sidecar-injection-exclude-workload-from-mesh_ossm-sidecar-injection)
 
+### DNS Capture Configuration for ServiceEntry Resources
+
+OpenShift Service Mesh 3.0 disables DNS capture by default, aligning with upstream Istio. This differs from Service Mesh 2.6, which enabled DNS capture by default to support federation.
+
+When migrating from Service Mesh 2.x or when using ServiceEntry resources that rely on DNS resolution, you must explicitly enable DNS capture using the `enable_dns_capture` variable in the [modules/sm-istio](./modules/sm-istio) submodule. Failure to enable this feature will result in application errors such as "Name or service not known" when accessing external services through ServiceEntry resources.
+
+For more details, see [DNS capture configuration](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me) in the migration documentation.
+
 ### Multiple Service Mesh controlplanes deployment on the same cluster
 
 By appropriately configuring the controlplanes discovery selectors and sidecar injection properties with multiple instances of [modules/sm-istio](./modules/sm-istio) this module allows to deploy multiple controlplanes on the sidecar, each one discovering the appropriate workloads and injecting the related sidecars.
