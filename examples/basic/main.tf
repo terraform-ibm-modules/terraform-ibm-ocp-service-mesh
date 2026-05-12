@@ -110,7 +110,6 @@ module "deploy_istio" {
   name              = "default"
   namespace         = "istio-system"
   create_namespace  = true
-  enable_dns_capture = true
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
 }
