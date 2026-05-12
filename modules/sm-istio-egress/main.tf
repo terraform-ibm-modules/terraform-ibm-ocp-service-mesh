@@ -84,6 +84,28 @@ module "egress_namespace" {
   ]
 }
 
+# labels to add to an existing namespace
+resource "kubernetes_labels" "istio_namespace_labels" {
+  count       = var.create_namespace == false && var.add_istio_labels_annotations_to_existing_namespace == true ? 1 : 0
+  api_version = "v1"
+  kind        = "Namespace"
+  metadata {
+    name = var.namespace
+  }
+  labels = local.egress_discovery_configuration
+}
+
+# annotations to add to an existing namespace
+resource "kubernetes_annotations" "istio_namespace_annotations" {
+  count       = var.create_namespace == false && var.add_istio_labels_annotations_to_existing_namespace == true ? 1 : 0
+  api_version = "v1"
+  kind        = "Namespace"
+  metadata {
+    name = var.namespace
+  }
+  annotations = local.egress_discovery_configuration
+}
+
 # installing helm chart for istio deployment
 resource "helm_release" "istio_egress" {
   depends_on        = [module.egress_namespace[0]]

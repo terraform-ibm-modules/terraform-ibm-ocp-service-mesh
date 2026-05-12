@@ -55,6 +55,12 @@ variable "create_namespace" {
   default     = true
 }
 
+variable "add_istio_labels_annotations_to_existing_namespace" {
+  type        = bool
+  description = "Flag to add istio labels and annotations like the discovery ones or the value of var.egress_discovery_custom_configuration to an existing namespace. Default to false. If var.create_namespace is true this flag is ignored."
+  default     = false
+}
+
 variable "namespace" {
   type        = string
   description = "Namespace where to install istio egress dataplane."

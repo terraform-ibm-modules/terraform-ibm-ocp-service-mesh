@@ -31,9 +31,17 @@ locals {
   }
 
   # if istio_namespace_discovery_custom_labels is null the istio_namespace_discovery_labels value is generated according to controlplane name
+  # if var.istio_namespace_add_discovery_for_workload is true the namespace is added with the label/annotations to allow istio injection
   istio_namespace_discovery_labels = var.istio_namespace_discovery_custom_labels == null ? (
-    var.name == "default" ? { "istio-discovery" = "enabled" } : { "istio-discovery" : var.name }
+    var.name == "default" ? (
+      var.istio_namespace_add_discovery_for_workload ?
+      { "istio-discovery" = "enabled", "istio-injection" : "enabled" } : { "istio-discovery" = "enabled" }
+      ) : (
+      var.istio_namespace_add_discovery_for_workload ?
+      { "istio-discovery" : var.name, "istio.io/rev" : var.name } : { "istio-discovery" : var.name }
+    )
   ) : var.istio_namespace_discovery_custom_labels
+
 
   istio_pilot_resources = var.pilot_resources == null ? {} : {
     "istioconfiguration" : {
