@@ -25,7 +25,7 @@ locals {
     ) : {
     "istioconfiguration" : {
       "meshConfig" : {
-        "discoverySelectors" : [var.istio_discovery_custom_configuration.matchLabels != null ? { "matchLabels" : var.istio_discovery_custom_configuration.matchLabels } : null, var.istio_discovery_custom_configuration.matchExpressions != null ? { "matchExpressions" : var.istio_discovery_custom_configuration.matchExpressions } : null]
+        "discoverySelectors" : [var.istio_discovery_custom_configuration.matchLabels != null ? { "matchLabels" : var.istio_discovery_custom_configuration.matchLabels } : { "matchLabels" : null }, var.istio_discovery_custom_configuration.matchExpressions != null ? { "matchExpressions" : var.istio_discovery_custom_configuration.matchExpressions } : { "matchExpressions" : null }]
       }
     }
   }

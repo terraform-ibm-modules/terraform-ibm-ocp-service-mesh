@@ -52,7 +52,7 @@ variable "istio_discovery_custom_configuration" {
       key : string
       operator : string
       values : list(string)
-    })), [])
+    })), null)
   })
   default     = null
   description = "Istio controlplane discovery label. Default to null to autogenerate the labels according to var.name value to matchLabels: {\"istio-discovery\" : \"enabled\"}. For more details https://istio.io/latest/blog/2021/discovery-selectors/ https://github.com/istio/api/blob/master/mesh/v1alpha1/config.proto#L1411 https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh#ossm-discoveryselectors-scope-service-mesh_ossm-installing-openshift-service-mesh"
