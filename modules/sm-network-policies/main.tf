@@ -27,11 +27,31 @@ locals {
     } : {
     "ingressSelectors" : null
   }
+
+  istio_network_policy_default_ingress_selector_istiod = var.add_default_istio_network_policy ? {
+    "networkpolicy" : {
+      "ingressSelectors" : [
+        {}
+      ]
+    }
+    } : {
+    "ingressSelectors" : null
+  }
+
+  istio_network_policy_default_pods_selector_istiod = var.add_default_istio_network_policy ? {
+    "networkpolicy" : {
+      "podSelector" : {}
+    }
+    } : {
+    "networkpolicy" : {
+      "podSelector" : null
+    }
+  }
 }
 
 resource "helm_release" "istio_default_network_policy" {
   count             = var.add_default_istio_network_policy ? 1 : 0
-  name              = "${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-np"
+  name              = "np-${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-np"
   chart             = "${path.module}/../../chart/${local.istio_network_policy_chart_path}"
   namespace         = var.network_policy_namespace
   create_namespace  = false
@@ -39,8 +59,9 @@ resource "helm_release" "istio_default_network_policy" {
   force_update      = var.force_network_policies_update
   dependency_update = true
   cleanup_on_fail   = false
-  atomic            = true
-  wait              = true
+  # atomic            = true
+  atomic = false
+  wait   = true
 
   disable_openapi_validation = false
 
@@ -48,7 +69,59 @@ resource "helm_release" "istio_default_network_policy" {
     {
       name  = "networkpolicy.name"
       type  = "string"
-      value = "${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-np"
+      value = "np-${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-np"
+    },
+    {
+      name  = "networkpolicy.namespace"
+      type  = "string"
+      value = var.network_policy_namespace
+    },
+    {
+      name  = "networkpolicy.label.key"
+      type  = "string"
+      value = local.istio_network_policy_label_key
+    },
+    {
+      name  = "networkpolicy.label.value"
+      type  = "string"
+      value = local.istio_network_policy_label_value
+    },
+    {
+      name  = "networkpolicy.isIngressPolicy"
+      value = true
+    },
+    {
+      name  = "networkpolicy.isEgressPolicy"
+      value = false
+    }
+  ]
+
+  values = [
+    yamlencode(local.istio_network_policy_default_ingress_selector)
+  ]
+}
+
+resource "helm_release" "istio_default_network_policy_istiod" {
+  count             = var.add_default_istio_network_policy ? 1 : 0
+  name              = "istiod-${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-istiod"
+  chart             = "${path.module}/../../chart/${local.istio_network_policy_chart_path}"
+  namespace         = var.network_policy_namespace
+  create_namespace  = false
+  timeout           = var.network_policy_deployment_timeout
+  force_update      = var.force_network_policies_update
+  dependency_update = true
+  cleanup_on_fail   = false
+  # atomic            = true
+  atomic = false
+  wait   = true
+
+  disable_openapi_validation = false
+
+  set = [
+    {
+      name  = "networkpolicy.name"
+      type  = "string"
+      value = "istiod-${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-istiod"
     },
     {
       name  = "networkpolicy.namespace"
@@ -81,7 +154,8 @@ resource "helm_release" "istio_default_network_policy" {
   ]
 
   values = [
-    yamlencode(local.istio_network_policy_default_ingress_selector)
+    yamlencode(local.istio_network_policy_default_ingress_selector_istiod),
+    yamlencode(local.istio_network_policy_default_pods_selector_istiod)
   ]
 }
 

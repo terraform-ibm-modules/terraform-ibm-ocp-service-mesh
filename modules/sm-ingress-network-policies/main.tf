@@ -51,9 +51,10 @@ resource "helm_release" "istio_default_ingress_network_policy_traffic_selectors"
   timeout           = var.ingress_network_policy_deployment_timeout
   dependency_update = true
   cleanup_on_fail   = false
-  atomic            = true
-  wait              = true
-  force_update      = var.force_ingress_network_policies_update
+  # atomic            = true
+  atomic       = false
+  wait         = true
+  force_update = var.force_ingress_network_policies_update
 
   disable_openapi_validation = false
 

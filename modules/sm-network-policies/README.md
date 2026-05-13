@@ -1,9 +1,9 @@
 # ServiceMesh Network policies
 
-This module allows to create a set of [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) for a specific RedHat Openshift Service Mesh v3 controlplane to implement a 'Secure by default' pattern: essentially it creates a network policy for ingress type traffic to allow only the Pods members of the same controlplane to reach the controlplane pods.
-The check is performed through the namespaceSelector condition on the label used to enroll the other namespaces in this controlplane `"istio-injection" : "enabled"` or `"istio.io/rev" : "[control plane name]"`
-The network policy is also labeled with the same label key and value.
-The name of the policy is in the format `[prefix-][control plane name]-np`
+This module allows to create a set of [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) for a specific RedHat Openshift Service Mesh v3 controlplane to implement a 'Secure by default' pattern: essentially it creates two network policies for ingress type traffic to allow only the Pods members of the same controlplane to reach the controlplane pods and to allow the istiod pods to be reached by all the sources
+The first rule named `[prefix-][control plane name]-np` is performed through the namespaceSelector condition on the label used to enroll the other namespaces in this controlplane `"istio-injection" : "enabled"` or `"istio.io/rev" : "[control plane name]"`
+The second rule `[prefix-][control plane name]-istiod` allows all the ingress traffic on the istiod pods.
+Both the network policies are also labeled with the same label key and value.
 
 In addiction to this the submodule allows to add custom network policies that integrate with the default one to customise the controlplane namespace network control.
 
@@ -31,6 +31,7 @@ No modules.
 |------|------|
 | [helm_release.istio_custom_network_policies](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.istio_default_network_policy](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.istio_default_network_policy_istiod](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 
 ### Inputs
 

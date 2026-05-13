@@ -162,8 +162,9 @@ module "basic_workload_ingress" {
       targetavgutil = 70
     }
   }
-  cluster_id        = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
+  cluster_id          = module.ocp_base.cluster_id
+  resource_group_id   = module.resource_group.resource_group_id
+  rollback_on_failure = false
 }
 
 module "istio_network_policy" {
@@ -172,92 +173,6 @@ module "istio_network_policy" {
   network_policy_namespace          = "istio-system"
   network_policy_istio_controlplane = "default"
   add_default_istio_network_policy  = true
-  additional_custom_network_policies = [
-    {
-      policyName      = "test-policy-ingress"
-      isIngressPolicy = true
-      isEgressPolicy  = false
-      ingressSelectors = [
-        {
-          "from" : [
-            {
-              "namespaceSelector" : {
-                "matchLabels" : {
-                  "testlabel" : "testvalue"
-                }
-              }
-            }
-          ]
-        }
-      ]
-      egressSelectors = []
-      podSelector = {
-        "matchLabels" : {
-          "app" : "istiod"
-          "istio.io/rev" : "gateways-on-edge-pool"
-        }
-      }
-    }
-    ,
-    {
-      policyName       = "test-policy-egress"
-      isIngressPolicy  = false
-      isEgressPolicy   = true
-      ingressSelectors = []
-      egressSelectors = [
-        {
-          "to" : [
-            {
-              "ipBlock" : {
-                "cidr" : "10.0.0.8/16"
-              }
-            }
-          ]
-        }
-      ]
-      podSelector = {
-        "matchLabels" : {
-          "app" : "istiod"
-          "istio.io/rev" : "gateways-on-edge-pool"
-        }
-      }
-    },
-    {
-      policyName      = "test-policy-both"
-      isIngressPolicy = true
-      isEgressPolicy  = true
-      ingressSelectors = [
-        {
-          "from" : [
-            {
-              "namespaceSelector" : {
-                "matchLabels" : {
-                  "testlabel" : "testvalue"
-                }
-              }
-            }
-          ]
-        }
-      ]
-      egressSelectors = [
-        {
-          "to" : [
-            {
-              "ipBlock" : {
-                "cidr" : "10.0.0.16/16"
-              }
-            }
-          ]
-        }
-      ]
-      podSelector = {
-        "matchLabels" : {
-          "app" : "istiod"
-          "istio.io/rev" : "gateways-on-edge-pool"
-        }
-      }
-    }
-  ]
 }
 
 module "istio_ingress_network_policy" {
@@ -395,8 +310,9 @@ module "default_workload_egress" {
       targetavgutil = 70
     }
   }
-  cluster_id        = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
+  cluster_id          = module.ocp_base.cluster_id
+  resource_group_id   = module.resource_group.resource_group_id
+  rollback_on_failure = false
 }
 
 resource "kubernetes_namespace_v1" "sample_app_namespace" {
@@ -425,14 +341,15 @@ resource "kubernetes_namespace_v1" "sample_app_namespace" {
 resource "helm_release" "sample_app" {
   depends_on = [kubernetes_namespace_v1.sample_app_namespace]
 
-  name                       = "httpbin-sample-app"
-  chart                      = "../charts/sample-app/httpbin"
-  namespace                  = "httpbin"
-  create_namespace           = false
-  timeout                    = 300
-  cleanup_on_fail            = true
-  wait                       = true
-  atomic                     = true
+  name             = "httpbin-sample-app"
+  chart            = "../charts/sample-app/httpbin"
+  namespace        = "httpbin"
+  create_namespace = false
+  timeout          = 300
+  cleanup_on_fail  = true
+  wait             = true
+  # atomic                     = true
+  atomic                     = false
   disable_openapi_validation = false
 
   set = [{
