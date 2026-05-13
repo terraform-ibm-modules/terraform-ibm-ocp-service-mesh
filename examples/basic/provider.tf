@@ -13,9 +13,6 @@ provider "helm" {
     token                  = data.ibm_container_cluster_config.cluster_config.token
     cluster_ca_certificate = data.ibm_container_cluster_config.cluster_config.ca_certificate
   }
-  experiments = {
-    manifest = true
-  }
 }
 
 provider "kubernetes" {
