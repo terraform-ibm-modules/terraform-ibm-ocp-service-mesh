@@ -1,0 +1,8 @@
+networkpolicy:
+  namespace:
+  name:
+  isEgressPolicy: false
+  isIngressPolicy: false
+  ingressSelectors:
+  egressSelectors:
+  podSelector:

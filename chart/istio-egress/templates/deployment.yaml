@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.egress.name }}
+  name: {{ .Values.egress.name }}-dp
   namespace: {{ .Values.egress.namespace }}
 spec:
   {{- if .Values.egress.replicacount }}

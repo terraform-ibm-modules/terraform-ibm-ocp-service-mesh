@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app: istio
+    release: istio
+    {{- if .Values.networkpolicy.label }}
+    {{- if .Values.networkpolicy.label.key }}
+    {{ .Values.networkpolicy.label.key }}: {{ .Values.networkpolicy.label.value }}
+    {{- end }}
+    {{- end }}
+  name: {{ .Values.networkpolicy.name }}
+  namespace: {{ .Values.networkpolicy.namespace }}
+spec:
+  {{- if .Values.networkpolicy.isIngressPolicy }}
+  ingress:
+  {{- if .Values.networkpolicy.ingressSelectors }}
+  {{- toYaml .Values.networkpolicy.ingressSelectors | nindent 2 }}
+  {{- else }}
+  - {}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.networkpolicy.podSelector }}
+  podSelector:
+  {{- toYaml .Values.networkpolicy.podSelector | nindent 4 }}
+  {{- else }}
+  podSelector: {}
+  {{- end }}
+  {{- if .Values.networkpolicy.isEgressPolicy }}
+  egress:
+  {{- if .Values.networkpolicy.egressSelectors }}
+  {{- toYaml .Values.networkpolicy.egressSelectors | nindent 2 }}
+  {{- else }}
+  - {}
+  {{- end }}
+  {{- end }}
+  policyTypes:
+  {{- if .Values.networkpolicy.isIngressPolicy }}
+  - Ingress
+  {{- end }}
+  {{- if .Values.networkpolicy.isEgressPolicy }}
+  - Egress
+  {{- end }}

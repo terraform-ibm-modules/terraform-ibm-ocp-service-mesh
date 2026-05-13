@@ -139,12 +139,223 @@ module "basic_workload_ingress" {
   ingress_service_type      = "LoadBalancer"
   ingress_ip_type           = "public"
   istio_mesh_enrollment     = "default"
-  ingress_affinity          = {} # local.alb_affinity
+  ingress_affinity          = {}
   ingress_selectors = {
     "istio" : "ingress-gateway",
   }
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "protocol" : "TCP"
+    }
+  ]
+  ingress_autoscale_configuration = {
+    enabled      = true
+    autoscaleMin = 1
+    autoscaleMax = 3
+    cpu = {
+      targetavgutil = 75
+    }
+    memory = {
+      targetavgutil = 70
+    }
+  }
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+}
+
+module "istio_network_policy" {
+  depends_on                        = [time_sleep.wait_istio]
+  source                            = "../../modules/sm-network-policies"
+  network_policy_namespace          = "istio-system"
+  network_policy_istio_controlplane = "default"
+  add_default_istio_network_policy  = true
+  additional_custom_network_policies = [
+    {
+      policyName      = "test-policy-ingress"
+      isIngressPolicy = true
+      isEgressPolicy  = false
+      ingressSelectors = [
+        {
+          "from" : [
+            {
+              "namespaceSelector" : {
+                "matchLabels" : {
+                  "testlabel" : "testvalue"
+                }
+              }
+            }
+          ]
+        }
+      ]
+      egressSelectors = []
+      podSelector = {
+        "matchLabels" : {
+          "app" : "istiod"
+          "istio.io/rev" : "gateways-on-edge-pool"
+        }
+      }
+    }
+    ,
+    {
+      policyName       = "test-policy-egress"
+      isIngressPolicy  = false
+      isEgressPolicy   = true
+      ingressSelectors = []
+      egressSelectors = [
+        {
+          "to" : [
+            {
+              "ipBlock" : {
+                "cidr" : "10.0.0.8/16"
+              }
+            }
+          ]
+        }
+      ]
+      podSelector = {
+        "matchLabels" : {
+          "app" : "istiod"
+          "istio.io/rev" : "gateways-on-edge-pool"
+        }
+      }
+    },
+    {
+      policyName      = "test-policy-both"
+      isIngressPolicy = true
+      isEgressPolicy  = true
+      ingressSelectors = [
+        {
+          "from" : [
+            {
+              "namespaceSelector" : {
+                "matchLabels" : {
+                  "testlabel" : "testvalue"
+                }
+              }
+            }
+          ]
+        }
+      ]
+      egressSelectors = [
+        {
+          "to" : [
+            {
+              "ipBlock" : {
+                "cidr" : "10.0.0.16/16"
+              }
+            }
+          ]
+        }
+      ]
+      podSelector = {
+        "matchLabels" : {
+          "app" : "istiod"
+          "istio.io/rev" : "gateways-on-edge-pool"
+        }
+      }
+    }
+  ]
+}
+
+module "istio_ingress_network_policy" {
+  depends_on                       = [time_sleep.wait_istio]
+  source                           = "../../modules/sm-ingress-network-policies"
+  ingress_network_policy_namespace = "alb-ingress"
+  ingress_network_policy_istio_traffic_selectors = {
+    "app" : "istio-ingress",
+    "istio" : "istio-ingress"
+  }
+  ingress_network_policy_istio_controlplane  = "default"
+  add_default_istio_ingress_network_policies = true
+  additional_custom_ingress_network_policies = [
+    {
+      policyName      = "test-policy-ingress"
+      isIngressPolicy = true
+      isEgressPolicy  = false
+      ingressSelectors = [
+        {
+          "from" : [
+            {
+              "namespaceSelector" : {
+                "matchLabels" : {
+                  "testlabel" : "testvalue"
+                }
+              }
+            }
+          ]
+        }
+      ]
+      egressSelectors = []
+      podSelector = {
+        "matchLabels" : {
+          "app" : "istiod"
+          "istio.io/rev" : "gateways-on-edge-pool"
+        }
+      }
+    }
+    ,
+    {
+      policyName       = "test-policy-egress"
+      isIngressPolicy  = false
+      isEgressPolicy   = true
+      ingressSelectors = []
+      egressSelectors = [
+        {
+          "to" : [
+            {
+              "ipBlock" : {
+                "cidr" : "10.0.0.8/16"
+              }
+            }
+          ]
+        }
+      ]
+      podSelector = {
+        "matchLabels" : {
+          "app" : "istiod"
+          "istio.io/rev" : "gateways-on-edge-pool"
+        }
+      }
+    },
+    {
+      policyName      = "test-policy-both"
+      isIngressPolicy = true
+      isEgressPolicy  = true
+      ingressSelectors = [
+        {
+          "from" : [
+            {
+              "namespaceSelector" : {
+                "matchLabels" : {
+                  "testlabel" : "testvalue"
+                }
+              }
+            }
+          ]
+        }
+      ]
+      egressSelectors = [
+        {
+          "to" : [
+            {
+              "ipBlock" : {
+                "cidr" : "10.0.0.16/16"
+              }
+            }
+          ]
+        }
+      ]
+      podSelector = {
+        "matchLabels" : {
+          "app" : "istiod"
+          "istio.io/rev" : "gateways-on-edge-pool"
+        }
+      }
+    }
+  ]
 }
 
 module "default_workload_egress" {
@@ -158,6 +369,31 @@ module "default_workload_egress" {
   egress_affinity        = {}
   egress_selectors = {
     "istio" : "egress-gateway",
+  }
+  egress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "protocol" : "TCP"
+    },
+    {
+      "name" : "https"
+      "port" : "443"
+      "targetPort" : "443"
+      "protocol" : "TCP"
+    }
+  ]
+  egress_autoscale_configuration = {
+    enabled      = true
+    autoscaleMin = 1
+    autoscaleMax = 3
+    cpu = {
+      targetavgutil = 75
+    }
+    memory = {
+      targetavgutil = 70
+    }
   }
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
