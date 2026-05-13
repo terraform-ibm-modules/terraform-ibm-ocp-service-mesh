@@ -21,17 +21,3 @@ output "ingress_loadbalancer_ips" {
   description = "Load balancer IPs - map of service_name to IP for NLB type, map of indexed keys to IPs for other types, empty map for ALB"
   value       = module.basic_workload_ingress.ingress_loadbalancer_ips
 }
-
-# # This works
-# output "istio_network_policy_metadata" {
-#   value = module.istio_network_policy.istio_default_network_policy_metadata
-# }
-
-# # Manifest fails
-# output "istio_network_policy_manifest" {
-#   value = module.istio_network_policy.istio_default_network_policy_manifest
-# }
-
-# output "istio_network_policy_default_ingress_selector" {
-#   value = module.istio_network_policy.istio_network_policy_default_ingress_selector
-# }
