@@ -151,6 +151,11 @@ resource "helm_release" "istio_ingress" {
       value = var.namespace
     },
     {
+      name  = "ingress.istioMeshEnrollment"
+      type  = "string"
+      value = var.istio_mesh_enrollment
+    },
+    {
       name  = "ingress.svctype"
       type  = "string"
       value = var.ingress_service_type # LoadBalancer

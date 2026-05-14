@@ -2,8 +2,9 @@ locals {
 
   ingress_network_policy_names_prefix = var.ingress_network_policy_names_prefix != null ? trimspace(var.ingress_network_policy_names_prefix) != "" ? "${var.ingress_network_policy_names_prefix}-" : "" : ""
 
-  istio_ingress_network_policy_chart_path  = "sm-network-policy"
-  istio_ingress_network_policy_label_key   = "istio-revision"
+  istio_ingress_network_policy_chart_path = "sm-network-policy"
+  istio_ingress_network_policy_label_key  = var.ingress_network_policy_istio_controlplane == "default" ? "istio-injection" : "istio.io/rev"
+
   istio_ingress_network_policy_label_value = var.ingress_network_policy_istio_controlplane
   istio_ingress_network_policy_default_namespace_selector_value = var.ingress_network_policy_istio_controlplane == "default" ? {
     "istio-injection" : "enabled"
@@ -51,10 +52,9 @@ resource "helm_release" "istio_default_ingress_network_policy_traffic_selectors"
   timeout           = var.ingress_network_policy_deployment_timeout
   dependency_update = true
   cleanup_on_fail   = false
-  # atomic            = true
-  atomic       = false
-  wait         = true
-  force_update = var.force_ingress_network_policies_update
+  atomic            = true
+  wait              = true
+  force_update      = var.force_ingress_network_policies_update
 
   disable_openapi_validation = false
 

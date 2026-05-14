@@ -1,11 +1,12 @@
 ingress:
   name: default
   namespace: istio-system
+  istioMeshEnrollment:
   proxyProtocol:
     enabled: false
     allowWithoutProxyProtocol: false
   svctype: LoadBalancer
-  lbtype: alb # nlb sdnlb
+  lbtype: alb # nlb other
   lbiptype: public # private
   customAnnotations: {}
   istioNamespaceEnrollmentLabels: {}

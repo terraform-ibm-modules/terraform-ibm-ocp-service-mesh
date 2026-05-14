@@ -134,6 +134,11 @@ resource "helm_release" "istio_egress" {
       value = var.namespace
     },
     {
+      name  = "egress.istioMeshEnrollment"
+      type  = "string"
+      value = var.istio_mesh_enrollment
+    },
+    {
       name  = "egress.internalTrafficPolicy"
       type  = "string"
       value = var.egress_internal_traffic_policy
