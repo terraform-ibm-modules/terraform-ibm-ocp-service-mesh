@@ -51,7 +51,7 @@ locals {
 
 resource "helm_release" "istio_default_network_policy" {
   count             = var.add_default_istio_network_policy ? 1 : 0
-  name              = "np-${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-np"
+  name              = "${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-np-is"
   chart             = "${path.module}/../../chart/${local.istio_network_policy_chart_path}"
   namespace         = var.network_policy_namespace
   create_namespace  = false
@@ -69,7 +69,7 @@ resource "helm_release" "istio_default_network_policy" {
     {
       name  = "networkpolicy.name"
       type  = "string"
-      value = "np-${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-np"
+      value = "${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-np-is"
     },
     {
       name  = "networkpolicy.namespace"
@@ -103,7 +103,7 @@ resource "helm_release" "istio_default_network_policy" {
 
 resource "helm_release" "istio_default_network_policy_istiod" {
   count             = var.add_default_istio_network_policy ? 1 : 0
-  name              = "istiod-${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-istiod"
+  name              = "${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-np-istiod"
   chart             = "${path.module}/../../chart/${local.istio_network_policy_chart_path}"
   namespace         = var.network_policy_namespace
   create_namespace  = false
@@ -121,7 +121,7 @@ resource "helm_release" "istio_default_network_policy_istiod" {
     {
       name  = "networkpolicy.name"
       type  = "string"
-      value = "istiod-${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-istiod"
+      value = "${local.network_policy_names_prefix}${replace(var.network_policy_istio_controlplane, "_", "-")}-np-istiod"
     },
     {
       name  = "networkpolicy.namespace"
