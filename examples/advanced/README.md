@@ -9,6 +9,6 @@
 </p>
 <!-- END SCHEMATICS DEPLOY HOOK -->
 
-This sample deploys a VPC and its infrastructure resources and an OpenShift Cluster on IBM Cloud, then deploys on the cluster the RedHat Service Mesh v3 operator, a Service Mesh / istio control plane, a basic ingress and a basic egress in different namespaces, and a sample app serving the httpbin microservice for testing purposes.
+This sample deploys a VPC and its infrastructure resources and an OpenShift Cluster on IBM Cloud, then deploys on the cluster the RedHat Service Mesh v3 operator, a Service Mesh / istio control plane named `istio-1`, a basic ingress and a basic egress in different namespaces, and a sample app serving the httpbin microservice for testing purposes. The configuration shows how to deploy a controlplane named with a different name than `default` and how to enroll the workload and to setup the traffic routing resources accordingly.
 
-The ingress and the egress gateways deployments are also configured to leverage on autoscaling and on the ports opened for ingress and egress traffic.
+The ingress and the egress gateways deployments are configured to leverage on autoscaling and on the ports opened for ingress and egress traffic.
