@@ -25,7 +25,9 @@ locals {
       ]
     }
     } : {
-    "ingressSelectors" : null
+    "networkpolicy" : {
+      "ingressSelectors" : null
+    }
   }
 
   istio_network_policy_default_ingress_selector_istiod = var.add_default_istio_network_policy ? {
@@ -35,7 +37,9 @@ locals {
       ]
     }
     } : {
-    "ingressSelectors" : null
+    "networkpolicy" : {
+      "ingressSelectors" : null
+    }
   }
 
   istio_network_policy_default_pods_selector_istiod = var.add_default_istio_network_policy ? {
