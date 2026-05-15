@@ -260,17 +260,19 @@ resource "helm_release" "istio_controlplane" {
     }
   ]
 
-  values = [
-    yamlencode(local.istio_discovery_configuration),
-    yamlencode(local.istio_pilot_resources),
-    yamlencode(local.istio_pilot_affinity),
-    yamlencode(local.istio_pilot_tolerations),
-    yamlencode(local.istio_mesh_config_keep_alive),
-    yamlencode(local.istio_pilot_node_selector),
-    yamlencode(local.istio_mesh_config_mesh_mtls),
-    yamlencode(local.istio_mesh_config_mesh_tls_defaults),
-    yamlencode(local.istio_mesh_config_dns_capture),
-  ]
+  values = concat(
+    [
+      yamlencode(local.istio_discovery_configuration),
+      yamlencode(local.istio_pilot_resources),
+      yamlencode(local.istio_pilot_affinity),
+      yamlencode(local.istio_pilot_tolerations),
+      yamlencode(local.istio_mesh_config_keep_alive),
+      yamlencode(local.istio_pilot_node_selector),
+      yamlencode(local.istio_mesh_config_mesh_mtls),
+      yamlencode(local.istio_mesh_config_mesh_tls_defaults),
+    ],
+    var.enable_dns_capture ? [yamlencode(local.istio_mesh_config_dns_capture)] : []
+  )
 }
 
 resource "null_resource" "confirm_istio_operational" {
