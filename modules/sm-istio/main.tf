@@ -8,7 +8,12 @@ locals {
       "istioconfiguration" : {
         "meshConfig" : {
           "discoverySelectors" : [
-            { "matchLabels" : { "istio-discovery" : "enabled" } }, { "matchExpressions" : null }
+            merge({
+              matchLabels = { "istio-discovery" : "enabled" } },
+              # This is to prevent type mismatch errors when a matchExpressions value is provided.
+              var.istio_discovery_custom_configuration != null ? { matchExpressions = null } : {}
+            )
+
           ]
         }
       }
@@ -17,7 +22,11 @@ locals {
       "istioconfiguration" : {
         "meshConfig" : {
           "discoverySelectors" : [
-            { "matchLabels" : { "istio-discovery" : var.name } }, { "matchExpressions" : null }
+            merge({
+              matchLabels = { "istio-discovery" : var.name } },
+              # This is to prevent type mismatch errors when a matchExpressions value is provided.
+              var.istio_discovery_custom_configuration != null ? { matchExpressions = null } : {}
+            )
           ]
         }
       }
@@ -25,7 +34,13 @@ locals {
     ) : {
     "istioconfiguration" : {
       "meshConfig" : {
-        "discoverySelectors" : [var.istio_discovery_custom_configuration.matchLabels != null ? { "matchLabels" : var.istio_discovery_custom_configuration.matchLabels } : null, var.istio_discovery_custom_configuration.matchExpressions != null ? { "matchExpressions" : var.istio_discovery_custom_configuration.matchExpressions } : null]
+        "discoverySelectors" : [
+          merge(
+            var.istio_discovery_custom_configuration.matchLabels != null ? {
+              matchLabels = var.istio_discovery_custom_configuration.matchLabels
+            } : {},
+          length(var.istio_discovery_custom_configuration.matchExpressions) > 0 ? { matchExpressions = var.istio_discovery_custom_configuration.matchExpressions } : {})
+        ]
       }
     }
   }
