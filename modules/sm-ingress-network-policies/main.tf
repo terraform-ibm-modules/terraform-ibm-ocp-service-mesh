@@ -39,10 +39,11 @@ locals {
       ]
     }
     } : {
-    "ingressSelectors" : null
+    "networkpolicy" : {
+      "ingressSelectors" : null
+    }
   }
 }
-
 resource "helm_release" "istio_default_ingress_network_policy_traffic_selectors" {
   count             = var.add_default_istio_ingress_network_policies ? 1 : 0
   name              = "${local.ingress_network_policy_names_prefix}${replace(var.ingress_network_policy_istio_controlplane, "_", "-")}-np-ts"
