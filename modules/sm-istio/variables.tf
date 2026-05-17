@@ -290,9 +290,16 @@ variable "mesh_config_access_log_format" {
 }
 
 variable "enable_dns_capture" {
-  description = "Enable DNS capture for ServiceEntry resources. Required for ServiceEntry resources that rely on DNS resolution. In OpenShift Service Mesh 3.0, DNS capture is disabled by default (aligned with upstream Istio). Set to true to enable DNS capture by setting ISTIO_META_DNS_AUTO_ALLOCATE and ISTIO_META_DNS_CAPTURE to true in proxy metadata. For more details refer to https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me"
+  description = "Whether to enable DNS capture for ServiceEntry resources that rely on DNS resolution. [Learn more](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me)"
   type        = bool
-  default     = false
+  default     = true
+  nullable    = false
+}
+
+variable "proxy_metadata" {
+  description = "Additional key-value pairs to merge into meshConfig.defaultConfig.proxyMetadata. Keys set by enable_dns_capture take precedence if both are specified."
+  type        = map(string)
+  default     = {}
   nullable    = false
 }
 

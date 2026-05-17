@@ -114,14 +114,20 @@ locals {
     }
   }
 
-  istio_mesh_config_dns_capture = var.enable_dns_capture ? {
+  # Merge proxy_metadata with DNS capture settings (DNS capture takes precedence)
+  merged_proxy_metadata = merge(
+    var.proxy_metadata,
+    var.enable_dns_capture ? {
+      "ISTIO_META_DNS_AUTO_ALLOCATE" : "true"
+      "ISTIO_META_DNS_CAPTURE" : "true"
+    } : {}
+  )
+
+  istio_mesh_config_proxy_metadata = length(local.merged_proxy_metadata) > 0 ? {
     "istioconfiguration" : {
       "meshConfig" : {
         "defaultConfig" : {
-          "proxyMetadata" : {
-            "ISTIO_META_DNS_AUTO_ALLOCATE" : "true"
-            "ISTIO_META_DNS_CAPTURE" : "true"
-          }
+          "proxyMetadata" : local.merged_proxy_metadata
         }
       }
     }
@@ -286,7 +292,7 @@ resource "helm_release" "istio_controlplane" {
       yamlencode(local.istio_mesh_config_mesh_mtls),
       yamlencode(local.istio_mesh_config_mesh_tls_defaults),
     ],
-    var.enable_dns_capture ? [yamlencode(local.istio_mesh_config_dns_capture)] : []
+    length(local.merged_proxy_metadata) > 0 ? [yamlencode(local.istio_mesh_config_proxy_metadata)] : []
   )
 }
 

@@ -49,3 +49,9 @@ variable "service_mesh_operator_version" {
   type        = string
   default     = null
 }
+
+variable "proxy_metadata" {
+  description = "Additional key-value pairs to merge into meshConfig.defaultConfig.proxyMetadata for the Istio control plane. Useful for HTTP_PROXY, HTTPS_PROXY, etc."
+  type        = map(string)
+  default     = {}
+}
