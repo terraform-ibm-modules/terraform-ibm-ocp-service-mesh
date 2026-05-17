@@ -48,7 +48,6 @@ module "deploy_istio" {
   pilot_autoscaling_max_pods = 5
   pilot_autoscaling_min_pods = 2
   pilot_node_selector        = { "ibm-cloud.kubernetes.io/worker-pool-name" : "default" }
-  proxy_metadata             = var.proxy_metadata
 
   pilot_affinity = {
     podAntiAffinity : {
