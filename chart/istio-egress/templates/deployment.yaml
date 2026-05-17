@@ -20,7 +20,11 @@ spec:
         {{- if .Values.egress.istioselectors }}
         {{- toYaml .Values.egress.istioselectors | nindent 8 }}
         {{- end }}
+        {{- if eq .Values.egress.istioMeshEnrollment "default" }}
         sidecar.istio.io/inject: "true"
+        {{- else }}
+        istio.io/rev: "{{ .Values.egress.istioMeshEnrollment }}"
+        {{- end }}
         istio.io/gateway: "{{ .Values.egress.name }}.{{ .Values.egress.namespace }}"
     spec:
       {{- if .Values.egress.affinity }}
@@ -38,7 +42,7 @@ spec:
           {{- toYaml .Values.egress.affinity.podAntiAffinity | nindent 10 }}
         {{- end }}
       {{- end }}
-      serviceAccountName: {{ .Values.egress.name }}
+      serviceAccountName: {{ .Values.egress.name }}-service-account
       {{- if .Values.egress.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.egress.terminationGracePeriodSeconds }}
       {{- end }}
@@ -72,18 +76,3 @@ spec:
           name: {{ .name }}
         {{- end }}
         {{- end }}
-#---
-# Allow outside traffic to access the gateway
-# This is optional, only needed in case your cluster contains restrictive NetworkPolicies
-#apiVersion: networking.k8s.io/v1
-#kind: NetworkPolicy
-#metadata:
-#  name: gatewayegress
-#spec:
-#  podSelector:
-#    matchLabels:
-#      istio: egressgateway
-#  egress:
-#    - {}
-#  policyTypes:
-#  - Egress

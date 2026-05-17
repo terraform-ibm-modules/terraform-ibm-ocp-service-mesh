@@ -24,7 +24,11 @@ spec:
         {{- if $.Values.ingress.istioselectors }}
         {{- toYaml $.Values.ingress.istioselectors | nindent 8 }}
         {{- end }}
+        {{- if eq .Values.ingress.istioMeshEnrollment "default" }}
         sidecar.istio.io/inject: "true"
+        {{- else }}
+        istio.io/rev: "{{ .Values.ingress.istioMeshEnrollment }}"
+        {{- end }}
         istio.io/gateway: "{{ $.Values.ingress.name }}.{{ $.Values.ingress.namespace }}"
     spec:
       {{- if $lb_subnet_zone }}
@@ -46,7 +50,7 @@ spec:
           {{- toYaml $.Values.ingress.affinity.podAntiAffinity | nindent 10 }}
         {{- end }}
       {{- end }}
-      serviceAccountName: {{ $.Values.ingress.name }}
+      serviceAccountName: {{ $.Values.ingress.name }}-service-account
       {{- if $.Values.ingress.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ $.Values.ingress.terminationGracePeriodSeconds }}
       {{- end }}
@@ -83,18 +87,3 @@ spec:
 ---
 {{- end }}
 {{- end }}
-#---
-# Allow outside traffic to access the gateway
-# This is optional, only needed in case your cluster contains restrictive NetworkPolicies
-#apiVersion: networking.k8s.io/v1
-#kind: NetworkPolicy
-#metadata:
-#  name: gatewayingress
-#spec:
-#  podSelector:
-#    matchLabels:
-#      istio: ingressgateway
-#  ingress:
-#    - {}
-#  policyTypes:
-#  - Ingress

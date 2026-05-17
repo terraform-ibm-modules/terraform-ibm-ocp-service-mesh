@@ -1,6 +1,7 @@
 egress:
   name: default
   namespace: istio-system
+  istioMeshEnrollment:
   istioNamespaceEnrollmentLabels: {}
   istioselectors: {}
   ports:

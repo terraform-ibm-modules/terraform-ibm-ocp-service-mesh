@@ -14,6 +14,9 @@ const resourceGroup = "geretain-test-ocp-service-mesh"
 // Ensure every example directory has a corresponding test
 const basicExampleDir = "examples/basic"
 
+// Ensure every example directory has a corresponding test
+const advExampleDir = "examples/advanced"
+
 func setupOptions(t *testing.T, prefix string, dir string) *testhelper.TestOptions {
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
 		Testing:       t,
@@ -34,6 +37,17 @@ func TestRunBasicExample(t *testing.T) {
 	t.Parallel()
 
 	options := setupOptions(t, "ocpsm-basic", basicExampleDir)
+
+	output, err := options.RunTestConsistency()
+	assert.Nil(t, err, "This should not have errored")
+	assert.NotNil(t, output, "Expected some output")
+}
+
+// Consistency test for the advanced example
+func TestRunAdvancedExample(t *testing.T) {
+	t.Parallel()
+
+	options := setupOptions(t, "ocpsm-adv", advExampleDir)
 
 	output, err := options.RunTestConsistency()
 	assert.Nil(t, err, "This should not have errored")

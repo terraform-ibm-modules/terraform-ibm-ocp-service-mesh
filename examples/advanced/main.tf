@@ -107,7 +107,7 @@ module "service_mesh_operator" {
 module "deploy_istio" {
   depends_on        = [module.service_mesh_operator]
   source            = "../../modules/sm-istio"
-  name              = "default"
+  name              = "istio-1"
   namespace         = "istio-system"
   create_namespace  = true
   cluster_id        = module.ocp_base.cluster_id
@@ -128,6 +128,14 @@ resource "time_sleep" "wait_istio" {
   destroy_duration = "60s"
 }
 
+module "istio_network_policy" {
+  depends_on                        = [time_sleep.wait_istio]
+  source                            = "../../modules/sm-network-policies"
+  network_policy_namespace          = "istio-system"
+  network_policy_istio_controlplane = "istio-1"
+  add_default_istio_network_policy  = true
+}
+
 module "basic_workload_ingress" {
   depends_on                = [time_sleep.wait_istio]
   source                    = "../../modules/sm-istio-ingress"
@@ -138,13 +146,63 @@ module "basic_workload_ingress" {
   ingress_loadbalancer_type = "alb"
   ingress_service_type      = "LoadBalancer"
   ingress_ip_type           = "public"
-  istio_mesh_enrollment     = "default"
-  ingress_affinity          = {} # local.alb_affinity
+  istio_mesh_enrollment     = "istio-1"
+  ingress_affinity          = {}
   ingress_selectors = {
-    "istio" : "ingress-gateway",
+    "istio" : "istio-ingress",
+  }
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000" # ingress gateway target port, to match in network policy, in the gateway configuration and in the workload service configuration
+      "protocol" : "TCP"
+    }
+  ]
+  ingress_autoscale_configuration = {
+    enabled      = true
+    autoscaleMin = 1
+    autoscaleMax = 3
+    cpu = {
+      targetavgutil = 75
+    }
+    memory = {
+      targetavgutil = 70
+    }
   }
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+}
+
+module "istio_ingress_network_policy" {
+  depends_on                       = [time_sleep.wait_istio]
+  source                           = "../../modules/sm-ingress-network-policies"
+  ingress_network_policy_namespace = "alb-ingress"
+  ingress_network_policy_istio_traffic_selectors = {
+    "app" : "istio-ingress",
+    "istio" : "istio-ingress"
+  }
+  ingress_network_policy_istio_controlplane  = "istio-1"
+  add_default_istio_ingress_network_policies = true
+  additional_custom_ingress_network_policies = [
+    {
+      policyName      = "httpbin-policy-ingress"
+      isIngressPolicy = true
+      isEgressPolicy  = false
+      ingressSelectors = [
+        {
+          ports = [
+            {
+              protocol = "TCP"
+              port     = 8000
+            }
+          ]
+        }
+      ]
+      egressSelectors = []
+      podSelector     = {}
+    }
+  ]
 }
 
 module "default_workload_egress" {
@@ -154,10 +212,35 @@ module "default_workload_egress" {
   namespace              = "basic-egress"
   create_namespace       = true
   force_dataplane_update = true
-  istio_mesh_enrollment  = "default"
+  istio_mesh_enrollment  = "istio-1"
   egress_affinity        = {}
   egress_selectors = {
-    "istio" : "egress-gateway",
+    "istio" : "istio-egress",
+  }
+  egress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000"
+      "protocol" : "TCP"
+    },
+    {
+      "name" : "https"
+      "port" : "443"
+      "targetPort" : "443"
+      "protocol" : "TCP"
+    }
+  ]
+  egress_autoscale_configuration = {
+    enabled      = true
+    autoscaleMin = 1
+    autoscaleMax = 3
+    cpu = {
+      targetavgutil = 75
+    }
+    memory = {
+      targetavgutil = 70
+    }
   }
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
@@ -167,14 +250,14 @@ resource "kubernetes_namespace_v1" "sample_app_namespace" {
   depends_on = [time_sleep.wait_istio]
   metadata {
     name = "httpbin"
-    # istio injection annotations for default dataplane
+    # istio injection annotations for istio dataplane
     labels = {
-      "istio-discovery" : "enabled"
-      "istio-injection" : "enabled"
+      "istio-discovery" : "istio-1"
+      "istio.io/rev" : "istio-1"
     }
     annotations = {
-      "istio-discovery" : "enabled"
-      "istio-injection" : "enabled"
+      "istio-discovery" : "istio-1"
+      "istio.io/rev" : "istio-1"
     }
   }
 
@@ -204,7 +287,7 @@ resource "helm_release" "sample_app" {
     value = "httpbin"
     }, {
     name  = "gateway.istioSelector"
-    value = "ingress-gateway"
+    value = "istio-ingress"
     },
     {
       name  = "gateway.istioPort"
