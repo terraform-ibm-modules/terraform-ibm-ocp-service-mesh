@@ -28,10 +28,10 @@ spec:
         {{- if $.Values.ingress.istioselectors }}
         {{- toYaml $.Values.ingress.istioselectors | nindent 8 }}
         {{- end }}
-        {{- if eq .Values.ingress.istioMeshEnrollment "default" }}
+        {{- if eq $.Values.ingress.istioMeshEnrollment "default" }}
         sidecar.istio.io/inject: "true"
         {{- else }}
-        istio.io/rev: "{{ .Values.ingress.istioMeshEnrollment }}"
+        istio.io/rev: "{{ $.Values.ingress.istioMeshEnrollment }}"
         {{- end }}
         istio.io/gateway: "{{ $.Values.ingress.name }}.{{ $.Values.ingress.namespace }}"
     spec:
