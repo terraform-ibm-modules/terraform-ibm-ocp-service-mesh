@@ -49,3 +49,9 @@ variable "service_mesh_operator_version" {
   type        = string
   default     = null
 }
+
+variable "proxy_metadata" {
+  description = "Optional proxy metadata to add to the Istio mesh configuration. By default, DNS capture is enabled. You can add additional metadata like HTTP_PROXY settings here."
+  type        = map(string)
+  default     = null
+}

@@ -297,15 +297,8 @@ variable "mesh_config_access_log_format" {
   type        = string
 }
 
-variable "enable_dns_capture" {
-  description = "Whether to enable DNS capture for ServiceEntry resources that rely on DNS resolution. [Learn more](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me)"
-  type        = bool
-  default     = true
-  nullable    = false
-}
-
 variable "proxy_metadata" {
-  description = "Additional key-value pairs to merge into meshConfig.defaultConfig.proxyMetadata. Keys set by enable_dns_capture take precedence if both are specified."
+  description = "Additional key-value pairs to set in meshConfig.defaultConfig.proxyMetadata. DNS capture is enabled by default (ISTIO_META_DNS_AUTO_ALLOCATE and ISTIO_META_DNS_CAPTURE set to 'true'). Add additional metadata like HTTP_PROXY here, or explicitly set DNS capture keys to 'false' to disable. [Learn more](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me)"
   type        = map(string)
   default     = {}
   nullable    = false

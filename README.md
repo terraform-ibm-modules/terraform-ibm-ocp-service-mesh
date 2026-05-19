@@ -40,11 +40,11 @@ For more details about excluding single workload from the Service Mesh, see [Exc
 
 ### DNS Capture Configuration for ServiceEntry Resources
 
-OpenShift Service Mesh 3.0 disables DNS capture by default, aligning with upstream Istio. This differs from Service Mesh 2.6, which enabled DNS capture by default to support federation.
+This module **enables DNS capture by default** through the `proxy_metadata` variable in the [modules/sm-istio](./modules/sm-istio) submodule to support ServiceEntry resources that rely on DNS resolution. The default configuration sets `ISTIO_META_DNS_AUTO_ALLOCATE` and `ISTIO_META_DNS_CAPTURE` to `"true"`.
 
-When migrating from Service Mesh 2.x or when using ServiceEntry resources that rely on DNS resolution, you must explicitly enable DNS capture using the `enable_dns_capture` variable in the [modules/sm-istio](./modules/sm-istio) submodule. Failure to enable this feature will result in application errors such as "Name or service not known" when accessing external services through ServiceEntry resources.
+ServiceEntry resources that use DNS resolution require DNS capture to be enabled. If you don't use ServiceEntry resources with DNS resolution, you can disable DNS capture by explicitly setting these metadata keys to `"false"` in the `proxy_metadata` variable. You can also use `proxy_metadata` to add additional proxy configuration such as HTTP proxy settings.
 
-For more details, see [DNS capture configuration](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me) in the migration documentation.
+For more details and examples, see the [sm-istio module documentation](./modules/sm-istio/README.md).
 
 ### Multiple Service Mesh controlplanes deployment on the same cluster
 
