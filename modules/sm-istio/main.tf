@@ -132,6 +132,23 @@ locals {
       }
     }
   } : {}
+
+  istio_mesh_config_extension_providers = var.mesh_config_extension_providers == null ? {} : {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "extensionProviders" : var.mesh_config_extension_providers
+      }
+    }
+  }
+
+
+  istio_pilot_env = length(var.pilot_env) == 0 ? {} : {
+    "istioconfiguration" = {
+      "pilot" = {
+        "env" = var.pilot_env
+      }
+    }
+  }
 }
 
 ##############################################################################
@@ -294,6 +311,18 @@ resource "helm_release" "istio_controlplane" {
     ],
     length(local.merged_proxy_metadata) > 0 ? [yamlencode(local.istio_mesh_config_proxy_metadata)] : []
   )
+  values = [
+    yamlencode(local.istio_discovery_configuration),
+    yamlencode(local.istio_pilot_resources),
+    yamlencode(local.istio_pilot_affinity),
+    yamlencode(local.istio_pilot_tolerations),
+    yamlencode(local.istio_mesh_config_keep_alive),
+    yamlencode(local.istio_pilot_node_selector),
+    yamlencode(local.istio_mesh_config_mesh_mtls),
+    yamlencode(local.istio_mesh_config_mesh_tls_defaults),
+    yamlencode(local.istio_mesh_config_extension_providers),
+    yamlencode(local.istio_pilot_env),
+  ]
 }
 
 resource "null_resource" "confirm_istio_operational" {

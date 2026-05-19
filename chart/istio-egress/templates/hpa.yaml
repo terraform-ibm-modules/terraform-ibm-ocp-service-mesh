@@ -36,5 +36,5 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Values.egress.name }}
+    name: {{ default .Values.egress.name .Values.egress.deploymentName }}
 {{- end }}

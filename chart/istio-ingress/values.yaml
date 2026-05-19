@@ -1,5 +1,6 @@
 ingress:
   name: default
+  deploymentName: null
   namespace: istio-system
   istioMeshEnrollment:
   proxyProtocol:
@@ -11,6 +12,7 @@ ingress:
   customAnnotations: {}
   istioNamespaceEnrollmentLabels: {}
   istioselectors: {}
+  extraDeploymentLabels: {}
   albsubnets:
   albtimeout:
   nlbzonessubnets:
@@ -55,3 +57,4 @@ ingress:
             values:
             - edge
   tolerations:
+  topologySpreadConstraints: []

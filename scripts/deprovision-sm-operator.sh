@@ -121,7 +121,13 @@ fi
 echo "Deleting all CRDs from istio operator"
 echo "Deleting all CRDs from istio operator" >> "${LOGFILE}"
 
-kubectl get crds -oname | grep -e istio.io -e sailoperator.io | xargs kubectl delete
+if kubectl get crds -oname | grep 'maistra\.io'; then
+    echo "Detected SM v2 -> deleting ONLY '*.sailoperator.io' CRDs"
+    kubectl get crds -oname | grep sailoperator.io | xargs -r kubectl delete
+else
+    echo "SM v2 NOT detected -> deleting ONLY '*.sailoperator.io' CRDs"
+    kubectl get crds -oname | grep -e istio.io -e sailoperator.io | xargs kubectl delete
+fi
 
 echo "Deleting operator ${operator_name} in namespace ${operator_namespace}"
 echo "Deleting operator ${operator_name} in namespace ${operator_namespace}" >> "${LOGFILE}"

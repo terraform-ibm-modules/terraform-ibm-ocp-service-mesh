@@ -57,6 +57,10 @@ spec:
       tolerations:
       {{- toYaml .Values.istioconfiguration.pilot.tolerations | nindent 8 }}
       {{- end }}
+      {{- if .Values.istioconfiguration.pilot.env }}
+      env:
+      {{- toYaml .Values.istioconfiguration.pilot.env | nindent 8 }}
+      {{- end }}
     {{- if .Values.istioconfiguration.meshConfig }}
     meshConfig: # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig
       {{- if .Values.istioconfiguration.meshConfig.enableAutoMTLS }}
@@ -109,5 +113,9 @@ spec:
       {{- if .Values.istioconfiguration.meshConfig.tlsDefaults }}
       tlsDefaults:
         {{- toYaml .Values.istioconfiguration.meshConfig.tlsDefaults | nindent 8 }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.extensionProviders }}
+      extensionProviders:
+      {{- toYaml .Values.istioconfiguration.meshConfig.extensionProviders | nindent 8 }}
       {{- end }}
     {{- end }}

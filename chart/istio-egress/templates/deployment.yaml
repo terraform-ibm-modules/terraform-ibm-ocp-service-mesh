@@ -1,8 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.egress.name }}
+  name: {{ default .Values.egress.name .Values.egress.deploymentName }}
   namespace: {{ .Values.egress.namespace }}
+  {{- if .Values.egress.extraDeploymentLabels }}
+  labels:
+  {{- toYaml .Values.egress.extraDeploymentLabels | nindent 4 }}
+  {{- end }}
 spec:
   {{- if .Values.egress.replicacount }}
   replicas: {{ .Values.egress.replicacount }}
@@ -41,6 +45,10 @@ spec:
         podAntiAffinity:
           {{- toYaml .Values.egress.affinity.podAntiAffinity | nindent 10 }}
         {{- end }}
+      {{- end }}
+      {{- if .Values.egress.topologySpreadConstraints }}
+      topologySpreadConstraints:
+      {{- toYaml .Values.egress.topologySpreadConstraints | nindent 6 }}
       {{- end }}
       serviceAccountName: {{ .Values.egress.name }}-service-account
       {{- if .Values.egress.terminationGracePeriodSeconds }}

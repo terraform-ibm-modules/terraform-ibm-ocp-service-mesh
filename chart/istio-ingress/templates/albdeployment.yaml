@@ -2,8 +2,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.ingress.name }}
+  name: {{ default .Values.ingress.name .Values.ingress.deploymentName }}
   namespace: {{ .Values.ingress.namespace }}
+  {{- if .Values.ingress.extraDeploymentLabels }}
+  labels:
+  {{- toYaml .Values.ingress.extraDeploymentLabels | nindent 4 }}
+  {{- end }}
 spec:
   {{- if .Values.ingress.replicacount }}
   replicas: {{ .Values.ingress.replicacount }}
@@ -44,6 +48,10 @@ spec:
         podAntiAffinity:
           {{- toYaml .Values.ingress.affinity.podAntiAffinity | nindent 10 }}
         {{- end }}
+      {{- end }}
+      {{- if .Values.ingress.topologySpreadConstraints }}
+      topologySpreadConstraints:
+      {{- toYaml .Values.ingress.topologySpreadConstraints | nindent 6 }}
       {{- end }}
       serviceAccountName: {{ .Values.ingress.name }}-service-account
       {{- if .Values.ingress.terminationGracePeriodSeconds }}

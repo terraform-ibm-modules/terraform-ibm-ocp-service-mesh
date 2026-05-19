@@ -46,7 +46,7 @@ variable "prefix" {
 
 variable "name" {
   type        = string
-  description = "Name of the Istio egress deployment"
+  description = "Name of the Istio egress"
 }
 
 variable "create_namespace" {
@@ -229,4 +229,27 @@ variable "rollback_on_failure" {
   description = "Flag to automatically rollback the helm chart on installation failure."
   type        = bool
   default     = true
+}
+
+variable "egress_topology_spread_constraints" {
+  description = "List of topologySpreadConstraints to apply to the egress Deployment(s). See k8s apps/v1 TopologySpreadConstraint schema."
+  type        = any
+  default     = null
+}
+
+variable "egress_extra_deployment_labels" {
+  type        = map(string)
+  default     = {}
+  nullable    = true
+  description = <<-EOT
+    Llabel that defines an additional identity for the egress gateway.
+    This label is applied to:
+      - Deployment metadata.labels
+  EOT
+}
+
+variable "egress_deployment_name" {
+  description = "Optional override for the egress Deployment name. If null or empty, the value of var.name is used as default."
+  type        = string
+  default     = null
 }
