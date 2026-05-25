@@ -297,11 +297,26 @@ variable "mesh_config_access_log_format" {
   type        = string
 }
 
+variable "enable_dns_capture" {
+  description = "Enable DNS capture for ServiceEntry resources. When enabled, automatically sets ISTIO_META_DNS_AUTO_ALLOCATE and ISTIO_META_DNS_CAPTURE to 'true' in proxy metadata. Required for ServiceEntry resources that rely on DNS resolution. [Learn more](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me)"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
 variable "proxy_metadata" {
-  description = "Additional key-value pairs to set in meshConfig.defaultConfig.proxyMetadata. DNS capture is enabled by default (ISTIO_META_DNS_AUTO_ALLOCATE and ISTIO_META_DNS_CAPTURE set to 'true'). Add additional metadata like HTTP_PROXY here, or explicitly set DNS capture keys to 'false' to disable. [Learn more](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me)"
+  description = "Additional key-value pairs to configure meshConfig.defaultConfig.proxyMetadata. Use this to add custom proxy metadata like HTTP_PROXY, HTTPS_PROXY, etc. Do not include ISTIO_META_DNS_AUTO_ALLOCATE or ISTIO_META_DNS_CAPTURE here; use the enable_dns_capture variable instead."
   type        = map(string)
   default     = {}
   nullable    = false
+
+  validation {
+    condition = (
+      !contains(keys(var.proxy_metadata), "ISTIO_META_DNS_AUTO_ALLOCATE") &&
+      !contains(keys(var.proxy_metadata), "ISTIO_META_DNS_CAPTURE")
+    )
+    error_message = "Do not set ISTIO_META_DNS_AUTO_ALLOCATE or ISTIO_META_DNS_CAPTURE in proxy_metadata. Use the enable_dns_capture variable to control DNS capture functionality."
+  }
 }
 
 variable "rollback_on_failure" {

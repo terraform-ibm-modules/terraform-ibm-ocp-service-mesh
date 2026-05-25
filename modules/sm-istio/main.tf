@@ -114,13 +114,13 @@ locals {
     }
   }
 
-  # Merge user-provided proxy_metadata with DNS capture defaults
+  # Merge user-provided proxy metadata with DNS capture settings (if enabled)
   merged_proxy_metadata = merge(
-    {
+    var.proxy_metadata,
+    var.enable_dns_capture ? {
       "ISTIO_META_DNS_AUTO_ALLOCATE" = "true"
       "ISTIO_META_DNS_CAPTURE"       = "true"
-    },
-    var.proxy_metadata
+    } : {}
   )
 
   istio_mesh_config_proxy_metadata = length(local.merged_proxy_metadata) > 0 ? {
