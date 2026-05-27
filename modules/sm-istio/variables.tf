@@ -305,17 +305,19 @@ variable "enable_dns_capture" {
 }
 
 variable "proxy_metadata" {
-  description = "Additional key-value pairs to configure meshConfig.defaultConfig.proxyMetadata. Use this to add custom proxy metadata like HTTP_PROXY, HTTPS_PROXY, etc. Do not include ISTIO_META_DNS_AUTO_ALLOCATE or ISTIO_META_DNS_CAPTURE here; use the enable_dns_capture variable instead."
+  description = "Additional key-value pairs to configure meshConfig.defaultConfig.proxyMetadata. Use this to add custom proxy metadata like HTTP_PROXY, HTTPS_PROXY, etc. When enable_dns_capture is true, do not include ISTIO_META_DNS_AUTO_ALLOCATE or ISTIO_META_DNS_CAPTURE here (use the enable_dns_capture flag instead). When enable_dns_capture is false, you can set these keys directly in proxy_metadata if needed."
   type        = map(string)
   default     = {}
   nullable    = false
 
   validation {
     condition = (
-      !contains(keys(var.proxy_metadata), "ISTIO_META_DNS_AUTO_ALLOCATE") &&
-      !contains(keys(var.proxy_metadata), "ISTIO_META_DNS_CAPTURE")
+      var.enable_dns_capture && (
+        contains(keys(var.proxy_metadata), "ISTIO_META_DNS_AUTO_ALLOCATE") ||
+        contains(keys(var.proxy_metadata), "ISTIO_META_DNS_CAPTURE")
+      ) ? false : true
     )
-    error_message = "Do not set ISTIO_META_DNS_AUTO_ALLOCATE or ISTIO_META_DNS_CAPTURE in proxy_metadata. Use the enable_dns_capture variable to control DNS capture functionality."
+    error_message = "When enable_dns_capture is true, do not set ISTIO_META_DNS_AUTO_ALLOCATE or ISTIO_META_DNS_CAPTURE in proxy_metadata. Use the enable_dns_capture variable to control DNS capture functionality. If you need to set these keys manually, set enable_dns_capture to false."
   }
 }
 
