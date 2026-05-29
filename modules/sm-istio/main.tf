@@ -295,6 +295,10 @@ resource "helm_release" "istio_controlplane" {
       name  = "istioconfiguration.meshConfig.accessLogFormat"
       type  = "string"
       value = var.mesh_config_access_log_format != null && var.mesh_config_access_log_format != "" ? var.mesh_config_access_log_format : ""
+      }, {
+      name  = "istioconfiguration.peerAuthenticationName"
+      type  = "string"
+      value = var.peer_authentication_name
     }
   ]
 

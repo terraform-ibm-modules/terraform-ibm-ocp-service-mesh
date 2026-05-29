@@ -332,3 +332,9 @@ variable "mesh_config_extension_providers" {
   default     = null
   description = "List of mesh-wide extension providers to place under spec.values.meshConfig.extensionProviders. Default to null."
 }
+
+variable "peer_authentication_name" {
+  type        = string
+  default     = null
+  description = "Name of the PeerAuthentication policy. Default to null to autogenerate the name as '<controlplane-name>-peerauthentication'."
+}

@@ -1,6 +1,7 @@
 istioconfiguration:
   namespace: istio-system
   name: default # use default for single cp or use cp name for multiple cp on the same cluster
+  peerAuthenticationName:
   outboundTrafficPolicy: REGISTRY_ONLY
   defaultpdb: false
   updateStrategyType: InPlace
