@@ -5,9 +5,13 @@ kind: Deployment
 metadata:
   name: {{ printf "%s-%s" (default $.Values.ingress.name $.Values.ingress.deploymentName) $lb_subnet_zone }}
   namespace: {{ $.Values.ingress.namespace }}
-  {{- if .Values.ingress.extraDeploymentLabels }}
+  {{- if $.Values.ingress.deploymentCustomLabels }}
   labels:
-  {{- toYaml .Values.ingress.extraDeploymentLabels | nindent 4 }}
+  {{- toYaml $.Values.ingress.deploymentCustomLabels | nindent 4 }}
+  {{- end }}
+  {{- if $.Values.ingress.deploymentCustomAnnotations }}
+  annotations:
+  {{- toYaml $.Values.ingress.deploymentCustomAnnotations | nindent 4 }}
   {{- end }}
 spec:
   {{- if $.Values.ingress.replicacount }}

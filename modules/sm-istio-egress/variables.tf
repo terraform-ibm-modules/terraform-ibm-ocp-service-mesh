@@ -238,7 +238,7 @@ variable "egress_topology_spread_constraints" {
   default     = null
 }
 
-variable "egress_extra_deployment_labels" {
+variable "egress_deployment_custom_labels" {
   type        = map(string)
   default     = {}
   nullable    = true
@@ -247,6 +247,13 @@ variable "egress_extra_deployment_labels" {
     This label is applied to:
       - Deployment metadata.labels
   EOT
+}
+
+variable "egress_deployment_custom_annotations" {
+  type        = map(string)
+  default     = {}
+  nullable    = true
+  description = "Map of custom annotations to add to the egress Deployment resource"
 }
 
 variable "egress_deployment_name" {

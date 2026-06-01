@@ -3,9 +3,13 @@ kind: Deployment
 metadata:
   name: {{ default .Values.egress.name .Values.egress.deploymentName }}
   namespace: {{ .Values.egress.namespace }}
-  {{- if .Values.egress.extraDeploymentLabels }}
+  {{- if .Values.egress.deploymentCustomLabels }}
   labels:
-  {{- toYaml .Values.egress.extraDeploymentLabels | nindent 4 }}
+  {{- toYaml .Values.egress.deploymentCustomLabels | nindent 4 }}
+  {{- end }}
+  {{- if .Values.egress.deploymentCustomAnnotations }}
+  annotations:
+  {{- toYaml .Values.egress.deploymentCustomAnnotations | nindent 4 }}
   {{- end }}
 spec:
   {{- if .Values.egress.replicacount }}

@@ -62,9 +62,15 @@ locals {
     }
   }
 
-  egress_extra_deployment_labels = length(var.egress_extra_deployment_labels) == 0 ? {} : {
+  egress_deployment_custom_labels = length(var.egress_deployment_custom_labels) == 0 ? {} : {
     "egress" = {
-      "extraDeploymentLabels" = var.egress_extra_deployment_labels
+      "deploymentCustomLabels" = var.egress_deployment_custom_labels
+    }
+  }
+
+  egress_deployment_custom_annotations = length(var.egress_deployment_custom_annotations) == 0 ? {} : {
+    "egress" = {
+      "deploymentCustomAnnotations" = var.egress_deployment_custom_annotations
     }
   }
 }
@@ -179,7 +185,8 @@ resource "helm_release" "istio_egress" {
     yamlencode(local.egress_affinity),
     yamlencode(local.egress_tolerations),
     yamlencode(local.egress_topology_spread_constraints),
-    yamlencode(local.egress_extra_deployment_labels),
+    yamlencode(local.egress_deployment_custom_labels),
+    yamlencode(local.egress_deployment_custom_annotations),
   ]
 
 }

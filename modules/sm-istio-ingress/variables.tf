@@ -332,13 +332,20 @@ variable "ingress_deployment_name" {
   default     = null
 }
 
-variable "ingress_extra_deployment_labels" {
+variable "ingress_deployment_custom_labels" {
   type        = map(string)
   default     = {}
   nullable    = true
   description = <<-EOT
-    Llabel that defines an additional identity for the egress gateway.
+    Llabel that defines an additional identity for the ingress gateway.
     This label is applied to:
       - Deployment metadata.labels
   EOT
+}
+
+variable "ingress_deployment_custom_annotations" {
+  type        = map(string)
+  default     = {}
+  nullable    = true
+  description = "Map of custom annotations to add to the ingress Deployment resource"
 }

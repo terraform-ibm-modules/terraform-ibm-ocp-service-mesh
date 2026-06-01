@@ -12,7 +12,8 @@ ingress:
   customAnnotations: {}
   istioNamespaceEnrollmentLabels: {}
   istioselectors: {}
-  extraDeploymentLabels: {}
+  deploymentCustomLabels: {}
+  deploymentCustomAnnotations: {}
   albsubnets:
   albtimeout:
   nlbzonessubnets:
