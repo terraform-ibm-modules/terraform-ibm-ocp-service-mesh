@@ -8,14 +8,14 @@ spec:
   updateStrategy:
     inactiveRevisionDeletionGracePeriodSeconds: 30
     type: {{ .Values.istioconfiguration.updateStrategyType }}
-  global:
-    logAsJson: true
-    istioNamespace: {{ .Values.istioconfiguration.namespace }}
-    defaultPodDisruptionBudget:
-      enabled: {{ .Values.istioconfiguration.defaultpdb }}
-    networkPolicy:
-      enabled: {{ .Values.istioconfiguration.enableNetworkPolicy }}
   values:
+    global:
+      logAsJson: true
+      istioNamespace: {{ .Values.istioconfiguration.namespace }}
+      defaultPodDisruptionBudget:
+        enabled: {{ .Values.istioconfiguration.defaultpdb }}
+      networkPolicy:
+        enabled: {{ .Values.istioconfiguration.enableNetworkPolicy }}
     outboundTrafficPolicy: {{ .Values.istioconfiguration.outboundTrafficPolicy }}
     pilot:
       enabled: {{ .Values.istioconfiguration.pilot.enabled }}
