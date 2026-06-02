@@ -282,7 +282,7 @@ resource "helm_release" "istio_controlplane" {
       value = var.mesh_config_ingress_controller_mode != null ? var.mesh_config_connect_timeout : ""
       }, {
       name  = "istioconfiguration.defaultpdb"
-      value = var.istio_enable_default_pod_disruption_budget != null ? var.istio_enable_default_pod_disruption_budget : null
+      value = var.istio_enable_default_pod_disruption_budget
       }, {
       name  = "istioconfiguration.meshConfig.accessLogFile"
       type  = "string"

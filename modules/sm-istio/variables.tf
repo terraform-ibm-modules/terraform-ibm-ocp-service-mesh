@@ -74,7 +74,8 @@ variable "istio_namespace_add_discovery_for_workload" {
 variable "istio_enable_default_pod_disruption_budget" {
   type        = bool
   description = "Controls whether a PodDisruptionBudget with a default minAvailable value of 1 is created for each deployment. Default to null, using Istio default configuration. More details at https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#defaultpoddisruptionbudgetconfig"
-  default     = null
+  default     = true
+  nullable    = false
 }
 
 variable "istio_update_strategy_type" {
