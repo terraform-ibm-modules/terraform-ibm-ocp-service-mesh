@@ -42,9 +42,8 @@ resource "helm_release" "istio_default_network_policy" {
   force_update      = var.force_network_policies_update
   dependency_update = true
   cleanup_on_fail   = false
-  # atomic            = true
-  atomic = false
-  wait   = true
+  atomic            = true
+  wait              = true
 
   disable_openapi_validation = false
 
