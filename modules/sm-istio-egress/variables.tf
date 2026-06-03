@@ -80,9 +80,10 @@ variable "istio_mesh_enrollment" {
 }
 
 variable "istio_egress_deployment_timeout" {
-  type        = string
-  default     = null
-  description = "Timeout for the helm release deployment for the egress gateway"
+  type        = number
+  default     = 180
+  description = "Timeout for the helm release deployment for the egress gateway. Default to 180s"
+  nullable    = false
 }
 
 variable "egress_discovery_custom_configuration" {
