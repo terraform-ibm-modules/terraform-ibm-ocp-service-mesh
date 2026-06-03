@@ -38,6 +38,14 @@ For more details about Service Mesh sidecar injection, see [Sidecar injection](h
 
 For more details about excluding single workload from the Service Mesh, see [Exclude a workload from the mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-sidecar-injection#ossm-enabling-sidecar-injection-exclude-workload-from-mesh_ossm-sidecar-injection)
 
+### DNS Capture Configuration for ServiceEntry Resources
+
+This module **enables DNS capture by default** through the `proxy_metadata` variable in the [modules/sm-istio](./modules/sm-istio) submodule to support ServiceEntry resources that rely on DNS resolution. The default configuration sets `ISTIO_META_DNS_AUTO_ALLOCATE` and `ISTIO_META_DNS_CAPTURE` to `"true"`.
+
+ServiceEntry resources that use DNS resolution require DNS capture to be enabled. If you don't use ServiceEntry resources with DNS resolution, you can disable DNS capture by explicitly setting these metadata keys to `"false"` in the `proxy_metadata` variable. You can also use `proxy_metadata` to add additional proxy configuration such as HTTP proxy settings.
+
+For more details and examples, see the [sm-istio module documentation](./modules/sm-istio/README.md).
+
 ### Multiple Service Mesh controlplanes deployment on the same cluster
 
 By appropriately configuring the controlplanes discovery selectors and sidecar injection properties with multiple instances of [modules/sm-istio](./modules/sm-istio) this module allows to deploy multiple controlplanes on the sidecar, each one discovering the appropriate workloads and injecting the related sidecars.

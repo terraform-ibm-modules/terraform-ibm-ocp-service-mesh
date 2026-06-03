@@ -305,6 +305,30 @@ variable "mesh_config_access_log_format" {
   type        = string
 }
 
+variable "enable_dns_capture" {
+  description = "Enable DNS capture for ServiceEntry resources. When enabled, automatically sets ISTIO_META_DNS_AUTO_ALLOCATE and ISTIO_META_DNS_CAPTURE to 'true' in proxy metadata. Required for ServiceEntry resources that rely on DNS resolution. [Learn more](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me)"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "proxy_metadata" {
+  description = "Additional key-value pairs to configure meshConfig.defaultConfig.proxyMetadata. Use this to add custom proxy metadata like HTTP_PROXY, HTTPS_PROXY, etc. When enable_dns_capture is true, do not include ISTIO_META_DNS_AUTO_ALLOCATE or ISTIO_META_DNS_CAPTURE here (use the enable_dns_capture flag instead). When enable_dns_capture is false, you can set these keys directly in proxy_metadata if needed."
+  type        = map(string)
+  default     = {}
+  nullable    = false
+
+  validation {
+    condition = (
+      var.enable_dns_capture && (
+        contains(keys(var.proxy_metadata), "ISTIO_META_DNS_AUTO_ALLOCATE") ||
+        contains(keys(var.proxy_metadata), "ISTIO_META_DNS_CAPTURE")
+      ) ? false : true
+    )
+    error_message = "When enable_dns_capture is true, do not set ISTIO_META_DNS_AUTO_ALLOCATE or ISTIO_META_DNS_CAPTURE in proxy_metadata. Use the enable_dns_capture variable to control DNS capture functionality. If you need to set these keys manually, set enable_dns_capture to false."
+  }
+}
+
 variable "rollback_on_failure" {
   description = "Flag to automatically rollback the helm chart on installation failure."
   type        = bool
@@ -315,4 +339,10 @@ variable "mesh_config_extension_providers" {
   type        = list(any)
   default     = null
   description = "List of mesh-wide extension providers to place under spec.values.meshConfig.extensionProviders. Default to null."
+}
+
+variable "peer_authentication_name" {
+  type        = string
+  default     = null
+  description = "Name of the PeerAuthentication policy. Default to null to autogenerate the name as '<controlplane-name>-peerauthentication'."
 }

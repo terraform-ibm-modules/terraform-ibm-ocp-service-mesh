@@ -3,7 +3,7 @@
 apiVersion: security.istio.io/v1
 kind: PeerAuthentication
 metadata:
-  name: {{ .Values.istioconfiguration.name }}-peerauthentication
+  name: {{ default (printf "%s-peerauthentication" .Values.istioconfiguration.name) .Values.istioconfiguration.peerAuthenticationName }}
   namespace: {{ .Values.istioconfiguration.namespace }}
 spec:
   mtls:

@@ -99,6 +99,13 @@ spec:
       discoverySelectors:
         {{- toYaml .Values.istioconfiguration.meshConfig.discoverySelectors | nindent 8 }}
       {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.defaultConfig }}
+      defaultConfig:
+        {{- if .Values.istioconfiguration.meshConfig.defaultConfig.proxyMetadata }}
+        proxyMetadata:
+          {{- toYaml .Values.istioconfiguration.meshConfig.defaultConfig.proxyMetadata | nindent 10 }}
+        {{- end }}
+      {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.meshMTLS }}
       meshMTLS:
         {{- toYaml .Values.istioconfiguration.meshConfig.meshMTLS | nindent 8 }}

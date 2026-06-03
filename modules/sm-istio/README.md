@@ -95,6 +95,20 @@ The default values are the below ones:
 }
 ```
 
+### DNS Capture Configuration for ServiceEntry Resources
+
+DNS capture is **enabled by default** in this module to support ServiceEntry resources that rely on DNS resolution. The default configuration sets `ISTIO_META_DNS_AUTO_ALLOCATE` and `ISTIO_META_DNS_CAPTURE` to `"true"` in the proxy metadata.
+
+**Important:** ServiceEntry resources that use DNS resolution require DNS capture to be enabled. Disabling it will result in application errors such as "Name or service not known" when accessing external services.
+
+#### Configuration Options
+
+- **Default behavior**: DNS capture is enabled automatically. See the [basic example](../../examples/basic) for a working configuration.
+- **Disabling DNS capture**: Set `ISTIO_META_DNS_AUTO_ALLOCATE` and `ISTIO_META_DNS_CAPTURE` to `"false"` in the `proxy_metadata` variable.
+- **Adding proxy settings**: Use the `proxy_metadata` variable to add HTTP proxy configuration or other custom metadata while preserving DNS capture defaults.
+
+For complete configuration examples, see the [examples folder](../../examples/).
+
 ### Example: Advanced configuration
 
 The following controlplane is configured with the following attributes:
@@ -189,6 +203,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
 | <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
 | <a name="input_create_namespace"></a> [create\_namespace](#input\_create\_namespace) | Flag to create the namespace where to install istio controlplane. Default to true | `bool` | `true` | no |
+| <a name="input_enable_dns_capture"></a> [enable\_dns\_capture](#input\_enable\_dns\_capture) | Enable DNS capture for ServiceEntry resources. When enabled, automatically sets ISTIO\_META\_DNS\_AUTO\_ALLOCATE and ISTIO\_META\_DNS\_CAPTURE to 'true' in proxy metadata. Required for ServiceEntry resources that rely on DNS resolution. [Learn more](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html-single/migrating_from_service_mesh_2_to_service_mesh_3/index#ossm-migrating-read-me-dns-capture-configuration_ossm-migrating-read-me) | `bool` | `true` | no |
 | <a name="input_force_controlplane_update"></a> [force\_controlplane\_update](#input\_force\_controlplane\_update) | Force controlplane to be recreated when updated. Default to false (may require to taint the resource to apply changes) | `bool` | `false` | no |
 | <a name="input_istio_controlplane_deployment_timeout"></a> [istio\_controlplane\_deployment\_timeout](#input\_istio\_controlplane\_deployment\_timeout) | Deployment timeout in seconds for the istio controlplane. Default to 300 seconds. | `number` | `300` | no |
 | <a name="input_istio_discovery_custom_configuration"></a> [istio\_discovery\_custom\_configuration](#input\_istio\_discovery\_custom\_configuration) | Istio controlplane discovery label. Default to null to autogenerate the labels according to var.name value to matchLabels: {"istio-discovery" : "enabled"}. For more details https://istio.io/latest/blog/2021/discovery-selectors/ https://github.com/istio/api/blob/master/mesh/v1alpha1/config.proto#L1411 https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh#ossm-discoveryselectors-scope-service-mesh_ossm-installing-openshift-service-mesh | <pre>object({<br/>    matchLabels : optional(map(string), null),<br/>    matchExpressions : optional(list(object({<br/>      key : string<br/>      operator : string<br/>      values : list(string)<br/>    })), [])<br/>  })</pre> | `null` | no |
@@ -212,6 +227,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_name"></a> [name](#input\_name) | Name of the Istio controlplane | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where to install istio controlplane. | `string` | n/a | yes |
 | <a name="input_outboundtrafficpolicy"></a> [outboundtrafficpolicy](#input\_outboundtrafficpolicy) | Istio controlplane output traffic policy configuration. Default to ALLOW\_ANY. Values allowed ALLOW\_ANY or REGISTRY\_ONLY | `string` | `"ALLOW_ANY"` | no |
+| <a name="input_peer_authentication_name"></a> [peer\_authentication\_name](#input\_peer\_authentication\_name) | Name of the PeerAuthentication policy. Default to null to autogenerate the name as '<controlplane-name>-peerauthentication'. | `string` | `null` | no |
 | <a name="input_pilot_affinity"></a> [pilot\_affinity](#input\_pilot\_affinity) | Istio pilot pods affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Default to empty configuration | <pre>object({<br/>    podAntiAffinity : optional(any, null),<br/>    podAffinity : optional(any, null),<br/>    nodeAffinity : optional(any, null)<br/>  })</pre> | `{}` | no |
 | <a name="input_pilot_autoscaling_enabled"></a> [pilot\_autoscaling\_enabled](#input\_pilot\_autoscaling\_enabled) | Enable Istio pilot autoscaling through HorizontalPodAutoscaler. Default to false | `bool` | `false` | no |
 | <a name="input_pilot_autoscaling_max_pods"></a> [pilot\_autoscaling\_max\_pods](#input\_pilot\_autoscaling\_max\_pods) | If var.pilot\_autoscaling\_enabled is enabled this sets the maximum amount of pods for Istio pilot HorizontalPodAutoscaler. Default to 5 | `number` | `5` | no |
@@ -224,6 +240,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_pilot_replicas"></a> [pilot\_replicas](#input\_pilot\_replicas) | Sets the number of replicas to deploy the Istio Pilot. Valid only if var.pilot\_autoscaling\_enabled is false. Default to 1 | `number` | `1` | no |
 | <a name="input_pilot_resources"></a> [pilot\_resources](#input\_pilot\_resources) | Istio pilot pods resources requests and limits for memory and CPU. Default to requests CPU 10m memory 128M limits CPU 100m memory 256M, using the default Istio values. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcerequirements-v1-core | <pre>object({<br/>    limits : optional(map(string), null),<br/>    requests : optional(map(string), null)<br/>  })</pre> | <pre>{<br/>  "limits": {<br/>    "cpu": "100m",<br/>    "memory": "256M"<br/>  },<br/>  "requests": {<br/>    "cpu": "10m",<br/>    "memory": "128M"<br/>  }<br/>}</pre> | no |
 | <a name="input_pilot_tolerations"></a> [pilot\_tolerations](#input\_pilot\_tolerations) | Istio pilot pods tolerations configuration. Default to empty list. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core | `list(any)` | `[]` | no |
+| <a name="input_proxy_metadata"></a> [proxy\_metadata](#input\_proxy\_metadata) | Additional key-value pairs to configure meshConfig.defaultConfig.proxyMetadata. Use this to add custom proxy metadata like HTTP\_PROXY, HTTPS\_PROXY, etc. When enable\_dns\_capture is true, do not include ISTIO\_META\_DNS\_AUTO\_ALLOCATE or ISTIO\_META\_DNS\_CAPTURE here (use the enable\_dns\_capture flag instead). When enable\_dns\_capture is false, you can set these keys directly in proxy\_metadata if needed. | `map(string)` | `{}` | no |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The ID of the resource group for the OpenShift Cluster. | `string` | n/a | yes |
 | <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
 

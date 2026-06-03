@@ -114,6 +114,24 @@ locals {
     }
   }
 
+  # Merge user-provided proxy metadata with DNS capture settings (if enabled)
+  merged_proxy_metadata = merge(
+    var.proxy_metadata,
+    var.enable_dns_capture ? {
+      "ISTIO_META_DNS_AUTO_ALLOCATE" = "true"
+      "ISTIO_META_DNS_CAPTURE"       = "true"
+    } : {}
+  )
+
+  istio_mesh_config_proxy_metadata = length(local.merged_proxy_metadata) > 0 ? {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "defaultConfig" : {
+          "proxyMetadata" : local.merged_proxy_metadata
+        }
+      }
+    }
+  } : {}
 
   istio_mesh_config_extension_providers = var.mesh_config_extension_providers == null ? {} : {
     "istioconfiguration" : {
@@ -277,21 +295,28 @@ resource "helm_release" "istio_controlplane" {
       name  = "istioconfiguration.meshConfig.accessLogFormat"
       type  = "string"
       value = var.mesh_config_access_log_format != null && var.mesh_config_access_log_format != "" ? var.mesh_config_access_log_format : ""
+      }, {
+      name  = "istioconfiguration.peerAuthenticationName"
+      type  = "string"
+      value = var.peer_authentication_name
     }
   ]
 
-  values = [
-    yamlencode(local.istio_discovery_configuration),
-    yamlencode(local.istio_pilot_resources),
-    yamlencode(local.istio_pilot_affinity),
-    yamlencode(local.istio_pilot_tolerations),
-    yamlencode(local.istio_mesh_config_keep_alive),
-    yamlencode(local.istio_pilot_node_selector),
-    yamlencode(local.istio_mesh_config_mesh_mtls),
-    yamlencode(local.istio_mesh_config_mesh_tls_defaults),
-    yamlencode(local.istio_mesh_config_extension_providers),
-    yamlencode(local.istio_pilot_env),
-  ]
+  values = concat(
+    [
+      yamlencode(local.istio_discovery_configuration),
+      yamlencode(local.istio_pilot_resources),
+      yamlencode(local.istio_pilot_affinity),
+      yamlencode(local.istio_pilot_tolerations),
+      yamlencode(local.istio_mesh_config_keep_alive),
+      yamlencode(local.istio_pilot_node_selector),
+      yamlencode(local.istio_mesh_config_mesh_mtls),
+      yamlencode(local.istio_mesh_config_mesh_tls_defaults),
+      yamlencode(local.istio_mesh_config_extension_providers),
+      yamlencode(local.istio_pilot_env),
+    ],
+    length(local.merged_proxy_metadata) > 0 ? [yamlencode(local.istio_mesh_config_proxy_metadata)] : []
+  )
 }
 
 resource "null_resource" "confirm_istio_operational" {
