@@ -358,7 +358,7 @@ variable "telemetry_config" {
     }), null)
   })
   default     = null
-  description = "Telemetry configuration for Istio. When null, no telemetry configuration is applied (backward compatible). For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
+  description = "Telemetry configuration for Istio. When null, no telemetry configuration is applied. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
 }
 
 variable "mesh_config_proxy_stats_matcher" {
@@ -366,19 +366,19 @@ variable "mesh_config_proxy_stats_matcher" {
     inclusionRegexps : optional(list(string), null)
   })
   default     = null
-  description = "Configure which stats to generate for Envoy proxies. When null, no configuration is applied (backward compatible). Set inclusionRegexps to control which metrics are collected (e.g., ['.*'] for all stats). For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
+  description = "Configure which stats to generate for Envoy proxies. When null, no configuration is applied. Set inclusionRegexps to control which metrics are collected (e.g., ['.*'] for all stats). For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
 }
 
 variable "mesh_config_extra_stat_tags" {
   type        = list(string)
   default     = null
-  description = "Additional stat tags to add to Envoy metrics. When null, no extra tags are added (backward compatible). Common tags include: request_protocol, response_code, connection_security_policy. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
+  description = "Additional stat tags to add to Envoy metrics. When null, no extra tags are added. Common tags include: request_protocol, response_code, connection_security_policy. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
 }
 
 variable "mesh_config_enable_prometheus_merge" {
   type        = bool
   default     = null
-  description = "Enable Istio agent to merge metrics exposed by the application with metrics from Envoy and Istio agent. When null, uses Istio default (backward compatible). For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
+  description = "Enable Istio agent to merge metrics exposed by the application with metrics from Envoy and Istio agent. When null, uses Istio default. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
 }
 
 variable "mesh_config_status_port" {
