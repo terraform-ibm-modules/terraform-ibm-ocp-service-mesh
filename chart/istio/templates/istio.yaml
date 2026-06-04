@@ -60,6 +60,10 @@ spec:
       {{- if .Values.istioconfiguration.pilot.env }}
       env:
       {{- toYaml .Values.istioconfiguration.pilot.env | nindent 8 }}
+    {{- if .Values.istioconfiguration.telemetry }}
+    telemetry:
+      {{- toYaml .Values.istioconfiguration.telemetry | nindent 6 }}
+    {{- end }}
       {{- end }}
     {{- if .Values.istioconfiguration.meshConfig }}
     meshConfig: # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig
@@ -99,11 +103,25 @@ spec:
       discoverySelectors:
         {{- toYaml .Values.istioconfiguration.meshConfig.discoverySelectors | nindent 8 }}
       {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.enablePrometheusMerge }}
+      enablePrometheusMerge: {{ .Values.istioconfiguration.meshConfig.enablePrometheusMerge }}
+      {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.defaultConfig }}
       defaultConfig:
         {{- if .Values.istioconfiguration.meshConfig.defaultConfig.proxyMetadata }}
         proxyMetadata:
           {{- toYaml .Values.istioconfiguration.meshConfig.defaultConfig.proxyMetadata | nindent 10 }}
+        {{- end }}
+        {{- if .Values.istioconfiguration.meshConfig.defaultConfig.proxyStatsMatcher }}
+        proxyStatsMatcher:
+          {{- toYaml .Values.istioconfiguration.meshConfig.defaultConfig.proxyStatsMatcher | nindent 10 }}
+        {{- end }}
+        {{- if .Values.istioconfiguration.meshConfig.defaultConfig.extraStatTags }}
+        extraStatTags:
+          {{- toYaml .Values.istioconfiguration.meshConfig.defaultConfig.extraStatTags | nindent 10 }}
+        {{- end }}
+        {{- if .Values.istioconfiguration.meshConfig.defaultConfig.statusPort }}
+        statusPort: {{ .Values.istioconfiguration.meshConfig.defaultConfig.statusPort }}
         {{- end }}
       {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.meshMTLS }}

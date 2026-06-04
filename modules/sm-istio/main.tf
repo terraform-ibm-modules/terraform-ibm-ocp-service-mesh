@@ -149,6 +149,50 @@ locals {
       }
     }
   }
+
+  istio_telemetry_config = var.telemetry_config == null ? {} : {
+    "istioconfiguration" : {
+      "telemetry" : var.telemetry_config
+    }
+  }
+
+  istio_mesh_config_proxy_stats_matcher = var.mesh_config_proxy_stats_matcher == null ? {} : {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "defaultConfig" : {
+          "proxyStatsMatcher" : var.mesh_config_proxy_stats_matcher
+        }
+      }
+    }
+  }
+
+  istio_mesh_config_extra_stat_tags = var.mesh_config_extra_stat_tags == null ? {} : {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "defaultConfig" : {
+          "extraStatTags" : var.mesh_config_extra_stat_tags
+        }
+      }
+    }
+  }
+
+  istio_mesh_config_enable_prometheus_merge = var.mesh_config_enable_prometheus_merge == null ? {} : {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "enablePrometheusMerge" : var.mesh_config_enable_prometheus_merge
+      }
+    }
+  }
+
+  istio_mesh_config_status_port = var.mesh_config_status_port == null ? {} : {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "defaultConfig" : {
+          "statusPort" : var.mesh_config_status_port
+        }
+      }
+    }
+  }
 }
 
 ##############################################################################
@@ -314,6 +358,11 @@ resource "helm_release" "istio_controlplane" {
       yamlencode(local.istio_mesh_config_mesh_tls_defaults),
       yamlencode(local.istio_mesh_config_extension_providers),
       yamlencode(local.istio_pilot_env),
+      yamlencode(local.istio_telemetry_config),
+      yamlencode(local.istio_mesh_config_proxy_stats_matcher),
+      yamlencode(local.istio_mesh_config_extra_stat_tags),
+      yamlencode(local.istio_mesh_config_status_port),
+      yamlencode(local.istio_mesh_config_enable_prometheus_merge),
     ],
     length(local.merged_proxy_metadata) > 0 ? [yamlencode(local.istio_mesh_config_proxy_metadata)] : []
   )
