@@ -314,6 +314,12 @@ variable "ingress_proxy_protocol_allow_without" {
   default     = false
 }
 
+variable "ingress_proxy_protocol_envoy_filter_name" {
+  description = "Optional name override for the EnvoyFilter resource used for Proxy Protocol. If null or empty, defaults to the ingress name."
+  type        = string
+  default     = null
+}
+
 variable "rollback_on_failure" {
   description = "Flag to automatically rollback the helm chart on installation failure."
   type        = bool

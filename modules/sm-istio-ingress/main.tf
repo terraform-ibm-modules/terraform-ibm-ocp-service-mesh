@@ -221,6 +221,10 @@ resource "helm_release" "istio_ingress" {
       value = var.ingress_proxy_protocol_allow_without
     },
     {
+      name  = "ingress.proxyProtocol.envoyFilterName"
+      value = var.ingress_proxy_protocol_envoy_filter_name
+    },
+    {
       name  = "ingress.deploymentName"
       value = var.ingress_deployment_name
     },

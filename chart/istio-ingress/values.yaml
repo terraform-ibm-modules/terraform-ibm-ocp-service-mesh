@@ -6,6 +6,7 @@ ingress:
   proxyProtocol:
     enabled: false
     allowWithoutProxyProtocol: false
+    envoyFilterName:
   svctype: LoadBalancer
   lbtype: alb # nlb other
   lbiptype: public # private
