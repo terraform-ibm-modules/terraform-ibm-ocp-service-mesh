@@ -1,3 +1,7 @@
+locals {
+  istio_controlplane_name = "istio-1"
+}
+
 ##############################################################################
 # Resource Group
 ##############################################################################
@@ -107,7 +111,7 @@ module "service_mesh_operator" {
 module "deploy_istio" {
   depends_on        = [module.service_mesh_operator]
   source            = "../../modules/sm-istio"
-  name              = "istio-1"
+  name              = local.istio_controlplane_name
   namespace         = "istio-system"
   create_namespace  = true
   cluster_id        = module.ocp_base.cluster_id
@@ -132,7 +136,7 @@ module "istio_network_policy" {
   depends_on                        = [time_sleep.wait_istio]
   source                            = "../../modules/sm-network-policies"
   network_policy_namespace          = "istio-system"
-  network_policy_istio_controlplane = "istio-1"
+  network_policy_istio_controlplane = local.istio_controlplane_name
   add_default_istio_network_policy  = true
 }
 
@@ -146,7 +150,7 @@ module "basic_workload_ingress" {
   ingress_loadbalancer_type = "alb"
   ingress_service_type      = "LoadBalancer"
   ingress_ip_type           = "public"
-  istio_mesh_enrollment     = "istio-1"
+  istio_mesh_enrollment     = local.istio_controlplane_name
   ingress_affinity          = {}
   ingress_selectors = {
     "istio" : "istio-ingress",
@@ -182,7 +186,7 @@ module "istio_ingress_network_policy" {
     "app" : "istio-ingress",
     "istio" : "istio-ingress"
   }
-  ingress_network_policy_istio_controlplane  = "istio-1"
+  ingress_network_policy_istio_controlplane  = local.istio_controlplane_name
   add_default_istio_ingress_network_policies = true
   additional_custom_ingress_network_policies = [
     {
@@ -212,7 +216,7 @@ module "default_workload_egress" {
   namespace              = "basic-egress"
   create_namespace       = true
   force_dataplane_update = true
-  istio_mesh_enrollment  = "istio-1"
+  istio_mesh_enrollment  = local.istio_controlplane_name
   egress_affinity        = {}
   egress_selectors = {
     "istio" : "istio-egress",
@@ -252,12 +256,12 @@ resource "kubernetes_namespace_v1" "sample_app_namespace" {
     name = "httpbin"
     # istio injection annotations for istio dataplane
     labels = {
-      "istio-discovery" : "istio-1"
-      "istio.io/rev" : "istio-1"
+      "istio-discovery" : local.istio_controlplane_name
+      "istio.io/rev" : local.istio_controlplane_name
     }
     annotations = {
-      "istio-discovery" : "istio-1"
-      "istio.io/rev" : "istio-1"
+      "istio-discovery" : local.istio_controlplane_name
+      "istio.io/rev" : local.istio_controlplane_name
     }
   }
 

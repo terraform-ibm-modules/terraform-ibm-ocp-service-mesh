@@ -31,7 +31,6 @@ No modules.
 | Name | Type |
 |------|------|
 | [helm_release.istio_custom_ingress_network_policies](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.istio_default_ingress_network_policy_controlplane](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.istio_default_ingress_network_policy_traffic_selectors](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 
 ### Inputs

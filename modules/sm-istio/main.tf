@@ -201,12 +201,12 @@ resource "kubernetes_annotations" "istio_namespace_annotations" {
 
 # installing helm chart for istio deployment
 resource "helm_release" "istio_controlplane" {
-  depends_on       = [module.istio_namespace[0]]
-  name             = local.istio_release_name
-  chart            = "${path.module}/../../chart/${local.istio_chart_path}"
-  namespace        = var.namespace
-  create_namespace = false
-  # timeout           = "60"
+  depends_on        = [module.istio_namespace[0]]
+  name              = local.istio_release_name
+  chart             = "${path.module}/../../chart/${local.istio_chart_path}"
+  namespace         = var.namespace
+  create_namespace  = false
+  timeout           = var.istio_controlplane_deployment_timeout
   dependency_update = true
   force_update      = var.force_controlplane_update
   cleanup_on_fail   = false
@@ -282,7 +282,7 @@ resource "helm_release" "istio_controlplane" {
       value = var.mesh_config_ingress_controller_mode != null ? var.mesh_config_connect_timeout : ""
       }, {
       name  = "istioconfiguration.defaultpdb"
-      value = var.istio_enable_default_pod_disruption_budget != null ? var.istio_enable_default_pod_disruption_budget : null
+      value = var.istio_enable_default_pod_disruption_budget
       }, {
       name  = "istioconfiguration.meshConfig.accessLogFile"
       type  = "string"

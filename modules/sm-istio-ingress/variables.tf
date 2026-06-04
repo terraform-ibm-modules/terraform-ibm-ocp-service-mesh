@@ -118,9 +118,10 @@ variable "istio_mesh_enrollment" {
 }
 
 variable "istio_ingress_deployment_timeout" {
-  type        = string
-  default     = null
-  description = "Timeout for the helm release deployment for the ingress gateway"
+  type        = number
+  default     = 180
+  description = "Timeout for the helm release deployment for the ingress gateway. Default to 180s"
+  nullable    = false
 }
 
 variable "ingress_discovery_custom_configuration" {
