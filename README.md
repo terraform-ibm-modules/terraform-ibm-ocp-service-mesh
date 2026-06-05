@@ -253,7 +253,6 @@ You need the following permissions to run this module.
 
 For more information about the access you need to run Terraform IBM modules, see [IBM Cloud IAM roles](https://cloud.ibm.com/docs/account?topic=account-userroles).
 
-
 <!-- The following content is automatically populated by the pre-commit hook -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ### Requirements

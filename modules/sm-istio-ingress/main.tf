@@ -79,9 +79,15 @@ locals {
     }
   }
 
-  egress_extra_deployment_labels = length(var.ingress_extra_deployment_labels) == 0 ? {} : {
+  ingress_deployment_custom_labels = length(var.ingress_deployment_custom_labels) == 0 ? {} : {
     "ingress" = {
-      "extraDeploymentLabels" = var.ingress_extra_deployment_labels
+      "deploymentCustomLabels" = var.ingress_deployment_custom_labels
+    }
+  }
+
+  ingress_deployment_custom_annotations = length(var.ingress_deployment_custom_annotations) == 0 ? {} : {
+    "ingress" = {
+      "deploymentCustomAnnotations" = var.ingress_deployment_custom_annotations
     }
   }
 }
@@ -215,6 +221,10 @@ resource "helm_release" "istio_ingress" {
       value = var.ingress_proxy_protocol_allow_without
     },
     {
+      name  = "ingress.proxyProtocol.envoyFilterName"
+      value = var.ingress_proxy_protocol_envoy_filter_name
+    },
+    {
       name  = "ingress.deploymentName"
       value = var.ingress_deployment_name
     },
@@ -233,7 +243,8 @@ resource "helm_release" "istio_ingress" {
     yamlencode(local.ingress_affinity),
     yamlencode(local.ingress_tolerations),
     yamlencode(local.ingress_topology_spread_constraints),
-    yamlencode(local.egress_extra_deployment_labels)
+    yamlencode(local.ingress_deployment_custom_labels),
+    yamlencode(local.ingress_deployment_custom_annotations)
   ]
 
 }

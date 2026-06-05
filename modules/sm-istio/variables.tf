@@ -346,3 +346,43 @@ variable "peer_authentication_name" {
   default     = null
   description = "Name of the PeerAuthentication policy. Default to null to autogenerate the name as '<controlplane-name>-peerauthentication'."
 }
+
+variable "telemetry_config" {
+  type = object({
+    enabled : optional(bool, true)
+    v2 : optional(object({
+      enabled : optional(bool, true)
+      prometheus : optional(object({
+        enabled : optional(bool, true)
+      }), null)
+    }), null)
+  })
+  default     = null
+  description = "Telemetry configuration for Istio. When null, no telemetry configuration is applied. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
+}
+
+variable "mesh_config_proxy_stats_matcher" {
+  type = object({
+    inclusionRegexps : optional(list(string), null)
+  })
+  default     = null
+  description = "Configure which stats to generate for Envoy proxies. When null, no configuration is applied. Set inclusionRegexps to control which metrics are collected (e.g., ['.*'] for all stats). For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
+}
+
+variable "mesh_config_extra_stat_tags" {
+  type        = list(string)
+  default     = null
+  description = "Additional stat tags to add to Envoy metrics. When null, no extra tags are added. Common tags include: request_protocol, response_code, connection_security_policy. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
+}
+
+variable "mesh_config_enable_prometheus_merge" {
+  type        = bool
+  default     = null
+  description = "Enable Istio agent to merge metrics exposed by the application with metrics from Envoy and Istio agent. When null, uses Istio default. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
+}
+
+variable "mesh_config_status_port" {
+  type        = number
+  default     = null
+  description = "Port on which the Envoy health check, readiness probe, and Prometheus metrics are exposed. When null, uses Istio default (15020). For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
+}

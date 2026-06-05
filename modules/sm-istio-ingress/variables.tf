@@ -314,6 +314,12 @@ variable "ingress_proxy_protocol_allow_without" {
   default     = false
 }
 
+variable "ingress_proxy_protocol_envoy_filter_name" {
+  description = "Optional name override for the EnvoyFilter resource used for Proxy Protocol. If null or empty, defaults to the ingress name."
+  type        = string
+  default     = null
+}
+
 variable "rollback_on_failure" {
   description = "Flag to automatically rollback the helm chart on installation failure."
   type        = bool
@@ -332,13 +338,20 @@ variable "ingress_deployment_name" {
   default     = null
 }
 
-variable "ingress_extra_deployment_labels" {
+variable "ingress_deployment_custom_labels" {
   type        = map(string)
   default     = {}
   nullable    = true
   description = <<-EOT
-    Llabel that defines an additional identity for the egress gateway.
+    Llabel that defines an additional identity for the ingress gateway.
     This label is applied to:
       - Deployment metadata.labels
   EOT
+}
+
+variable "ingress_deployment_custom_annotations" {
+  type        = map(string)
+  default     = {}
+  nullable    = true
+  description = "Map of custom annotations to add to the ingress Deployment resource"
 }
