@@ -7,7 +7,7 @@ metadata:
     {{- toYaml .Values.ingress.istioselectors | nindent 4 }}
     {{- end }}
     release: istio
-  name: {{ .Values.ingress.name }}
+  name: {{ default .Values.ingress.name .Values.ingress.autoscale.hpa_name }}
   namespace: {{ .Values.ingress.namespace }}
 spec:
   metrics:
