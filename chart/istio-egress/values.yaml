@@ -16,6 +16,7 @@ egress:
   internalTrafficPolicy: Cluster
   autoscale:
     enabled: false
+    # hpa_name: default
     # autoscaleMin: 1
     # autoscaleMax: 3
     # cpu:
