@@ -130,6 +130,7 @@ variable "egress_internal_traffic_policy" {
 variable "egress_autoscale_configuration" {
   type = object({
     enabled : optional(bool, false),
+    hpa_name : optional(string, null),
     autoscaleMin : optional(number, 1),
     autoscaleMax : optional(number, 5),
     cpu : optional(object(
@@ -146,7 +147,7 @@ variable "egress_autoscale_configuration" {
   default = {
     enabled : false
   }
-  description = "egress autoscale configuration defined through HPA. If enabled is set to true the HPA definition is deployed. Otherwise if false the HPA configuration is not deployed. Default to enabled=false."
+  description = "egress autoscale configuration defined through HPA. If enabled is set to true the HPA definition is deployed. Otherwise if false the HPA configuration is not deployed. The hpa_name field allows customizing the HPA resource name (defaults to the egress name if null). Default to enabled=false."
 }
 
 variable "egress_pdb_configuration" {
