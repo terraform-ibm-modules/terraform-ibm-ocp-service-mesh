@@ -7,9 +7,16 @@ metadata:
   labels:
   {{- toYaml .Values.egress.deploymentCustomLabels | nindent 4 }}
   {{- end }}
-  {{- if .Values.egress.deploymentCustomAnnotations }}
   annotations:
+  {{- if .Values.egress.deploymentCustomAnnotations }}
   {{- toYaml .Values.egress.deploymentCustomAnnotations | nindent 4 }}
+  {{- end }}
+  {{- if .Values.egress.checkov_skip_list }}
+  {{- if .Values.egress.checkov_skip_list.deployment }}
+  {{- range $k, $v := .Values.egress.checkov_skip_list.deployment }}
+    {{ $k }}: {{ $v | quote }}
+  {{- end }}
+  {{- end }}
   {{- end }}
 spec:
   {{- if .Values.egress.replicacount }}
