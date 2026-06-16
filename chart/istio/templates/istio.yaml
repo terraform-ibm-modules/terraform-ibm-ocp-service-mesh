@@ -71,7 +71,6 @@ spec:
     telemetry:
       {{- toYaml .Values.istioconfiguration.telemetry | nindent 6 }}
     {{- end }}
-      {{- end }}
     {{- if .Values.istioconfiguration.meshConfig }}
     meshConfig: # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig
       {{- if .Values.istioconfiguration.meshConfig.enableAutoMTLS }}
