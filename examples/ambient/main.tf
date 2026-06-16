@@ -154,6 +154,14 @@ module "basic_workload_ingress" {
   ingress_selectors = {
     "istio" : "ingress-gateway",
   }
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000" # ingress gateway target port, to match in network policy, in the gateway configuration and in the workload service configuration
+      "protocol" : "TCP"
+    }
+  ]
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
 }
