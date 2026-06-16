@@ -29,6 +29,9 @@ resource "helm_release" "istiocni" {
       name  = "istiocniconfiguration.name"
       type  = "string"
       value = local.istiocni_name
+      }, {
+      name  = "istiocniconfiguration.ambient"
+      value = var.is_ambient_mode
     }
   ]
 

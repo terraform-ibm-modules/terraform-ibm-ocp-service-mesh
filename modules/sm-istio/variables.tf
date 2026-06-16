@@ -386,3 +386,14 @@ variable "mesh_config_status_port" {
   default     = null
   description = "Port on which the Envoy health check, readiness probe, and Prometheus metrics are exposed. When null, uses Istio default (15020). For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
 }
+variable "is_ambient_mode" {
+  type        = bool
+  default     = false
+  description = "Enable Istio ambient mode. Ambient mode is a sidecarless approach for service mesh that uses a shared node proxy instead of per-pod sidecars."
+}
+
+variable "ztunnel_namespace" {
+  type        = string
+  default     = "ztunnel"
+  description = "Namespace for the ztunnel component when ambient mode is enabled. Only used when is_ambient_mode is true."
+}

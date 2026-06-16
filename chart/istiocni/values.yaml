@@ -1,3 +1,4 @@
 istiocniconfiguration:
   namespace: istio-cni
   name: default
+  ambient: false

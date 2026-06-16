@@ -6,6 +6,8 @@ istioconfiguration:
   defaultpdb: false
   updateStrategyType: InPlace
   enableNetworkPolicy: true
+  ambient: false
+  ztunnelNamespace: ztunnel
   pilot:
     env:
     enabled: true

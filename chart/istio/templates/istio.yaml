@@ -5,6 +5,9 @@ metadata:
   name: {{ .Values.istioconfiguration.name }}
 spec:
   namespace: {{ .Values.istioconfiguration.namespace }}
+  {{- if .Values.istioconfiguration.ambient }}
+  profile: ambient
+  {{- end }}
   updateStrategy:
     inactiveRevisionDeletionGracePeriodSeconds: 30
     type: {{ .Values.istioconfiguration.updateStrategyType }}
@@ -60,6 +63,10 @@ spec:
       {{- if .Values.istioconfiguration.pilot.env }}
       env:
       {{- toYaml .Values.istioconfiguration.pilot.env | nindent 8 }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.ambient }}
+      trustedZtunnelNamespace: {{ .Values.istioconfiguration.ztunnelNamespace }}
+      {{- end }}
     {{- if .Values.istioconfiguration.telemetry }}
     telemetry:
       {{- toYaml .Values.istioconfiguration.telemetry | nindent 6 }}
