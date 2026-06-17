@@ -124,12 +124,29 @@ module "deploy_istio_cni" {
   is_ambient_mode  = true
 }
 
+resource "kubernetes_namespace_v1" "ztunnel_namespace" {
+  depends_on = [module.deploy_istio]
+  metadata {
+    name = "ztunnel"
+    labels = {
+      "istio-discovery" = "enabled"
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations,
+      metadata[0].labels
+    ]
+  }
+}
+
 module "deploy_ztunnel" {
-  depends_on       = [module.service_mesh_operator]
+  depends_on       = [kubernetes_namespace_v1.ztunnel_namespace]
   source           = "../../modules/ztunnel"
-  namespace        = "ztunnel"
+  namespace        = kubernetes_namespace_v1.ztunnel_namespace.metadata[0].name
   name             = "default"
-  create_namespace = true
+  create_namespace = false
 }
 
 resource "time_sleep" "wait_istio" {

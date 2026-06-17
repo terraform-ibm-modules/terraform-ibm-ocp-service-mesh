@@ -70,6 +70,7 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
       <li><a href="./modules/sm-istio-egress">sm-istio-egress</a></li>
       <li><a href="./modules/sm-istio-ingress">sm-istio-ingress</a></li>
       <li><a href="./modules/sm-network-policies">sm-network-policies</a></li>
+      <li><a href="./modules/ztunnel">ztunnel</a></li>
     </ul>
   </li>
   <li><a href="./examples">Examples</a>
