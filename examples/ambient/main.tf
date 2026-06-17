@@ -105,15 +105,15 @@ module "service_mesh_operator" {
 }
 
 module "deploy_istio" {
-  depends_on         = [module.service_mesh_operator]
-  source             = "../../modules/sm-istio"
-  name               = "default"
-  namespace          = "istio-system"
-  create_namespace   = true
-  cluster_id         = module.ocp_base.cluster_id
-  resource_group_id  = module.resource_group.resource_group_id
-  is_ambient_mode    = true
-  ztunnel_namespace  = "ztunnel"
+  depends_on        = [module.service_mesh_operator]
+  source            = "../../modules/sm-istio"
+  name              = "default"
+  namespace         = "istio-system"
+  create_namespace  = true
+  cluster_id        = module.ocp_base.cluster_id
+  resource_group_id = module.resource_group.resource_group_id
+  is_ambient_mode   = true
+  ztunnel_namespace = "ztunnel"
 }
 
 module "deploy_istio_cni" {

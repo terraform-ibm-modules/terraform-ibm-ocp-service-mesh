@@ -6,10 +6,10 @@ locals {
 # installing helm chart for ztunnel deployment
 resource "helm_release" "ztunnel" {
 
-  name             = local.ztunnel_release_name
-  chart            = "${path.module}/../../chart/${local.ztunnel_chart_path}"
-  namespace        = var.namespace
-  create_namespace = var.create_namespace
+  name              = local.ztunnel_release_name
+  chart             = "${path.module}/../../chart/${local.ztunnel_chart_path}"
+  namespace         = var.namespace
+  create_namespace  = var.create_namespace
   dependency_update = true
   force_update      = false
   cleanup_on_fail   = false
