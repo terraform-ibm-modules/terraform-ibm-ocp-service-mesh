@@ -13,9 +13,9 @@ metadata:
   {{- if $.Values.ingress.deploymentCustomAnnotations }}
   {{- toYaml $.Values.ingress.deploymentCustomAnnotations | nindent 4 }}
   {{- end }}
-  {{- if .Values.ingress.checkov_skip_list }}
-  {{- if .Values.ingress.checkov_skip_list.deployment }}
-  {{- range $k, $v := .Values.ingress.checkov_skip_list.deployment }}
+  {{- if $.Values.ingress.checkov_skip_list }}
+  {{- if $.Values.ingress.checkov_skip_list.deployment }}
+  {{- range $k, $v := $.Values.ingress.checkov_skip_list.deployment }}
     {{ $k }}: {{ $v | quote }}
   {{- end }}
   {{- end }}
