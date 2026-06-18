@@ -333,10 +333,37 @@ variable "ingress_topology_spread_constraints" {
   default     = null
 }
 
+variable "ingress_create_deployment" {
+  description = "Flag to disable ingress Deployment resource creation. Default to true"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
 variable "ingress_deployment_name" {
   description = "Optional override for the ingress Deployment name. If null or empty, the value of var.name is used as default."
   type        = string
   default     = null
+}
+
+variable "ingress_create_service" {
+  description = "Flag to disable ingress Service resource creation. Default to true"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "ingress_service_name" {
+  description = "Optional override for the ingress Service name. If null or empty, the value of var.name is used as default."
+  type        = string
+  default     = null
+}
+
+variable "ingress_create_service_account" {
+  description = "Flag to disable ingress ServiceAccount resource creation. Default to true"
+  type        = bool
+  default     = true
+  nullable    = false
 }
 
 variable "ingress_deployment_custom_labels" {

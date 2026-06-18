@@ -1,6 +1,10 @@
 egress:
   name: default
-  deploymentName:
+  createDeployment: true
+  deploymentName: null
+  createService: true
+  serviceName: null
+  createServiceAccount: true
   namespace: istio-system
   istioMeshEnrollment:
   istioNamespaceEnrollmentLabels: {}

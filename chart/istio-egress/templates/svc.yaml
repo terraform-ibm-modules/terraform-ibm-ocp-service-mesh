@@ -1,7 +1,8 @@
+{{- if (.Values.egress).createService | default true -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.egress.name }}
+  name: {{ default .Values.egress.name .Values.egress.serviceName }}
   namespace: {{ .Values.egress.namespace }}
   annotations:
 spec:
@@ -20,3 +21,4 @@ spec:
     targetPort: {{ .targetPort }}
   {{- end }}
   {{- end }}
+{{- end }}
