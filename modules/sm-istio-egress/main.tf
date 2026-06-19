@@ -73,6 +73,14 @@ locals {
       "deploymentCustomAnnotations" = var.egress_deployment_custom_annotations
     }
   }
+
+  egress_resources_creation = {
+    "egress" = {
+      "createDeployment"     = var.egress_create_deployment
+      "createService"        = var.egress_create_service
+      "createServiceAccount" = var.egress_create_service_account
+    }
+  }
 }
 
 ##############################################################################
@@ -172,7 +180,13 @@ resource "helm_release" "istio_egress" {
     },
     {
       name  = "egress.deploymentName"
+      type  = "string"
       value = var.egress_deployment_name
+    },
+    {
+      name  = "egress.serviceName"
+      type  = "string"
+      value = var.egress_service_name
     },
   ]
 
@@ -187,6 +201,7 @@ resource "helm_release" "istio_egress" {
     yamlencode(local.egress_topology_spread_constraints),
     yamlencode(local.egress_deployment_custom_labels),
     yamlencode(local.egress_deployment_custom_annotations),
+    yamlencode(local.egress_resources_creation)
   ]
 
 }

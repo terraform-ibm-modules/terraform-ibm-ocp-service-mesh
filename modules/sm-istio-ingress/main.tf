@@ -90,6 +90,14 @@ locals {
       "deploymentCustomAnnotations" = var.ingress_deployment_custom_annotations
     }
   }
+
+  ingress_resources_creation = {
+    "ingress" = {
+      "createDeployment"     = var.ingress_create_deployment
+      "createService"        = var.ingress_create_service
+      "createServiceAccount" = var.ingress_create_service_account
+    }
+  }
 }
 
 ##############################################################################
@@ -226,7 +234,13 @@ resource "helm_release" "istio_ingress" {
     },
     {
       name  = "ingress.deploymentName"
+      type  = "string"
       value = var.ingress_deployment_name
+    },
+    {
+      name  = "ingress.serviceName"
+      type  = "string"
+      value = var.ingress_service_name
     },
   ]
 
@@ -244,11 +258,10 @@ resource "helm_release" "istio_ingress" {
     yamlencode(local.ingress_tolerations),
     yamlencode(local.ingress_topology_spread_constraints),
     yamlencode(local.ingress_deployment_custom_labels),
-    yamlencode(local.ingress_deployment_custom_annotations)
+    yamlencode(local.ingress_deployment_custom_annotations),
+    yamlencode(local.ingress_resources_creation)
   ]
-
 }
-
 
 resource "null_resource" "confirm_ingress_operational_alb" {
   depends_on = [helm_release.istio_ingress]

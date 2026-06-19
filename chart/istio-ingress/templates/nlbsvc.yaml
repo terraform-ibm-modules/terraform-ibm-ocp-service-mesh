@@ -1,9 +1,10 @@
+{{- if (.Values.ingress).createService | default true -}}
 {{- if (eq .Values.ingress.lbtype "nlb") }}
 {{- range $lb_subnet, $lb_subnet_zone := .Values.ingress.nlbzonessubnets }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $.Values.ingress.name }}-{{ $lb_subnet_zone }}
+  name: {{ default $.Values.ingress.name $.Values.ingress.serviceName }}-{{ $lb_subnet_zone }}
   namespace: {{ $.Values.ingress.namespace }}
   annotations:
     service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features: "nlb"
@@ -30,5 +31,6 @@ spec:
   {{- end }}
   {{- end }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}
