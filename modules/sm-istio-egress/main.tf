@@ -75,7 +75,7 @@ locals {
   }
 
   egress_resources_creation = {
-    "ingress" = {
+    "egress" = {
       "createDeployment"     = var.egress_create_deployment
       "createService"        = var.egress_create_service
       "createServiceAccount" = var.egress_create_service_account
