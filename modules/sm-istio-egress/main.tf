@@ -212,6 +212,8 @@ resource "helm_release" "istio_egress" {
 }
 
 resource "null_resource" "confirm_egress_operational" {
+
+  count = var.egress_create_service ? 1 : 0
   depends_on = [helm_release.istio_egress]
   triggers = {
     helm_revision = helm_release.istio_egress.metadata.revision
