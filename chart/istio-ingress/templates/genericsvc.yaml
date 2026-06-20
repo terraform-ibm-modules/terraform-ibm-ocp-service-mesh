@@ -1,4 +1,4 @@
-{{- if ne .Values.ingress.createService false -}}
+{{- if ne (.Values.ingress).createService false -}}
 {{- if and (eq .Values.ingress.lbtype "other") .Values.ingress.customAnnotations }}
 apiVersion: v1
 kind: Service

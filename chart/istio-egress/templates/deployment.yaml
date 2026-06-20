@@ -1,4 +1,4 @@
-{{- if ne .Values.egress.createDeployment false -}}
+{{- if ne (.Values.egress).createDeployment false -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
