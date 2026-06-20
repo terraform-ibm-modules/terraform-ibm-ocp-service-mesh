@@ -1,4 +1,4 @@
-{{- if (.Values.ingress).createDeployment | default true -}}
+{{- if ne .Values.ingress.createDeployment false -}}
 {{- if or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "other") }}
 apiVersion: apps/v1
 kind: Deployment

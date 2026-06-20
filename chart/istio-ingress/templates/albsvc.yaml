@@ -1,4 +1,4 @@
-{{- if (.Values.ingress).createService | default true -}}
+{{- if ne .Values.ingress.createService false -}}
 {{- if or (eq .Values.ingress.lbtype "alb") }}
 apiVersion: v1
 kind: Service
