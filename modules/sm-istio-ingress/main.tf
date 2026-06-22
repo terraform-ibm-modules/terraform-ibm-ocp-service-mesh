@@ -3,6 +3,11 @@ locals {
   istio_ingress_release_name = "${var.namespace}-${var.name}"
   istio_ingress_chart_path   = "istio-ingress"
 
+  service_name = (
+    var.ingress_service_name != null &&
+    trimspace(var.ingress_service_name) != ""
+  ) ? var.ingress_service_name : var.name
+
   ingress_discovery_configuration = var.ingress_discovery_custom_configuration != null ? var.ingress_discovery_custom_configuration : (
     var.istio_mesh_enrollment == "default" ? {
       "istio-discovery" : "enabled",
@@ -265,9 +270,12 @@ resource "helm_release" "istio_ingress" {
 
 resource "null_resource" "confirm_ingress_operational_alb" {
   depends_on = [helm_release.istio_ingress]
-  count      = var.ingress_loadbalancer_type == "alb" ? 1 : 0
+  triggers = {
+    helm_revision = helm_release.istio_ingress.metadata.revision
+  }
+  count = var.ingress_loadbalancer_type == "alb" && var.ingress_create_service == true ? 1 : 0
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}\" \"alb\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${local.service_name}\" \"alb\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -278,9 +286,13 @@ resource "null_resource" "confirm_ingress_operational_alb" {
 # for nlb the ingress svc are created for each zone so there are a set of svc to check named "ingress-[svc name]-[zone]"
 resource "null_resource" "confirm_ingress_operational_nlb" {
   depends_on = [helm_release.istio_ingress]
-  for_each   = var.ingress_loadbalancer_type == "nlb" ? var.ingress_nlb_zones_subnets : {}
+
+  triggers = {
+    helm_revision = helm_release.istio_ingress.metadata.revision
+  }
+  for_each = var.ingress_loadbalancer_type == "nlb" && var.ingress_create_service == true ? var.ingress_nlb_zones_subnets : {}
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}-${each.value}\" \"nlb\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${local.service_name}-${each.value}\" \"nlb\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -291,9 +303,13 @@ resource "null_resource" "confirm_ingress_operational_nlb" {
 # for other types (internal use) - single service with potentially multiple IPs
 resource "null_resource" "confirm_ingress_operational_other" {
   depends_on = [helm_release.istio_ingress]
-  count      = var.ingress_loadbalancer_type == "other" ? 1 : 0
+
+  triggers = {
+    helm_revision = helm_release.istio_ingress.metadata.revision
+  }
+  count = var.ingress_loadbalancer_type == "other" && var.ingress_create_service == true ? 1 : 0
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}\" \"other\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${local.service_name}\" \"other\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -309,18 +325,21 @@ locals {
   # Build map of service names to query based on LB type
   # For NLB: multiple services (one per zone)
   # For ALB/other: single service
-  ingress_services_map = var.ingress_loadbalancer_type == "nlb" ? {
-    for subnet_id, zone in var.ingress_nlb_zones_subnets :
-    "${local.prefix}${var.name}-${zone}" => {
-      namespace = var.namespace
-      service   = "${local.prefix}${var.name}-${zone}"
+
+  ingress_services_map = var.ingress_create_service ? (
+    var.ingress_loadbalancer_type == "nlb" ? {
+      for subnet_id, zone in var.ingress_nlb_zones_subnets :
+      "${local.prefix}${local.service_name}-${zone}" => {
+        namespace = var.namespace
+        service   = "${local.prefix}${local.service_name}-${zone}"
+      }
+      } : {
+      "${local.prefix}${local.service_name}" = {
+        namespace = var.namespace
+        service   = "${local.prefix}${local.service_name}"
+      }
     }
-    } : {
-    "${local.prefix}${var.name}" = {
-      namespace = var.namespace
-      service   = "${local.prefix}${var.name}"
-    }
-  }
+  ) : {}
 }
 
 # Query all ingress services (works for ALB, NLB, and other types)

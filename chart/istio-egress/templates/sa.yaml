@@ -1,4 +1,4 @@
-{{- if (.Values.egress).createServiceAccount | default true -}}
+{{- if ne (.Values.egress).createServiceAccount false -}}
 apiVersion: v1
 kind: ServiceAccount
 metadata:

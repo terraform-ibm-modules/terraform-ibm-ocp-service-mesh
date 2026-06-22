@@ -1,4 +1,4 @@
-{{- if (.Values.ingress).createDeployment | default true -}}
+{{- if ne (.Values.ingress).createDeployment false -}}
 {{- if (eq .Values.ingress.lbtype "nlb") }}
 {{- range $lb_subnet, $lb_subnet_zone := .Values.ingress.nlbzonessubnets }}
 apiVersion: apps/v1

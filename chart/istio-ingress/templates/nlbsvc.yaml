@@ -1,4 +1,4 @@
-{{- if (.Values.ingress).createService | default true -}}
+{{- if ne (.Values.ingress).createService false -}}
 {{- if (eq .Values.ingress.lbtype "nlb") }}
 {{- range $lb_subnet, $lb_subnet_zone := .Values.ingress.nlbzonessubnets }}
 apiVersion: v1
