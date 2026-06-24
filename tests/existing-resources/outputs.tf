@@ -56,6 +56,34 @@ output "cluster_vpc_subnets" {
   }
 }
 
+# JSON-encoded string output for passing via -var
+output "cluster_vpc_subnets_json" {
+  description = "JSON-encoded string of cluster_vpc_subnets for passing via -var"
+  value = jsonencode({
+    subnet-1 = [
+      {
+        id         = ibm_is_subnet.subnet_zone_1.id
+        cidr_block = ibm_is_subnet.subnet_zone_1.ipv4_cidr_block
+        zone       = ibm_is_subnet.subnet_zone_1.zone
+      }
+    ]
+    subnet-2 = [
+      {
+        id         = ibm_is_subnet.subnet_zone_2.id
+        cidr_block = ibm_is_subnet.subnet_zone_2.ipv4_cidr_block
+        zone       = ibm_is_subnet.subnet_zone_2.zone
+      }
+    ]
+    subnet-3 = [
+      {
+        id         = ibm_is_subnet.subnet_zone_3.id
+        cidr_block = ibm_is_subnet.subnet_zone_3.ipv4_cidr_block
+        zone       = ibm_is_subnet.subnet_zone_3.zone
+      }
+    ]
+  })
+}
+
 ##############################################################################
 # NLB Zones Subnets Output (for istio-ingress NLB configuration)
 ##############################################################################
@@ -67,4 +95,14 @@ output "nlb_zones_subnets" {
     (ibm_is_subnet.subnet_zone_2.id) = ibm_is_subnet.subnet_zone_2.zone
     (ibm_is_subnet.subnet_zone_3.id) = ibm_is_subnet.subnet_zone_3.zone
   }
+}
+
+# JSON-encoded string output for passing via -var
+output "nlb_zones_subnets_json" {
+  description = "JSON-encoded string of nlb_zones_subnets for passing via -var"
+  value = jsonencode({
+    (ibm_is_subnet.subnet_zone_1.id) = ibm_is_subnet.subnet_zone_1.zone
+    (ibm_is_subnet.subnet_zone_2.id) = ibm_is_subnet.subnet_zone_2.zone
+    (ibm_is_subnet.subnet_zone_3.id) = ibm_is_subnet.subnet_zone_3.zone
+  })
 }

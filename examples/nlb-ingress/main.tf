@@ -104,8 +104,8 @@ module "nlb_workload_ingress" {
   ingress_ip_type                  = "public"
   istio_mesh_enrollment            = local.istio_controlplane_name
   istio_ingress_deployment_timeout = 1200
-  ingress_deployment_name = "nlb-deployment"
-  ingress_service_name = "nlb-service"
+  ingress_deployment_name          = "nlb-deployment"
+  ingress_service_name             = "nlb-service"
   ingress_affinity                 = {}
   ingress_selectors = {
     "istio" : "istio-ingress",

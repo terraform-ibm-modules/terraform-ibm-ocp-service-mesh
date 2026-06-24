@@ -139,11 +139,17 @@ func TestRunNLBIngressExample(t *testing.T) {
 	logger.Log(t, "Fetching outputs from existing resources...")
 	resourceGroupID := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "resource_group_id")
 	vpcID := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "vpc_id")
-	clusterVpcSubnets := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "cluster_vpc_subnets")
-	nlbZonesSubnets := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "nlb_zones_subnets")
 	region := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "region")
 
+	// Get JSON-encoded string outputs (these are already JSON strings from jsonencode())
+	clusterVpcSubnetsJSON := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "cluster_vpc_subnets_json")
+	nlbZonesSubnetsJSON := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "nlb_zones_subnets_json")
+
+	logger.Log(t, fmt.Sprintf("cluster_vpc_subnets_json: %s", clusterVpcSubnetsJSON))
+	logger.Log(t, fmt.Sprintf("nlb_zones_subnets_json: %s", nlbZonesSubnetsJSON))
+
 	// Step 3: Setup NLB Ingress example with testhelper
+	// Pass the JSON strings directly - Terraform will parse them
 	logger.Log(t, "Setting up NLB Ingress example with testhelper...")
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
 		Testing:      t,
@@ -154,8 +160,8 @@ func TestRunNLBIngressExample(t *testing.T) {
 			"region":                    region,
 			"resource_group_id":         resourceGroupID,
 			"vpc_id":                    vpcID,
-			"cluster_vpc_subnets":       clusterVpcSubnets,
-			"ingress_nlb_zones_subnets": nlbZonesSubnets,
+			"cluster_vpc_subnets":       clusterVpcSubnetsJSON,
+			"ingress_nlb_zones_subnets": nlbZonesSubnetsJSON,
 		},
 		IgnoreUpdates: testhelper.Exemptions{ // Ignore for consistency check
 			List: []string{
