@@ -6,7 +6,7 @@ locals {
   service_name = (
     var.ingress_service_name != null &&
     trimspace(var.ingress_service_name) != ""
-  ) ? var.ingress_service_name : var.name
+  ) ? var.ingress_service_name : "${local.prefix}${var.name}"
 
   ingress_discovery_configuration = var.ingress_discovery_custom_configuration != null ? var.ingress_discovery_custom_configuration : (
     var.istio_mesh_enrollment == "default" ? {
@@ -275,7 +275,7 @@ resource "null_resource" "confirm_ingress_operational_alb" {
   }
   count = var.ingress_loadbalancer_type == "alb" && var.ingress_create_service == true ? 1 : 0
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${local.service_name}\" \"alb\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.service_name}\" \"alb\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -292,7 +292,7 @@ resource "null_resource" "confirm_ingress_operational_nlb" {
   }
   for_each = var.ingress_loadbalancer_type == "nlb" && var.ingress_create_service == true ? var.ingress_nlb_zones_subnets : {}
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${local.service_name}-${each.value}\" \"nlb\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.service_name}-${each.value}\" \"nlb\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -309,7 +309,7 @@ resource "null_resource" "confirm_ingress_operational_other" {
   }
   count = var.ingress_loadbalancer_type == "other" && var.ingress_create_service == true ? 1 : 0
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.prefix}${local.service_name}\" \"other\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.service_name}\" \"other\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -329,14 +329,14 @@ locals {
   ingress_services_map = var.ingress_create_service ? (
     var.ingress_loadbalancer_type == "nlb" ? {
       for subnet_id, zone in var.ingress_nlb_zones_subnets :
-      "${local.prefix}${local.service_name}-${zone}" => {
+      "${local.service_name}-${zone}" => {
         namespace = var.namespace
-        service   = "${local.prefix}${local.service_name}-${zone}"
+        service   = "${local.service_name}-${zone}"
       }
       } : {
-      "${local.prefix}${local.service_name}" = {
+      local.service_name = {
         namespace = var.namespace
-        service   = "${local.prefix}${local.service_name}"
+        service   = local.service_name
       }
     }
   ) : {}

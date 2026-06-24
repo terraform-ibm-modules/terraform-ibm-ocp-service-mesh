@@ -7,7 +7,7 @@ locals {
   service_name = (
     var.egress_service_name != null &&
     trimspace(var.egress_service_name) != ""
-  ) ? var.egress_service_name : var.name
+  ) ? var.egress_service_name : "${local.prefix}${var.name}"
 
   egress_discovery_configuration = var.egress_discovery_custom_configuration != null ? var.egress_discovery_custom_configuration : (
     var.istio_mesh_enrollment == "default" ? {
@@ -219,7 +219,7 @@ resource "null_resource" "confirm_egress_operational" {
     helm_revision = helm_release.istio_egress.metadata.revision
   }
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"${local.prefix}${local.service_name}\""
+    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"${local.service_name}\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
