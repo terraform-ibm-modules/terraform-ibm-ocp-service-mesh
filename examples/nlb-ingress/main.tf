@@ -92,14 +92,6 @@ resource "time_sleep" "wait_istio" {
   destroy_duration = "60s"
 }
 
-module "istio_network_policy" {
-  depends_on                        = [time_sleep.wait_istio]
-  source                            = "../../modules/sm-network-policies"
-  network_policy_namespace          = "istio-system"
-  network_policy_istio_controlplane = local.istio_controlplane_name
-  add_default_istio_network_policy  = true
-}
-
 module "nlb_workload_ingress" {
   depends_on                       = [time_sleep.wait_istio]
   source                           = "../../modules/sm-istio-ingress"
@@ -112,6 +104,8 @@ module "nlb_workload_ingress" {
   ingress_ip_type                  = "public"
   istio_mesh_enrollment            = local.istio_controlplane_name
   istio_ingress_deployment_timeout = 1200
+  ingress_deployment_name = "nlb-deployment"
+  ingress_service_name = "nlb-service"
   ingress_affinity                 = {}
   ingress_selectors = {
     "istio" : "istio-ingress",
