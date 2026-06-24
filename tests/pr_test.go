@@ -10,6 +10,7 @@ import (
 
 	"github.com/gruntwork-io/terratest/modules/files"
 	"github.com/gruntwork-io/terratest/modules/logger"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -128,8 +129,7 @@ func validateEnvVariable(t *testing.T, varName string) string {
 func TestRunNLBIngressExample(t *testing.T) {
 	t.Parallel()
 
-	prefix := "ocpsm-nlb"
-
+	prefix := fmt.Sprintf("ocpsm-nlb-%s", strings.ToLower(random.UniqueID()))
 	// Step 1: Setup existing resources (VPC, subnets, etc.)
 	logger.Log(t, "Setting up existing resources...")
 	existingTerraformOptions := setupTerraform(t, prefix, "./existing-resources")
