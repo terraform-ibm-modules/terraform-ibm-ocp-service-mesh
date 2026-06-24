@@ -334,7 +334,7 @@ locals {
         service   = "${local.service_name}-${zone}"
       }
       } : {
-      local.service_name = {
+      (local.service_name) = {
         namespace = var.namespace
         service   = local.service_name
       }
