@@ -83,7 +83,7 @@ func setupTerraform(t *testing.T, prefix, realTerraformDir string) *terraform.Op
 	tempTerraformDir, err := files.CopyTerraformFolderToTemp(realTerraformDir, prefix)
 	require.NoError(t, err, "Failed to create temporary Terraform folder")
 
-	apiKey := validateEnvVariable(t, "TF_VAR_ibmcloud_api_key")
+	apiKey := validateEnvVariable(t, "TF_VAR_ibmcloud_api_key") // pragma: allowlist secret
 	region, err := testhelper.GetBestVpcRegion(apiKey, "../common-dev-assets/common-go-assets/cloudinfo-region-vpc-gen2-prefs.yaml", "eu-de")
 	require.NoError(t, err, "Failed to get best VPC region")
 

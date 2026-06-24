@@ -41,7 +41,7 @@ A map of subnet IDs to zone names for NLB configuration in istio-ingress:
 
 1. Set required variables:
 ```bash
-export TF_VAR_ibmcloud_api_key="your-api-key"
+export TF_VAR_ibmcloud_api_key="your-api-key" # pragma: allowlist secret
 # Optionally set an existing resource group name, otherwise a new one will be created
 # export TF_VAR_resource_group="your-resource-group-name"
 ```

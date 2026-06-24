@@ -52,14 +52,14 @@ Before running this example, you need to:
 
 1. Create a `terraform.tfvars` file:
    ```hcl
-   ibmcloud_api_key = "your-api-key"
+   ibmcloud_api_key = "your-api-key" # pragma: allowlist secret
    region           = "us-south"
    prefix           = "nlb-test"
-   
+
    # From tests/existing-resources outputs
-   resource_group_id = "abc123def456"
+   resource_group_id = "abc123def456" # pragma: allowlist secret
    vpc_id            = "r006-xxxxx"
-   
+
    cluster_vpc_subnets = {
      subnet-1 = [{
        id         = "0717-xxxxx"
@@ -77,7 +77,7 @@ Before running this example, you need to:
        zone       = "us-south-3"
      }]
    }
-   
+
    ingress_nlb_zones_subnets = {
      "0717-xxxxx" = "us-south-1"
      "0717-yyyyy" = "us-south-2"
@@ -101,7 +101,7 @@ Before running this example, you need to:
    ```bash
    # Get NLB IPs
    terraform output ingress_loadbalancer_ips
-   
+
    # Test the httpbin service
    curl http://<nlb-ip>/headers
    ```

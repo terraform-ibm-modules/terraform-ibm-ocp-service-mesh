@@ -101,18 +101,18 @@ module "istio_network_policy" {
 }
 
 module "nlb_workload_ingress" {
-  depends_on                = [time_sleep.wait_istio]
-  source                    = "../../modules/sm-istio-ingress"
-  name                      = "nlb-ingress"
-  namespace                 = "nlb-ingress"
-  create_namespace          = true
-  force_dataplane_update    = false
-  ingress_loadbalancer_type = "nlb"
-  ingress_service_type      = "LoadBalancer"
-  ingress_ip_type           = "public"
-  istio_mesh_enrollment     = local.istio_controlplane_name
-  istio_ingress_deployment_timeout            = 1200
-  ingress_affinity          = {}
+  depends_on                       = [time_sleep.wait_istio]
+  source                           = "../../modules/sm-istio-ingress"
+  name                             = "nlb-ingress"
+  namespace                        = "nlb-ingress"
+  create_namespace                 = true
+  force_dataplane_update           = false
+  ingress_loadbalancer_type        = "nlb"
+  ingress_service_type             = "LoadBalancer"
+  ingress_ip_type                  = "public"
+  istio_mesh_enrollment            = local.istio_controlplane_name
+  istio_ingress_deployment_timeout = 1200
+  ingress_affinity                 = {}
   ingress_selectors = {
     "istio" : "istio-ingress",
   }
