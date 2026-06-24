@@ -193,6 +193,11 @@ resource "helm_release" "istio_egress" {
       type  = "string"
       value = var.egress_service_name
     },
+    {
+      name  = "egress.serviceAccountName"
+      type  = "string"
+      value = var.egress_service_account_name != null ? var.egress_service_account_name : "${local.prefix}${var.name}-service-account"
+    },
   ]
 
   values = [

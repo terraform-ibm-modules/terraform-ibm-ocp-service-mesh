@@ -183,7 +183,7 @@ For all the configuration parameters details refer to the section below
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 | <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >= 1.59.0, < 3.0.0 |
@@ -193,13 +193,13 @@ For all the configuration parameters details refer to the section below
 ### Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_ingress_namespace"></a> [ingress\_namespace](#module\_ingress\_namespace) | terraform-ibm-modules/namespace/ibm | v2.0.1 |
 
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.istio_ingress](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubernetes_annotations.istio_namespace_annotations](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/annotations) | resource |
 | [kubernetes_labels.istio_namespace_labels](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/labels) | resource |
@@ -212,7 +212,7 @@ For all the configuration parameters details refer to the section below
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_add_istio_labels_annotations_to_existing_namespace"></a> [add\_istio\_labels\_annotations\_to\_existing\_namespace](#input\_add\_istio\_labels\_annotations\_to\_existing\_namespace) | Flag to add istio labels and annotations like the discovery ones or the value of var.ingress\_discovery\_custom\_configuration to an existing namespace. Default to false. If var.create\_namespace is true this flag is ignored. | `bool` | `false` | no |
 | <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
 | <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
@@ -243,6 +243,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_ingress_replicas"></a> [ingress\_replicas](#input\_ingress\_replicas) | Istio ingress deployment replicaset configuration. If the var.ingress\_autoscale\_configuration.enabled is true this value is ignored. Default to 3. | `number` | `3` | no |
 | <a name="input_ingress_resources_configuration"></a> [ingress\_resources\_configuration](#input\_ingress\_resources\_configuration) | Istio ingress resources deployment configuration. Default configuration is null and leverages on Istio default setting. | <pre>object(<br/>    {<br/>      limits : optional(object(<br/>        {<br/>          cpu : optional(string, null),<br/>          memory : optional(string, null)<br/>      }), null),<br/>      requests : optional(object(<br/>        {<br/>          cpu : optional(string, null)<br/>          memory : optional(string, null)<br/>      }), null)<br/>    }<br/>  )</pre> | `null` | no |
 | <a name="input_ingress_selectors"></a> [ingress\_selectors](#input\_ingress\_selectors) | Istio ingress selectors to route inbound ingress traffic to the expected istio gateway and to the expected workload. Default to "app": "istio-ingress" "istio": "istio-ingress". Null not allowed | `map(string)` | <pre>{<br/>  "app": "istio-ingress",<br/>  "istio": "istio-ingress"<br/>}</pre> | no |
+| <a name="input_ingress_service_account_name"></a> [ingress\_service\_account\_name](#input\_ingress\_service\_account\_name) | Optional override for the ingress ServiceAccount name. If null or empty, defaults to '<ingress.name>-service-account'. | `string` | `null` | no |
 | <a name="input_ingress_service_name"></a> [ingress\_service\_name](#input\_ingress\_service\_name) | Optional override for the ingress Service name. If null or empty, the value of var.name is used as default. | `string` | `null` | no |
 | <a name="input_ingress_service_type"></a> [ingress\_service\_type](#input\_ingress\_service\_type) | Istio ingress type for the service (svc) resource definition: possible values are LoadBalancer and ClusterIP.  Default to LoadBalancer | `string` | `"LoadBalancer"` | no |
 | <a name="input_ingress_termination_grace_period"></a> [ingress\_termination\_grace\_period](#input\_ingress\_termination\_grace\_period) | Number of seconds for the Istio ingress deployment for the grace period before terminating the pods and dropping the connections. Default to null to leverage on Istio default. | `number` | `null` | no |
@@ -259,7 +260,7 @@ For all the configuration parameters details refer to the section below
 ### Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_ingress_loadbalancer_hostname"></a> [ingress\_loadbalancer\_hostname](#output\_ingress\_loadbalancer\_hostname) | Load balancer hostname(s). For ALB: returns map with single hostname. For NLB: returns map of service name to hostname per zone. For other types: returns empty map. |
 | <a name="output_ingress_loadbalancer_ips"></a> [ingress\_loadbalancer\_ips](#output\_ingress\_loadbalancer\_ips) | Load balancer IP addresses. For NLB: returns map of service name to IP. For other types: returns map with indexed keys (ip-0, ip-1, etc). Returns empty map for ALB. |
 | <a name="output_istio_ingress_metadata"></a> [istio\_ingress\_metadata](#output\_istio\_ingress\_metadata) | Istio ingress helm release metadata |

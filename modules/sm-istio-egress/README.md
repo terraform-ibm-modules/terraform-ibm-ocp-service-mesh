@@ -183,7 +183,7 @@ For all the configuration parameters details refer to the section below
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 | <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >= 1.59.0, < 3.0.0 |
@@ -193,13 +193,13 @@ For all the configuration parameters details refer to the section below
 ### Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_egress_namespace"></a> [egress\_namespace](#module\_egress\_namespace) | terraform-ibm-modules/namespace/ibm | v2.0.1 |
 
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.istio_egress](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubernetes_annotations.istio_namespace_annotations](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/annotations) | resource |
 | [kubernetes_labels.istio_namespace_labels](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/labels) | resource |
@@ -209,7 +209,7 @@ For all the configuration parameters details refer to the section below
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_add_istio_labels_annotations_to_existing_namespace"></a> [add\_istio\_labels\_annotations\_to\_existing\_namespace](#input\_add\_istio\_labels\_annotations\_to\_existing\_namespace) | Flag to add istio labels and annotations like the discovery ones or the value of var.egress\_discovery\_custom\_configuration to an existing namespace. Default to false. If var.create\_namespace is true this flag is ignored. | `bool` | `false` | no |
 | <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
 | <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
@@ -229,6 +229,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_egress_replicas"></a> [egress\_replicas](#input\_egress\_replicas) | Istio egress deployment replicaset configuration. If the var.egress\_autoscale\_configuration.enabled is true this value is ignored. Default to 3. | `number` | `3` | no |
 | <a name="input_egress_resources_configuration"></a> [egress\_resources\_configuration](#input\_egress\_resources\_configuration) | Istio egress resources deployment configuration. Default configuration is null and leverages on Istio default setting. | <pre>object(<br/>    {<br/>      limits : optional(object(<br/>        {<br/>          cpu : optional(string, null),<br/>          memory : optional(string, null)<br/>      }), null),<br/>      requests : optional(object(<br/>        {<br/>          cpu : optional(string, null)<br/>          memory : optional(string, null)<br/>      }), null)<br/>    }<br/>  )</pre> | `null` | no |
 | <a name="input_egress_selectors"></a> [egress\_selectors](#input\_egress\_selectors) | Istio egress selectors to route outbound egress traffic to the expected istio gateway and to the expected workload. Default to "app": "istio-egress" "istio": "istio-egress" "gateway-instance": "istio-egressgateway". Null not allowed | `map(string)` | <pre>{<br/>  "app": "istio-egress",<br/>  "istio": "istio-egress"<br/>}</pre> | no |
+| <a name="input_egress_service_account_name"></a> [egress\_service\_account\_name](#input\_egress\_service\_account\_name) | Optional override for the egress ServiceAccount name. If null or empty, defaults to '<egress.name>-service-account'. | `string` | `null` | no |
 | <a name="input_egress_service_name"></a> [egress\_service\_name](#input\_egress\_service\_name) | Optional override for the egress Service name. If null or empty, the value of var.name is used as default. | `string` | `null` | no |
 | <a name="input_egress_termination_grace_period"></a> [egress\_termination\_grace\_period](#input\_egress\_termination\_grace\_period) | Number of seconds for the Istio egress deployment for the grace period before terminating the pods and dropping the connections. Default to null to leverage on Istio default. | `number` | `null` | no |
 | <a name="input_egress_tolerations"></a> [egress\_tolerations](#input\_egress\_tolerations) | Istio egress tolerations configuration. Default to tolerate 'dedicated: edge' taint. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#toleration-v1-core | `list(any)` | `[]` | no |
@@ -245,6 +246,6 @@ For all the configuration parameters details refer to the section below
 ### Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_istio_egress_metadata"></a> [istio\_egress\_metadata](#output\_istio\_egress\_metadata) | istio\_egress definition metadata |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
