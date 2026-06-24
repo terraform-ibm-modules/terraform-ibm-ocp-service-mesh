@@ -183,7 +183,7 @@ For all the configuration parameters details refer to the section below
 ### Requirements
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 | <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >= 1.59.0, < 3.0.0 |
@@ -193,13 +193,13 @@ For all the configuration parameters details refer to the section below
 ### Modules
 
 | Name | Source | Version |
-| ---- | ------ | ------- |
+|------|--------|---------|
 | <a name="module_egress_namespace"></a> [egress\_namespace](#module\_egress\_namespace) | terraform-ibm-modules/namespace/ibm | v2.0.1 |
 
 ### Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [helm_release.istio_egress](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubernetes_annotations.istio_namespace_annotations](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/annotations) | resource |
 | [kubernetes_labels.istio_namespace_labels](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/labels) | resource |
@@ -209,7 +209,7 @@ For all the configuration parameters details refer to the section below
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_add_istio_labels_annotations_to_existing_namespace"></a> [add\_istio\_labels\_annotations\_to\_existing\_namespace](#input\_add\_istio\_labels\_annotations\_to\_existing\_namespace) | Flag to add istio labels and annotations like the discovery ones or the value of var.egress\_discovery\_custom\_configuration to an existing namespace. Default to false. If var.create\_namespace is true this flag is ignored. | `bool` | `false` | no |
 | <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
 | <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
@@ -246,6 +246,6 @@ For all the configuration parameters details refer to the section below
 ### Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_istio_egress_metadata"></a> [istio\_egress\_metadata](#output\_istio\_egress\_metadata) | istio\_egress definition metadata |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
