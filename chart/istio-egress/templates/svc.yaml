@@ -12,6 +12,7 @@ spec:
   {{- if .Values.egress.istioselectors }}
   {{- toYaml .Values.egress.istioselectors | nindent 4 }}
   {{- end }}
+    deploymentName: {{ default .Values.egress.name .Values.egress.deploymentName }}
   ports:
   {{- if .Values.egress.ports }}
   {{- range .Values.egress.ports }}

@@ -1,0 +1,28 @@
+{{- if .Values.ingress.pdb }}
+{{- if (eq .Values.ingress.lbtype "nlb") }}
+{{- range $lb_subnet, $lb_subnet_zone := .Values.ingress.nlbzonessubnets }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    {{- if $.Values.ingress.istioselectors }}
+    {{- toYaml $.Values.ingress.istioselectors | nindent 4 }}
+    {{- end }}
+    release: istio
+  name: {{ printf "%s-%s" $.Values.ingress.name $lb_subnet_zone }}
+  namespace: {{ $.Values.ingress.namespace }}
+spec:
+  {{- if $.Values.ingress.pdb.minAvailable }}
+  minAvailable: {{ $.Values.ingress.pdb.minAvailable }}
+  {{- end }}
+  {{- if $.Values.ingress.pdb.maxUnavailable }}
+  maxUnavailable: {{ $.Values.ingress.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- toYaml $.Values.ingress.istioselectors | nindent 6 }}
+      deploymentName: {{ printf "%s-%s" (default $.Values.ingress.name $.Values.ingress.deploymentName) $lb_subnet_zone }}
+---
+{{- end }}
+{{- end }}
+{{- end }}

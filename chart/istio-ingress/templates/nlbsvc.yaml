@@ -21,6 +21,7 @@ spec:
   {{- if $.Values.ingress.istioselectors }}
   {{- toYaml $.Values.ingress.istioselectors | nindent 4 }}
   {{- end }}
+    deploymentName: {{ printf "%s-%s" (default $.Values.ingress.name $.Values.ingress.deploymentName) $lb_subnet_zone }}
   ports:
   {{- if $.Values.ingress.ports }}
   {{- range $.Values.ingress.ports }}

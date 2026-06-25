@@ -31,6 +31,7 @@ spec:
       {{- if $.Values.ingress.istioselectors }}
       {{- toYaml $.Values.ingress.istioselectors | nindent 6 }}
       {{- end }}
+      deploymentName: {{ printf "%s-%s" (default $.Values.ingress.name $.Values.ingress.deploymentName) $lb_subnet_zone }}
   {{- end }}
   template:
     metadata:
@@ -40,6 +41,7 @@ spec:
         {{- if $.Values.ingress.istioselectors }}
         {{- toYaml $.Values.ingress.istioselectors | nindent 8 }}
         {{- end }}
+        deploymentName: {{ printf "%s-%s" (default $.Values.ingress.name $.Values.ingress.deploymentName) $lb_subnet_zone }}
         {{- if eq $.Values.ingress.istioMeshEnrollment "default" }}
         sidecar.istio.io/inject: "true"
         {{- else }}
