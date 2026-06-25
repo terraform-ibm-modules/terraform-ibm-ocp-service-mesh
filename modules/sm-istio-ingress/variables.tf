@@ -383,3 +383,9 @@ variable "ingress_deployment_custom_annotations" {
   nullable    = true
   description = "Map of custom annotations to add to the ingress Deployment resource"
 }
+
+variable "ingress_service_account_name" {
+  type        = string
+  default     = null
+  description = "Optional override for the ingress ServiceAccount name. If null or empty, defaults to '<ingress.name>-service-account'."
+}
