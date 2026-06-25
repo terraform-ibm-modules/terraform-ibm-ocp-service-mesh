@@ -105,7 +105,6 @@ https://terraform-ibm-modules.github.io/documentation/#/implementation-guideline
 -->
 <!-- ## Reference architectures -->
 
-
 <!-- Replace this heading with the name of the root level module (the repo name) -->
 ## terraform-ibm-ocp-service-mesh
 

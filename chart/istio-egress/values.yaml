@@ -5,6 +5,7 @@ egress:
   createService: true
   serviceName: null
   createServiceAccount: true
+  serviceAccountName: null
   namespace: istio-system
   istioMeshEnrollment:
   istioNamespaceEnrollmentLabels: {}

@@ -289,3 +289,9 @@ variable "egress_create_service_account" {
   default     = true
   nullable    = false
 }
+
+variable "egress_service_account_name" {
+  type        = string
+  default     = null
+  description = "Optional override for the egress ServiceAccount name. If null or empty, defaults to '<egress.name>-service-account'."
+}

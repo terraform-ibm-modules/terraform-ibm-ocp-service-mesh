@@ -247,6 +247,11 @@ resource "helm_release" "istio_ingress" {
       type  = "string"
       value = var.ingress_service_name
     },
+    {
+      name  = "ingress.serviceAccountName"
+      type  = "string"
+      value = var.ingress_service_account_name != null ? var.ingress_service_account_name : "${local.prefix}${var.name}-service-account"
+    },
   ]
 
   # yamlencode(local.ingress_namespace_enrollment_labels),
