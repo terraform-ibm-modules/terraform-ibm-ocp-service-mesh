@@ -1,6 +1,12 @@
 locals {
   ztunnel_release_name = "${var.namespace}-default"
   ztunnel_chart_path   = "ztunnel"
+
+  ztunnel_resources_configuration = var.ztunnel_resources_configuration == null ? {} : {
+    "ztunnel" : {
+      "resources" : var.ztunnel_resources_configuration
+    }
+  }
 }
 
 # installing helm chart for ztunnel deployment
@@ -24,6 +30,10 @@ resource "helm_release" "ztunnel" {
       type  = "string"
       value = var.namespace
     }
+  ]
+
+  values = [
+    yamlencode(local.ztunnel_resources_configuration)
   ]
 
 }

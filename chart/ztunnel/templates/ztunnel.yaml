@@ -5,3 +5,9 @@ metadata:
 spec:
   namespace: {{ .Values.ztunnel.namespace }}
   profile: ambient
+  values:
+    ztunnel:
+      resources:
+      {{- if .Values.ztunnel.resources }}
+      {{- toYaml .Values.ztunnel.resources | nindent 8 }}
+      {{- end }}

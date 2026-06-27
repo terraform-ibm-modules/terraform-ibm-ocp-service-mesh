@@ -204,6 +204,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where to install ZTunnel | `string` | `"ztunnel"` | no |
 | <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
+| <a name="input_ztunnel_resources_configuration"></a> [ztunnel\_resources\_configuration](#input\_ztunnel\_resources\_configuration) | ZTunnel resources deployment configuration (cpu/memory requests and limits). Default configuration is null and leverages on Istio default setting. | <pre>object(<br/>    {<br/>      limits : optional(object(<br/>        {<br/>          cpu : optional(string, null),<br/>          memory : optional(string, null)<br/>      }), null),<br/>      requests : optional(object(<br/>        {<br/>          cpu : optional(string, null)<br/>          memory : optional(string, null)<br/>      }), null)<br/>    }<br/>  )</pre> | `null` | no |
 
 ### Outputs
 
