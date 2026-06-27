@@ -65,12 +65,12 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
   <li><a href="#terraform-ibm-ocp-service-mesh">terraform-ibm-ocp-service-mesh</a></li>
   <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules">Submodules</a>
     <ul>
-      <li><a href="./modules/sm-ingress-network-policies">sm-ingress-network-policies</a></li>
-      <li><a href="./modules/sm-istio">sm-istio</a></li>
-      <li><a href="./modules/sm-istio-egress">sm-istio-egress</a></li>
-      <li><a href="./modules/sm-istio-ingress">sm-istio-ingress</a></li>
-      <li><a href="./modules/sm-network-policies">sm-network-policies</a></li>
-      <li><a href="./modules/ztunnel">ztunnel</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-ingress-network-policies">sm-ingress-network-policies</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-istio">sm-istio</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-istio-egress">sm-istio-egress</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-istio-ingress">sm-istio-ingress</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-network-policies">sm-network-policies</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/ztunnel">ztunnel</a></li>
     </ul>
   </li>
   <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples">Examples</a>
@@ -80,11 +80,11 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-advanced-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/advanced"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
-        <a href="./examples/ambient">Ambient Mode Example</a>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/ambient">Ambient Mode Example</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-ambient-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/ambient"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
-        <a href="./examples/basic">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-basic-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
