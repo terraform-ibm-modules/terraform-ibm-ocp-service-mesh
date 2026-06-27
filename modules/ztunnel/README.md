@@ -55,12 +55,12 @@ The ztunnel namespace **must be discoverable** by the Istio Control Plane. This 
 
 ```yaml
 metadata:
-  name: ztunnel
+  name: ztunnel-ns
   labels:
     istio-discovery: enabled  # Required for Istio discovery
 ```
 
-**Important:** Create the namespace separately with the proper labels before deploying ztunnel, and set `create_namespace = false` in the ztunnel module configuration.
+**Important:** Create the namespace separately with the proper labels before deploying ztunnel.
 
 ## Application Namespace Configuration
 
@@ -202,8 +202,6 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_create_namespace"></a> [create\_namespace](#input\_create\_namespace) | Flag to create the namespace where to install ZTunnel. Default to true | `bool` | `true` | no |
-| <a name="input_name"></a> [name](#input\_name) | Name of the ZTunnel resource | `string` | `"default"` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where to install ZTunnel | `string` | `"ztunnel"` | no |
 | <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
 
@@ -211,7 +209,5 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_ztunnel_name"></a> [ztunnel\_name](#output\_ztunnel\_name) | Name of the ZTunnel resource |
-| <a name="output_ztunnel_namespace"></a> [ztunnel\_namespace](#output\_ztunnel\_namespace) | Namespace where ZTunnel is installed |
 | <a name="output_ztunnel_release_name"></a> [ztunnel\_release\_name](#output\_ztunnel\_release\_name) | Helm release name for ZTunnel |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

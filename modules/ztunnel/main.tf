@@ -1,5 +1,5 @@
 locals {
-  ztunnel_release_name = "${var.namespace}-${var.name}"
+  ztunnel_release_name = "${var.namespace}-default"
   ztunnel_chart_path   = "ztunnel"
 }
 
@@ -9,7 +9,7 @@ resource "helm_release" "ztunnel" {
   name              = local.ztunnel_release_name
   chart             = "${path.module}/../../chart/${local.ztunnel_chart_path}"
   namespace         = var.namespace
-  create_namespace  = var.create_namespace
+  create_namespace  = false
   dependency_update = true
   force_update      = false
   cleanup_on_fail   = false
@@ -23,10 +23,6 @@ resource "helm_release" "ztunnel" {
       name  = "ztunnel.namespace"
       type  = "string"
       value = var.namespace
-      }, {
-      name  = "ztunnel.name"
-      type  = "string"
-      value = var.name
     }
   ]
 

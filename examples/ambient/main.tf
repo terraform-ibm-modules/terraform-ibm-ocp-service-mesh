@@ -113,7 +113,7 @@ module "deploy_istio" {
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
   is_ambient_mode   = true
-  ztunnel_namespace = "ztunnel"
+  ztunnel_namespace = "ztunnel-ns"
 }
 
 module "deploy_istio_cni" {
@@ -127,7 +127,7 @@ module "deploy_istio_cni" {
 resource "kubernetes_namespace_v1" "ztunnel_namespace" {
   depends_on = [module.deploy_istio]
   metadata {
-    name = "ztunnel"
+    name = "ztunnel-ns"
     labels = {
       "istio-discovery" = "enabled"
     }
@@ -142,11 +142,9 @@ resource "kubernetes_namespace_v1" "ztunnel_namespace" {
 }
 
 module "deploy_ztunnel" {
-  depends_on       = [kubernetes_namespace_v1.ztunnel_namespace]
-  source           = "../../modules/ztunnel"
-  namespace        = kubernetes_namespace_v1.ztunnel_namespace.metadata[0].name
-  name             = "default"
-  create_namespace = false
+  depends_on = [kubernetes_namespace_v1.ztunnel_namespace]
+  source     = "../../modules/ztunnel"
+  namespace  = kubernetes_namespace_v1.ztunnel_namespace.metadata[0].name
 }
 
 resource "time_sleep" "wait_istio" {
