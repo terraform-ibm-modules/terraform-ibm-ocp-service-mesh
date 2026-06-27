@@ -1,8 +1,9 @@
+{{- if ne (.Values.ingress).createService false -}}
 {{- if and (eq .Values.ingress.lbtype "other") .Values.ingress.customAnnotations }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.ingress.name }}
+  name: {{ default .Values.ingress.name .Values.ingress.serviceName }}
   namespace: {{ .Values.ingress.namespace }}
   annotations:
     {{- if .Values.ingress.proxyProtocol }}
@@ -30,4 +31,5 @@ spec:
     targetPort: {{ .targetPort }}
   {{- end }}
   {{- end }}
+{{- end }}
 {{- end }}

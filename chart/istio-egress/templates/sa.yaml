@@ -1,7 +1,8 @@
+{{- if ne (.Values.egress).createServiceAccount false -}}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Values.egress.name }}-service-account
+  name: {{ .Values.egress.serviceAccountName }}
   namespace: {{ .Values.egress.namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -25,4 +26,5 @@ roleRef:
   name: {{ .Values.egress.name }}
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.egress.name }}-service-account
+  name: {{ .Values.egress.serviceAccountName }}
+{{- end }}

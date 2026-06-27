@@ -1,6 +1,11 @@
 egress:
   name: default
-  deploymentName:
+  createDeployment: true
+  deploymentName: null
+  createService: true
+  serviceName: null
+  createServiceAccount: true
+  serviceAccountName: null
   namespace: istio-system
   istioMeshEnrollment:
   istioNamespaceEnrollmentLabels: {}
@@ -47,3 +52,8 @@ egress:
             values:
             - edge
   tolerations:
+  checkov_skip_list:
+    deployment:
+    - checkov.io/skip1: CKV_K8S_31
+    - checkov.io/skip2: CKV_K8S_8
+    - checkov.io/skip2: CKV_K8S_12

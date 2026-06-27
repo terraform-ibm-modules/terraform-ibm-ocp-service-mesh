@@ -1,3 +1,4 @@
+{{- if ne (.Values.ingress).createDeployment false -}}
 {{- if or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "other") }}
 apiVersion: apps/v1
 kind: Deployment
@@ -8,9 +9,16 @@ metadata:
   labels:
   {{- toYaml .Values.ingress.deploymentCustomLabels | nindent 4 }}
   {{- end }}
-  {{- if .Values.ingress.deploymentCustomAnnotations }}
   annotations:
+  {{- if .Values.ingress.deploymentCustomAnnotations }}
   {{- toYaml .Values.ingress.deploymentCustomAnnotations | nindent 4 }}
+  {{- end }}
+  {{- if .Values.ingress.checkov_skip_list }}
+  {{- if .Values.ingress.checkov_skip_list.deployment }}
+  {{- range $k, $v := .Values.ingress.checkov_skip_list.deployment }}
+    {{ $k }}: {{ $v | quote }}
+  {{- end }}
+  {{- end }}
   {{- end }}
 spec:
   {{- if .Values.ingress.replicacount }}
@@ -91,4 +99,5 @@ spec:
           name: {{ .name }}
         {{- end }}
         {{- end }}
+{{- end }}
 {{- end }}
