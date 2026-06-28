@@ -147,6 +147,74 @@ module "deploy_ztunnel" {
   namespace  = kubernetes_namespace_v1.ztunnel_namespace.metadata[0].name
 }
 
+
+resource "kubernetes_namespace_v1" "waypoint_namespace" {
+  depends_on = [module.deploy_istio]
+  metadata {
+    name = "waypoint-ns"
+    labels = {
+      "istio-discovery" = "enabled"
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations,
+      metadata[0].labels
+    ]
+  }
+}
+
+module "deploy_east_west_waypoint" {
+  depends_on     = [kubernetes_namespace_v1.waypoint_namespace]
+  source         = "../../modules/east-west-waypoint"
+  namespace      = kubernetes_namespace_v1.waypoint_namespace.metadata[0].name
+  configmap_name = "wp-cm"
+  gateway_name   = "wp-gw"
+
+  resources_configuration = {
+    requests = {
+      cpu    = "200m"
+      memory = "256Mi"
+    }
+  }
+
+  deployment_labels = {
+    "app.kubernetes.io/component" = "waypoint"
+  }
+
+  waypoint_pod_labels = {
+    "workload-type" = "waypoint"
+  }
+
+  service_labels = {
+    "service-owner" = "platform"
+  }
+
+  gateway_labels = {
+    "environment" = "dev"
+  }
+
+  affinity = {
+    nodeAffinity = {
+      preferredDuringSchedulingIgnoredDuringExecution = [
+        {
+          weight = 100
+          preference = {
+            matchExpressions = [
+              {
+                key      = "node-role.kubernetes.io/worker"
+                operator = "Exists"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+
+
 resource "time_sleep" "wait_istio" {
   depends_on = [module.deploy_istio, module.deploy_istio_cni, module.deploy_ztunnel]
 
@@ -201,21 +269,15 @@ resource "kubernetes_namespace_v1" "sample_app_namespace" {
   depends_on = [time_sleep.wait_istio]
   metadata {
     name = "httpbin"
-    # istio injection annotations for ambient mode
     labels = {
       "istio-discovery" : "enabled"
       "istio.io/dataplane-mode" : "ambient"
+      "istio.io/use-waypoint-namespace" : "waypoint-ns"
+      "istio.io/use-waypoint" : "wp-gw"
     }
     annotations = {
       "istio-discovery" : "enabled"
     }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      metadata[0].annotations,
-      metadata[0].labels
-    ]
   }
 }
 

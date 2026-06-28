@@ -1,0 +1,6 @@
+apiVersion: v2
+name: east-west-waypoint
+description: A Helm chart for Kubernetes to deploy east-west waypoint resources for Istio ambient mode
+type: application
+version: 0.0.1
+appVersion: "0.0.1"

@@ -65,6 +65,7 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
   <li><a href="#terraform-ibm-ocp-service-mesh">terraform-ibm-ocp-service-mesh</a></li>
   <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules">Submodules</a>
     <ul>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/east-west-waypoint">east-west-waypoint</a></li>
       <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-ingress-network-policies">sm-ingress-network-policies</a></li>
       <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-istio">sm-istio</a></li>
       <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-istio-egress">sm-istio-egress</a></li>

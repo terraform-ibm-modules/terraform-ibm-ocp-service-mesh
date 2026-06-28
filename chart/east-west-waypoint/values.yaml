@@ -1,0 +1,23 @@
+namespace: istio-system
+
+configMap:
+  name: waypoint-config
+  deployment:
+    labels: {}
+    annotations: {}
+    replicas: null
+    podLabels: {}
+    podAnnotations: {}
+    tolerations: []
+    affinity: {}
+    resources: {}
+  service:
+    labels: {}
+    annotations: {}
+
+gateway:
+  name: east-west-waypoint
+  waypointFor: service
+  allowedRoutes: All
+  labels: {}
+  annotations: {}
