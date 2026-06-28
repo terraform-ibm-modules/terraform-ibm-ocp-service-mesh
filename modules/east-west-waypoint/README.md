@@ -1,6 +1,6 @@
 # East-West Waypoint Module
 
-This module deploys istio-proxy pods also known as waypoint proxies by creating a Kubernetes deployment specifically for ambient mode. These proxies run as standalone pods and do not act as a sidecar container for application pods and these can be shared by multiple pods for efficient resource usage purpose. These istio-proxy additional pods can be used by applications to do Layer 7 filtering. It is required in ambient mode if L7 filtering is needed because application pods do not have istio-proxy sidecar running with them because of which layer 7 traffic filtering can't be done natively which was possible in traditional sidecar mode. 
+This module deploys istio-proxy pods also known as waypoint proxies by creating a Kubernetes deployment specifically for ambient mode. These proxies run as standalone pods and do not act as a sidecar container for application pods and these can be shared by multiple pods for efficient resource usage purpose. These istio-proxy additional pods can be used by applications to do Layer 7 filtering. It is required in ambient mode if L7 filtering is needed because application pods do not have istio-proxy sidecar running with them because of which layer 7 traffic filtering can't be done natively which was possible in traditional sidecar mode.
 
 ## Layer 7 Traffic Management with Waypoints
 
