@@ -63,6 +63,7 @@ metadata:
     istio.io/dataplane-mode: ambient
     istio-discovery: enabled
     istio.io/use-waypoint: east-west-waypoint  # all services and pods in this namespace use the waypoint
+    istio.io/use-waypoint-namespace: waypoint-ns # if waypoint gateway is present in same namespace as application namespace then this field can be omitted
 ```
 
 #### Example — Enroll a single Service
@@ -75,6 +76,7 @@ metadata:
   namespace: bookinfo
   labels:
     istio.io/use-waypoint: east-west-waypoint  # only traffic to this Service goes through the waypoint
+    istio.io/use-waypoint-namespace: waypoint-ns # if waypoint gateway is present in same namespace as application namespace then this field can be omitted
 ```
 
 ### Example — Namespace Waypoint with HTTPRoute
