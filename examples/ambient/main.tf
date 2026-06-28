@@ -272,12 +272,19 @@ resource "kubernetes_namespace_v1" "sample_app_namespace" {
     labels = {
       "istio-discovery" : "enabled"
       "istio.io/dataplane-mode" : "ambient"
-      "istio.io/use-waypoint-namespace" : "waypoint-ns"
-      "istio.io/use-waypoint" : "wp-gw"
+      "istio.io/use-waypoint-namespace": "waypoint-ns"
+      "istio.io/use-waypoint": "wp-gw"
     }
     annotations = {
       "istio-discovery" : "enabled"
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations,
+      metadata[0].labels
+    ]
   }
 }
 
