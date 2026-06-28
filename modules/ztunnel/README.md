@@ -108,75 +108,15 @@ metadata:
 - Without satisfying the Istio `discoverySelectors` condition (typically via `istio-discovery: enabled`), the Istio Control Plane will not manage the namespace
 - Both labels are required for proper ambient mesh functionality
 
-## Layer 7 Traffic Management with Waypoints
-
-While ztunnel handles L4 traffic management efficiently, some use cases require **Layer 7 (L7) filtering** capabilities such as:
-
-- Canary traffic splitting based on percentages
-- Traffic routing based on HTTP headers
-- Request/response manipulation
-- Advanced routing rules
-
-In traditional sidecar mode, these L7 features were handled by the Envoy proxy in each pod using resources like `VirtualService`, `DestinationRule`, etc.
-
-### Waypoint Proxies
-
-In ambient mode, L7 traffic management is handled by **waypoint proxies**. A waypoint is an optional L7 proxy that can be deployed per namespace or per service account to handle advanced traffic management.
-
-To create a waypoint:
-
-1. Create a Kubernetes Gateway with the `istio-waypoint` gateway class:
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: bookinfo-gateway
-  namespace: bookinfo
-spec:
-  gatewayClassName: istio-waypoint
-  listeners:
-  - name: mesh
-    port: 15008
-    protocol: HBONE
-```
-
-2. Attach HTTPRoutes to your services for L7 filtering:
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: reviews
-  namespace: bookinfo
-spec:
-  parentRefs:
-  - group: ""
-    kind: Service
-    name: reviews
-    port: 9080
-  rules:
-  - backendRefs:
-    - name: reviews-v1
-      port: 9080
-      weight: 90
-    - name: reviews-v2
-      port: 9080
-      weight: 10
-```
-
-Waypoints provide the same L7 capabilities as sidecars but with better resource efficiency since they're deployed only where needed, not in every pod.
-
 ## Learn More
 
-For comprehensive information about Istio ambient mode, ztunnel, and waypoints, refer to the official Red Hat OpenShift Service Mesh documentation:
+For comprehensive information about Istio ambient mode and ztunnel, refer to the official Red Hat OpenShift Service Mesh documentation:
 
 **[Red Hat OpenShift Service Mesh - Istio Ambient Mode](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.3/html/installing/ossm-istio-ambient-mode#ossm-about-istio-ambient-mode_ossm-istio-ambient-mode)**
 
 This documentation covers:
 - Detailed architecture of ambient mode
 - Ztunnel deployment and configuration
-- Waypoint proxy setup and usage
 - Migration from sidecar to ambient mode
 - Best practices and troubleshooting
 
