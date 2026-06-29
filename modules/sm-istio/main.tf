@@ -193,6 +193,14 @@ locals {
       }
     }
   }
+
+  istio_mesh_config_outbound_traffic_policy = {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "outboundTrafficPolicy" : var.outboundtrafficpolicy
+      }
+    }
+  }
 }
 
 ##############################################################################
@@ -280,10 +288,6 @@ resource "helm_release" "istio_controlplane" {
       type  = "string"
       value = var.istio_update_strategy_type
       }, {
-      name  = "istioconfiguration.outboundtrafficpolicy"
-      type  = "string"
-      value = var.outboundtrafficpolicy
-      }, {
       name  = "istioconfiguration.enableNetworkPolicy"
       value = var.istio_enable_network_policy
       }, {
@@ -363,6 +367,7 @@ resource "helm_release" "istio_controlplane" {
       yamlencode(local.istio_mesh_config_extra_stat_tags),
       yamlencode(local.istio_mesh_config_status_port),
       yamlencode(local.istio_mesh_config_enable_prometheus_merge),
+      yamlencode(local.istio_mesh_config_outbound_traffic_policy),
     ],
     length(local.merged_proxy_metadata) > 0 ? [yamlencode(local.istio_mesh_config_proxy_metadata)] : []
   )
