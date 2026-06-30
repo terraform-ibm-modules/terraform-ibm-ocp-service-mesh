@@ -280,7 +280,7 @@ resource "helm_release" "istio_controlplane" {
       type  = "string"
       value = var.istio_update_strategy_type
       }, {
-      name  = "istioconfiguration.outboundtrafficpolicy"
+      name  = "istioconfiguration.meshConfig.outboundtrafficpolicy"
       type  = "string"
       value = var.outboundtrafficpolicy
       }, {
