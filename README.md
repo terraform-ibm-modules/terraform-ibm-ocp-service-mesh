@@ -86,6 +86,10 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
         <a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/existing_cluster">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-existing_cluster-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/existing_cluster"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
+      <li>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/nlb-ingress">NLB Ingress Example</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-nlb-ingress-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/nlb-ingress"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
     </ul>
     ℹ️ Ctrl/Cmd+Click or right-click on the Schematics deploy button to open in a new tab.
   </li>
@@ -306,6 +310,5 @@ No outputs.
 ## Contributing
 
 You can report issues and request features for this module in GitHub issues in the module repo. See [Report an issue or request a feature](https://github.com/terraform-ibm-modules/.github/blob/main/.github/SUPPORT.md).
-
 
 To set up your local development environment, see [Local development setup](https://terraform-ibm-modules.github.io/documentation/#/local-dev-setup) in the project documentation.

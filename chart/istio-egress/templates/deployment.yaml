@@ -27,6 +27,7 @@ spec:
   selector:
     matchLabels:
       {{- toYaml .Values.egress.istioselectors | nindent 6 }}
+      deploymentName: {{ default .Values.egress.name .Values.egress.deploymentName }}
   {{- end }}
   template:
     metadata:
@@ -36,6 +37,7 @@ spec:
         {{- if .Values.egress.istioselectors }}
         {{- toYaml .Values.egress.istioselectors | nindent 8 }}
         {{- end }}
+        deploymentName: {{ default .Values.egress.name .Values.egress.deploymentName }}
         {{- if eq .Values.egress.istioMeshEnrollment "default" }}
         sidecar.istio.io/inject: "true"
         {{- else }}
