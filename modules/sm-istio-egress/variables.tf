@@ -23,7 +23,7 @@ variable "cluster_config_endpoint_type" {
 variable "prefix" {
   type        = string
   nullable    = true
-  description = "Prefix value to append to the name of the resources. The name of the egress resources created with this module will be in format of <prefix>-<name>."
+  description = "Prefix value to append to the name of the resources. The name of the egress resources created with this module will be in format of <prefix>-<name>. If individual resource names for service, deployment or serviceAccount are provided then only they are used directly without appending any prefix."
   default     = null
   validation {
     # - null and empty string is allowed
