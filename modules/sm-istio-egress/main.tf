@@ -4,10 +4,7 @@ locals {
   istio_egress_release_name = "${var.namespace}-${var.name}"
   istio_egress_chart_path   = "istio-egress"
 
-  service_name = coalesce(
-    try(trimspace(var.egress_service_name) != "" ? var.egress_service_name : null, null),
-    var.name
-  )
+  service_name = try(trimspace(var.egress_service_name) != "" ? var.egress_service_name : "${local.prefix}${var.name}", "${local.prefix}${var.name}")
 
   egress_discovery_configuration = var.egress_discovery_custom_configuration != null ? var.egress_discovery_custom_configuration : (
     var.istio_mesh_enrollment == "default" ? {
