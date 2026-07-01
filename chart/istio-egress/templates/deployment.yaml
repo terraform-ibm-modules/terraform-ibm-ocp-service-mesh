@@ -68,7 +68,7 @@ spec:
       topologySpreadConstraints:
       {{- toYaml .Values.egress.topologySpreadConstraints | nindent 6 }}
       {{- end }}
-      serviceAccountName: {{ .Values.egress.name }}-service-account
+      serviceAccountName: {{ .Values.egress.serviceAccountName }}
       {{- if .Values.egress.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.egress.terminationGracePeriodSeconds }}
       {{- end }}
