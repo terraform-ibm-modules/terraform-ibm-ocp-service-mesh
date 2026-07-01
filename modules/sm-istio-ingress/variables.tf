@@ -389,3 +389,9 @@ variable "ingress_service_account_name" {
   default     = null
   description = "Optional override for the ingress ServiceAccount name. If null or empty, defaults to '<ingress.name>-service-account'."
 }
+
+variable "extend_selectors" {
+  type        = bool
+  default     = false
+  description = "Set to true to add deploymentName label to pods and deploymentSelector to matchLabels, ensuring HPA and PDB work correctly for NLBs. Keep false for ALB."
+}

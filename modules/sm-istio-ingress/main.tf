@@ -240,6 +240,10 @@ resource "helm_release" "istio_ingress" {
       value = var.ingress_deployment_name
     },
     {
+      name  = "ingress.extendSelector"
+      value = var.extend_selectors
+    },
+    {
       name  = "ingress.serviceName"
       type  = "string"
       value = var.ingress_service_name
@@ -247,7 +251,7 @@ resource "helm_release" "istio_ingress" {
     {
       name  = "ingress.serviceAccountName"
       type  = "string"
-      value = var.ingress_service_account_name != null ? var.ingress_service_account_name : "${local.prefix}${var.name}-service-account"
+      value = var.ingress_service_account_name != null ? var.ingress_service_account_name : "${var.name}-service-account"
     },
   ]
 

@@ -186,6 +186,10 @@ resource "helm_release" "istio_egress" {
       value = var.egress_deployment_name
     },
     {
+      name  = "egress.extendSelector"
+      value = var.extend_selectors
+    },
+    {
       name  = "egress.serviceName"
       type  = "string"
       value = var.egress_service_name
@@ -193,7 +197,7 @@ resource "helm_release" "istio_egress" {
     {
       name  = "egress.serviceAccountName"
       type  = "string"
-      value = var.egress_service_account_name != null ? var.egress_service_account_name : "${local.prefix}${var.name}-service-account"
+      value = var.egress_service_account_name != null ? var.egress_service_account_name : "${var.name}-service-account"
     },
   ]
 
