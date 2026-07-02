@@ -18,6 +18,8 @@ spec:
   selector:
     matchLabels:
       {{- toYaml .Values.ingress.istioselectors | nindent 6 }}
+      {{- if .Values.ingress.extendSelector }}
       deploymentName: {{ default .Values.ingress.name .Values.ingress.deploymentName }}
+      {{- end }}
 {{- end }}
 {{- end }}

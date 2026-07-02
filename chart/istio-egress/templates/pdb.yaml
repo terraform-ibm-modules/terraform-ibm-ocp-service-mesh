@@ -17,5 +17,7 @@ spec:
   selector:
     matchLabels:
       {{- toYaml .Values.egress.istioselectors | nindent 6 }}
+      {{- if .Values.egress.extendSelector }}
       deploymentName: {{ default .Values.egress.name .Values.egress.deploymentName }}
+      {{- end }}
 {{- end }}

@@ -3,10 +3,7 @@ locals {
   istio_ingress_release_name = "${var.namespace}-${var.name}"
   istio_ingress_chart_path   = "istio-ingress"
 
-  service_name = (
-    var.ingress_service_name != null &&
-    trimspace(var.ingress_service_name) != ""
-  ) ? var.ingress_service_name : "${local.prefix}${var.name}"
+  service_name = try(trimspace(var.ingress_service_name) != "" ? var.ingress_service_name : "${local.prefix}${var.name}", "${local.prefix}${var.name}")
 
   ingress_discovery_configuration = var.ingress_discovery_custom_configuration != null ? var.ingress_discovery_custom_configuration : (
     var.istio_mesh_enrollment == "default" ? {
@@ -241,6 +238,10 @@ resource "helm_release" "istio_ingress" {
       name  = "ingress.deploymentName"
       type  = "string"
       value = var.ingress_deployment_name
+    },
+    {
+      name  = "ingress.extendSelector"
+      value = var.extend_selectors
     },
     {
       name  = "ingress.serviceName"
