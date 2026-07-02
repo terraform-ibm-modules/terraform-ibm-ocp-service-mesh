@@ -53,13 +53,13 @@ locals {
 
   ingress_autoscale_configuration = {
     "ingress" : {
-      "autoscale" : merge(var.ingress_autoscale_configuration, { hpa_name = local.ingress_hpa_name })
+      "autoscale" : var.ingress_autoscale_configuration
     }
   }
 
   ingress_pdb_configuration = var.ingress_pdb_configuration == null ? {} : {
     "ingress" : {
-      "pdb" : merge(var.ingress_pdb_configuration, { name = local.ingress_pdb_name })
+      "pdb" : var.ingress_pdb_configuration
     }
   }
 
@@ -235,6 +235,16 @@ resource "helm_release" "istio_ingress" {
     {
       name  = "ingress.proxyProtocol.allowWithoutProxyProtocol"
       value = var.ingress_proxy_protocol_allow_without
+    },
+    {
+      name  = "ingress.autoscale.hpa_name"
+      type  = "string"
+      value = local.ingress_hpa_name
+    },
+    {
+      name  = "ingress.pdb.name"
+      type  = "string"
+      value = local.ingress_pdb_name
     },
     {
       name  = "ingress.deploymentName"

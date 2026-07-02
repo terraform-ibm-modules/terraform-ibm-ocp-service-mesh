@@ -35,13 +35,13 @@ locals {
 
   egress_autoscale_configuration = {
     "egress" : {
-      "autoscale" : merge(var.egress_autoscale_configuration, { hpa_name = local.egress_hpa_name })
+      "autoscale" : var.egress_autoscale_configuration
     }
   }
 
   egress_pdb_configuration = var.egress_pdb_configuration == null ? {} : {
     "egress" : {
-      "pdb" : merge(var.egress_pdb_configuration, { name = local.egress_pdb_name })
+      "pdb" : var.egress_pdb_configuration
     }
   }
 
@@ -184,6 +184,16 @@ resource "helm_release" "istio_egress" {
       name  = "egress.terminationGracePeriodSeconds"
       type  = "string"
       value = var.egress_termination_grace_period
+    },
+    {
+      name  = "egress.autoscale.hpa_name"
+      type  = "string"
+      value = local.egress_hpa_name
+    },
+    {
+      name  = "egress.pdb.name"
+      type  = "string"
+      value = local.egress_pdb_name
     },
     {
       name  = "egress.deploymentName"
