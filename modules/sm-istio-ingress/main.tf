@@ -3,7 +3,10 @@ locals {
   istio_ingress_release_name = "${var.namespace}-${var.name}"
   istio_ingress_chart_path   = "istio-ingress"
 
-  service_name = try(trimspace(var.ingress_service_name) != "" ? var.ingress_service_name : "${local.prefix}${var.name}", "${local.prefix}${var.name}")
+  ingress_deployment_name      = var.ingress_deployment_name != null && var.ingress_deployment_name != "" ? var.ingress_deployment_name : "${local.prefix}${var.name}"
+  service_name                 = var.ingress_service_name != null && var.ingress_service_name != "" ? var.ingress_service_name : "${local.prefix}${var.name}"
+  ingress_service_account_name = var.ingress_service_account_name != null && var.ingress_service_account_name != "" ? var.ingress_service_account_name : "${local.prefix}${var.name}-service-account"
+  ingress_envoy_filter_name    = var.ingress_proxy_protocol_envoy_filter_name != null && var.ingress_proxy_protocol_envoy_filter_name != "" ? var.ingress_proxy_protocol_envoy_filter_name : "${local.prefix}${var.name}"
 
   ingress_discovery_configuration = var.ingress_discovery_custom_configuration != null ? var.ingress_discovery_custom_configuration : (
     var.istio_mesh_enrollment == "default" ? {
@@ -45,15 +48,18 @@ locals {
     }
   }
 
+  ingress_hpa_name = var.ingress_autoscale_configuration.hpa_name != null && var.ingress_autoscale_configuration.hpa_name != "" ? var.ingress_autoscale_configuration.hpa_name : "${local.prefix}${var.name}"
+  ingress_pdb_name = var.ingress_pdb_configuration != null && var.ingress_pdb_configuration.name != null && var.ingress_pdb_configuration.name != "" ? var.ingress_pdb_configuration.name : "${local.prefix}${var.name}"
+
   ingress_autoscale_configuration = {
     "ingress" : {
-      "autoscale" : var.ingress_autoscale_configuration
+      "autoscale" : merge(var.ingress_autoscale_configuration, { hpa_name = local.ingress_hpa_name })
     }
   }
 
   ingress_pdb_configuration = var.ingress_pdb_configuration == null ? {} : {
     "ingress" : {
-      "pdb" : var.ingress_pdb_configuration
+      "pdb" : merge(var.ingress_pdb_configuration, { name = local.ingress_pdb_name })
     }
   }
 
@@ -231,13 +237,9 @@ resource "helm_release" "istio_ingress" {
       value = var.ingress_proxy_protocol_allow_without
     },
     {
-      name  = "ingress.proxyProtocol.envoyFilterName"
-      value = var.ingress_proxy_protocol_envoy_filter_name
-    },
-    {
       name  = "ingress.deploymentName"
       type  = "string"
-      value = var.ingress_deployment_name
+      value = local.ingress_deployment_name
     },
     {
       name  = "ingress.extendSelector"
@@ -246,12 +248,17 @@ resource "helm_release" "istio_ingress" {
     {
       name  = "ingress.serviceName"
       type  = "string"
-      value = var.ingress_service_name
+      value = local.service_name
     },
     {
       name  = "ingress.serviceAccountName"
       type  = "string"
-      value = var.ingress_service_account_name != null ? var.ingress_service_account_name : "${local.prefix}${var.name}-service-account"
+      value = local.ingress_service_account_name
+    },
+    {
+      name  = "ingress.proxyProtocol.envoyFilterName"
+      type  = "string"
+      value = local.ingress_envoy_filter_name
     },
   ]
 

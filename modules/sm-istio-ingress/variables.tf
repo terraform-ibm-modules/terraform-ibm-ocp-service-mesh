@@ -230,6 +230,7 @@ variable "ingress_pdb_configuration" {
   description = "Configuration of the PodDisruptionBudget for the istio ingress definition. Default to null to leverage on Istio default configuration."
   default     = null
   type = object({
+    name           = optional(string, null)
     minAvailable   = optional(string, null)
     maxUnavailable = optional(string, null)
   })

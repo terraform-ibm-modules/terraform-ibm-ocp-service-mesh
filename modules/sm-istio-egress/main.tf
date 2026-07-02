@@ -4,7 +4,9 @@ locals {
   istio_egress_release_name = "${var.namespace}-${var.name}"
   istio_egress_chart_path   = "istio-egress"
 
-  service_name = try(trimspace(var.egress_service_name) != "" ? var.egress_service_name : "${local.prefix}${var.name}", "${local.prefix}${var.name}")
+  egress_deployment_name      = var.egress_deployment_name != null && var.egress_deployment_name != "" ? var.egress_deployment_name : "${local.prefix}${var.name}"
+  service_name                = var.egress_service_name != null && var.egress_service_name != "" ? var.egress_service_name : "${local.prefix}${var.name}"
+  egress_service_account_name = var.egress_service_account_name != null && var.egress_service_account_name != "" ? var.egress_service_account_name : "${local.prefix}${var.name}-service-account"
 
   egress_discovery_configuration = var.egress_discovery_custom_configuration != null ? var.egress_discovery_custom_configuration : (
     var.istio_mesh_enrollment == "default" ? {
@@ -28,15 +30,18 @@ locals {
     }
   }
 
+  egress_hpa_name = var.egress_autoscale_configuration.hpa_name != null && var.egress_autoscale_configuration.hpa_name != "" ? var.egress_autoscale_configuration.hpa_name : "${local.prefix}${var.name}"
+  egress_pdb_name = var.egress_pdb_configuration != null && var.egress_pdb_configuration.name != null && var.egress_pdb_configuration.name != "" ? var.egress_pdb_configuration.name : "${local.prefix}${var.name}"
+
   egress_autoscale_configuration = {
     "egress" : {
-      "autoscale" : var.egress_autoscale_configuration
+      "autoscale" : merge(var.egress_autoscale_configuration, { hpa_name = local.egress_hpa_name })
     }
   }
 
   egress_pdb_configuration = var.egress_pdb_configuration == null ? {} : {
     "egress" : {
-      "pdb" : var.egress_pdb_configuration
+      "pdb" : merge(var.egress_pdb_configuration, { name = local.egress_pdb_name })
     }
   }
 
@@ -183,7 +188,7 @@ resource "helm_release" "istio_egress" {
     {
       name  = "egress.deploymentName"
       type  = "string"
-      value = var.egress_deployment_name
+      value = local.egress_deployment_name
     },
     {
       name  = "egress.extendSelector"
@@ -192,12 +197,12 @@ resource "helm_release" "istio_egress" {
     {
       name  = "egress.serviceName"
       type  = "string"
-      value = var.egress_service_name
+      value = local.service_name
     },
     {
       name  = "egress.serviceAccountName"
       type  = "string"
-      value = var.egress_service_account_name != null ? var.egress_service_account_name : "${local.prefix}${var.name}-service-account"
+      value = local.egress_service_account_name
     },
   ]
 
