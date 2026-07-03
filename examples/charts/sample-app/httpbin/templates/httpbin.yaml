@@ -20,6 +20,8 @@ kind: ServiceAccount
 metadata:
   name: httpbin
   namespace: {{ .Values.namespace }}
+  annotations:
+    automountServiceAccountToken: "false"
 ---
 apiVersion: v1
 kind: Service
@@ -37,6 +39,23 @@ spec:
   selector:
     app: httpbin
 ---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: httpbin
+  namespace: {{ .Values.namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: httpbin
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - {}
+  egress:
+  - {}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -49,13 +68,48 @@ spec:
       app: httpbin
   template:
     metadata:
+      annotations:
+        seccomp.security.alpha.kubernetes.io/pod: runtime/default
       labels:
         app: httpbin
     spec:
       serviceAccountName: httpbin
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
-      - image: quay.io/sail-dev/go-httpbin:v2.15.0
-        imagePullPolicy: IfNotPresent
+      - image: quay.io/sail-dev/go-httpbin:v2.15.0@sha256:2e5cd3795b2cd9fb525c72949f2e220e65156d2535e92089a89732b4ae7ddf6a
+        imagePullPolicy: Always
         name: httpbin
         ports:
         - containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /healthz/live
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz/ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
