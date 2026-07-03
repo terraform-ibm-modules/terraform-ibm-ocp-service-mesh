@@ -42,26 +42,14 @@ kind: Deployment
 metadata:
   name: httpbin
   namespace: {{ .Values.namespace }}
+  {{- if .Values.checkov_skip_list }}
+  {{- if .Values.checkov_skip_list.deployment }}
   annotations:
-    checkov.io/skip1: "CKV_K8S_37=sample app - capabilities assigned are acceptable for httpbin"
-    checkov.io/skip2: "CKV_K8S_31=sample app - seccomp profile not required for httpbin"
-    checkov.io/skip3: "CKV_K8S_8=sample app - liveness probe not required for httpbin"
-    checkov.io/skip4: "CKV_K8S_12=sample app - memory requests not required for httpbin"
-    checkov.io/skip5: "CKV_K8S_20=sample app - allowPrivilegeEscalation acceptable for httpbin"
-    checkov.io/skip6: "CKV_K8S_15=sample app - imagePullPolicy IfNotPresent acceptable for httpbin"
-    checkov.io/skip7: "CKV_K8S_13=sample app - memory limits not required for httpbin"
-    checkov.io/skip8: "CKV_K8S_40=sample app - UID requirement not enforced for httpbin"
-    checkov.io/skip9: "CKV_K8S_10=sample app - CPU requests not required for httpbin"
-    checkov.io/skip10: "CKV_K8S_22=sample app - read-only root filesystem not required for httpbin"
-    checkov.io/skip11: "CKV_K8S_9=sample app - readiness probe not required for httpbin"
-    checkov.io/skip12: "CKV_K8S_28=sample app - NET_RAW capability acceptable for httpbin"
-    checkov.io/skip13: "CKV_K8S_29=sample app - security context not required for httpbin"
-    checkov.io/skip14: "CKV_K8S_30=sample app - container security context not required for httpbin"
-    checkov.io/skip15: "CKV_K8S_38=sample app - service account token mounting acceptable for httpbin"
-    checkov.io/skip16: "CKV_K8S_23=sample app - root container acceptable for httpbin"
-    checkov.io/skip17: "CKV_K8S_43=sample app - image digest not required for httpbin"
-    checkov.io/skip18: "CKV_K8S_11=sample app - CPU limits not required for httpbin"
-    checkov.io/skip19: "CKV2_K8S_6=sample app - NetworkPolicy not required for httpbin"
+  {{- range $k, $v := .Values.checkov_skip_list.deployment }}
+    {{ $k }}: {{ $v | quote }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 spec:
   replicas: 1
   selector:
