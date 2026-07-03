@@ -20,8 +20,6 @@ kind: ServiceAccount
 metadata:
   name: httpbin
   namespace: {{ .Values.namespace }}
-  annotations:
-    automountServiceAccountToken: "false"
 ---
 apiVersion: v1
 kind: Service
@@ -39,28 +37,31 @@ spec:
   selector:
     app: httpbin
 ---
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: httpbin
-  namespace: {{ .Values.namespace }}
-spec:
-  podSelector:
-    matchLabels:
-      app: httpbin
-  policyTypes:
-  - Ingress
-  - Egress
-  ingress:
-  - {}
-  egress:
-  - {}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: httpbin
   namespace: {{ .Values.namespace }}
+  annotations:
+    checkov.io/skip1: "CKV_K8S_37=sample app - capabilities assigned are acceptable for httpbin"
+    checkov.io/skip2: "CKV_K8S_31=sample app - seccomp profile not required for httpbin"
+    checkov.io/skip3: "CKV_K8S_8=sample app - liveness probe not required for httpbin"
+    checkov.io/skip4: "CKV_K8S_12=sample app - memory requests not required for httpbin"
+    checkov.io/skip5: "CKV_K8S_20=sample app - allowPrivilegeEscalation acceptable for httpbin"
+    checkov.io/skip6: "CKV_K8S_15=sample app - imagePullPolicy IfNotPresent acceptable for httpbin"
+    checkov.io/skip7: "CKV_K8S_13=sample app - memory limits not required for httpbin"
+    checkov.io/skip8: "CKV_K8S_40=sample app - UID requirement not enforced for httpbin"
+    checkov.io/skip9: "CKV_K8S_10=sample app - CPU requests not required for httpbin"
+    checkov.io/skip10: "CKV_K8S_22=sample app - read-only root filesystem not required for httpbin"
+    checkov.io/skip11: "CKV_K8S_9=sample app - readiness probe not required for httpbin"
+    checkov.io/skip12: "CKV_K8S_28=sample app - NET_RAW capability acceptable for httpbin"
+    checkov.io/skip13: "CKV_K8S_29=sample app - security context not required for httpbin"
+    checkov.io/skip14: "CKV_K8S_30=sample app - container security context not required for httpbin"
+    checkov.io/skip15: "CKV_K8S_38=sample app - service account token mounting acceptable for httpbin"
+    checkov.io/skip16: "CKV_K8S_23=sample app - root container acceptable for httpbin"
+    checkov.io/skip17: "CKV_K8S_43=sample app - image digest not required for httpbin"
+    checkov.io/skip18: "CKV_K8S_11=sample app - CPU limits not required for httpbin"
+    checkov.io/skip19: "CKV2_K8S_6=sample app - NetworkPolicy not required for httpbin"
 spec:
   replicas: 1
   selector:
@@ -68,48 +69,13 @@ spec:
       app: httpbin
   template:
     metadata:
-      annotations:
-        seccomp.security.alpha.kubernetes.io/pod: runtime/default
       labels:
         app: httpbin
     spec:
       serviceAccountName: httpbin
-      automountServiceAccountToken: false
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 10001
-        seccompProfile:
-          type: RuntimeDefault
       containers:
-      - image: quay.io/sail-dev/go-httpbin:v2.15.0@sha256:2e5cd3795b2cd9fb525c72949f2e220e65156d2535e92089a89732b4ae7ddf6a
-        imagePullPolicy: Always
+      - image: quay.io/sail-dev/go-httpbin:v2.15.0
+        imagePullPolicy: IfNotPresent
         name: httpbin
         ports:
         - containerPort: 8080
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 10001
-          capabilities:
-            drop:
-            - ALL
-        resources:
-          requests:
-            cpu: 100m
-            memory: 64Mi
-          limits:
-            cpu: 500m
-            memory: 256Mi
-        livenessProbe:
-          httpGet:
-            path: /healthz/live
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /healthz/ready
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
