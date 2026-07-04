@@ -27,6 +27,9 @@ spec:
   selector:
     matchLabels:
       {{- toYaml .Values.egress.istioselectors | nindent 6 }}
+      {{- if .Values.egress.extendSelector }}
+      deploymentName: {{ default .Values.egress.name .Values.egress.deploymentName }}
+      {{- end }}
   {{- end }}
   template:
     metadata:
@@ -35,6 +38,9 @@ spec:
       labels:
         {{- if .Values.egress.istioselectors }}
         {{- toYaml .Values.egress.istioselectors | nindent 8 }}
+        {{- end }}
+        {{- if .Values.egress.extendSelector }}
+        deploymentName: {{ default .Values.egress.name .Values.egress.deploymentName }}
         {{- end }}
         {{- if eq .Values.egress.istioMeshEnrollment "default" }}
         sidecar.istio.io/inject: "true"
@@ -62,7 +68,7 @@ spec:
       topologySpreadConstraints:
       {{- toYaml .Values.egress.topologySpreadConstraints | nindent 6 }}
       {{- end }}
-      serviceAccountName: {{ .Values.egress.name }}-service-account
+      serviceAccountName: {{ .Values.egress.serviceAccountName }}
       {{- if .Values.egress.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.egress.terminationGracePeriodSeconds }}
       {{- end }}

@@ -197,10 +197,10 @@ variable "pilot_env" {
 variable "outboundtrafficpolicy" {
   type        = string
   default     = "ALLOW_ANY"
-  description = "Istio controlplane output traffic policy configuration. Default to ALLOW_ANY. Values allowed ALLOW_ANY or REGISTRY_ONLY"
+  description = "Istio controlplane outbound traffic policy configuration. Sets meshConfig.outboundTrafficPolicy.mode. Default to ALLOW_ANY. Values allowed: ALLOW_ANY, REGISTRY_ONLY, or ALLOW_ANY_DYNAMIC_DNS. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfigoutboundtrafficpolicy"
   validation {
-    condition     = var.outboundtrafficpolicy == "ALLOW_ANY" || var.outboundtrafficpolicy == "REGISTRY_ONLY"
-    error_message = "The outboundtrafficpolicy value must be one of the following: ALLOW_ANY, REGISTRY_ONLY"
+    condition     = contains(["ALLOW_ANY", "REGISTRY_ONLY", "ALLOW_ANY_DYNAMIC_DNS"], var.outboundtrafficpolicy)
+    error_message = "The outboundtrafficpolicy value must be one of the following: ALLOW_ANY, REGISTRY_ONLY, ALLOW_ANY_DYNAMIC_DNS"
   }
 }
 

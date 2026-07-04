@@ -1,5 +1,6 @@
 egress:
   name: default
+  extendSelector: false
   createDeployment: true
   deploymentName: null
   createService: true

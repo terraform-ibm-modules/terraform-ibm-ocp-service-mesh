@@ -18,7 +18,7 @@ output "ingress_loadbalancer_ips" {
     k => try(v.status[0].load_balancer[0].ingress[0].ip, null)
     } : var.ingress_loadbalancer_type == "other" && length(data.kubernetes_service_v1.ingress_services) > 0 ? {
     for idx, ip in try(
-      data.kubernetes_service_v1.ingress_services["${local.prefix}${local.service_name}"].status[0].load_balancer[0].ingress[*].ip,
+      data.kubernetes_service_v1.ingress_services[local.service_name].status[0].load_balancer[0].ingress[*].ip,
       []
     ) : "ip-${idx}" => ip
   } : {}

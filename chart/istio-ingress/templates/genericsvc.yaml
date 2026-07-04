@@ -16,7 +16,9 @@ metadata:
     {{- end }}
 spec:
   type: {{ .Values.ingress.svctype }}
+  {{- if ne .Values.ingress.svctype "ClusterIP" }}
   externalTrafficPolicy: {{ .Values.ingress.externalTrafficPolicy }}
+  {{- end }}
   internalTrafficPolicy: {{ .Values.ingress.internalTrafficPolicy }}
   selector:
   {{- if .Values.ingress.istioselectors }}

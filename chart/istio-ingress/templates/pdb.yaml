@@ -1,4 +1,5 @@
 {{- if .Values.ingress.pdb }}
+{{- if or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "other") }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -17,4 +18,8 @@ spec:
   selector:
     matchLabels:
       {{- toYaml .Values.ingress.istioselectors | nindent 6 }}
+      {{- if .Values.ingress.extendSelector }}
+      deploymentName: {{ default .Values.ingress.name .Values.ingress.deploymentName }}
+      {{- end }}
+{{- end }}
 {{- end }}

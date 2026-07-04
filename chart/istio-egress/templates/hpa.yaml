@@ -1,4 +1,4 @@
-{{- if (.Values.egress.autoscale).enabled | default false -}}
+{{- if ne ((.Values.egress).autoscale).enabled false -}}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
