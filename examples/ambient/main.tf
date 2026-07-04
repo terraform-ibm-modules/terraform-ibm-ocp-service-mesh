@@ -148,6 +148,56 @@ module "deploy_ztunnel" {
 }
 
 
+resource "time_sleep" "wait_istio" {
+  depends_on = [module.deploy_istio, module.deploy_istio_cni, module.deploy_ztunnel]
+
+  create_duration  = "300s"
+  destroy_duration = "60s"
+}
+
+module "basic_workload_ingress" {
+  depends_on                = [time_sleep.wait_istio]
+  source                    = "../../modules/sm-istio-ingress"
+  name                      = "alb-ingress"
+  namespace                 = "alb-ingress"
+  create_namespace          = true
+  force_dataplane_update    = false
+  ingress_loadbalancer_type = "alb"
+  ingress_service_type      = "LoadBalancer"
+  ingress_ip_type           = "public"
+  istio_mesh_enrollment     = "default"
+  ingress_affinity          = {} # local.alb_affinity
+  ingress_selectors = {
+    "istio" : "ingress-gateway",
+  }
+  ingress_ports = [
+    {
+      "name" : "http2"
+      "port" : "80"
+      "targetPort" : "8000" # ingress gateway target port, to match in network policy, in the gateway configuration and in the workload service configuration
+      "protocol" : "TCP"
+    }
+  ]
+  cluster_id        = module.ocp_base.cluster_id
+  resource_group_id = module.resource_group.resource_group_id
+}
+
+module "default_workload_egress" {
+  depends_on             = [time_sleep.wait_istio]
+  source                 = "../../modules/sm-istio-egress"
+  name                   = "basic-egress"
+  namespace              = "basic-egress"
+  create_namespace       = true
+  force_dataplane_update = true
+  istio_mesh_enrollment  = "default"
+  egress_affinity        = {}
+  egress_selectors = {
+    "istio" : "egress-gateway",
+  }
+  cluster_id        = module.ocp_base.cluster_id
+  resource_group_id = module.resource_group.resource_group_id
+}
+
 resource "kubernetes_namespace_v1" "waypoint_namespace" {
   depends_on = [module.deploy_istio]
   metadata {
@@ -214,56 +264,6 @@ module "deploy_east_west_waypoint" {
   }
 }
 
-
-resource "time_sleep" "wait_istio" {
-  depends_on = [module.deploy_istio, module.deploy_istio_cni, module.deploy_ztunnel]
-
-  create_duration  = "300s"
-  destroy_duration = "60s"
-}
-
-module "basic_workload_ingress" {
-  depends_on                = [time_sleep.wait_istio]
-  source                    = "../../modules/sm-istio-ingress"
-  name                      = "alb-ingress"
-  namespace                 = "alb-ingress"
-  create_namespace          = true
-  force_dataplane_update    = false
-  ingress_loadbalancer_type = "alb"
-  ingress_service_type      = "LoadBalancer"
-  ingress_ip_type           = "public"
-  istio_mesh_enrollment     = "default"
-  ingress_affinity          = {} # local.alb_affinity
-  ingress_selectors = {
-    "istio" : "ingress-gateway",
-  }
-  ingress_ports = [
-    {
-      "name" : "http2"
-      "port" : "80"
-      "targetPort" : "8000" # ingress gateway target port, to match in network policy, in the gateway configuration and in the workload service configuration
-      "protocol" : "TCP"
-    }
-  ]
-  cluster_id        = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
-}
-
-module "default_workload_egress" {
-  depends_on             = [time_sleep.wait_istio]
-  source                 = "../../modules/sm-istio-egress"
-  name                   = "basic-egress"
-  namespace              = "basic-egress"
-  create_namespace       = true
-  force_dataplane_update = true
-  istio_mesh_enrollment  = "default"
-  egress_affinity        = {}
-  egress_selectors = {
-    "istio" : "egress-gateway",
-  }
-  cluster_id        = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
-}
 
 resource "kubernetes_namespace_v1" "sample_app_namespace" {
   depends_on = [time_sleep.wait_istio]
