@@ -311,5 +311,9 @@ resource "helm_release" "sample_app" {
     {
       name  = "gateway.istioPort"
       value = "80"
+    },
+    {
+      name  = "useGatewayApi"
+      value = "true"
   }]
 }
