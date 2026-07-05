@@ -1,4 +1,4 @@
-# East-West Waypoint Module
+# Waypoint Module
 
 This module deploys istio-proxy pods also known as waypoint proxies by creating a Kubernetes deployment specifically for ambient mode. These proxies run as standalone pods and do not act as a sidecar container for application pods and these can be shared by multiple pods for efficient resource usage purpose. These istio-proxy additional pods can be used by applications to do Layer 7 filtering. It is required in ambient mode if L7 filtering is needed because application pods do not have istio-proxy sidecar running with them because of which layer 7 traffic filtering can't be done natively which was possible in traditional sidecar mode.
 
@@ -62,7 +62,7 @@ metadata:
   labels:
     istio.io/dataplane-mode: ambient
     istio-discovery: enabled
-    istio.io/use-waypoint: east-west-waypoint  # all services and pods in this namespace use the waypoint
+    istio.io/use-waypoint: wp-gw  # Name of the waypoint gateway to use as proxy
     istio.io/use-waypoint-namespace: waypoint-ns # if waypoint gateway is present in same namespace as application namespace then this field can be omitted
 ```
 
@@ -75,7 +75,7 @@ metadata:
   name: reviews
   namespace: bookinfo
   labels:
-    istio.io/use-waypoint: east-west-waypoint  # only traffic to this Service goes through the waypoint
+    istio.io/use-waypoint: wp-gw # only traffic to this Service goes through the waypoint
     istio.io/use-waypoint-namespace: waypoint-ns # if waypoint gateway is present in same namespace as application namespace then this field can be omitted
 ```
 
@@ -149,7 +149,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [helm_release.east_west_waypoint](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.waypoint](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 
 ### Inputs
 
@@ -162,8 +162,8 @@ No modules.
 | <a name="input_deployment_labels"></a> [deployment\_labels](#input\_deployment\_labels) | Map of labels to set under metadata.labels of the waypoint Deployment in the ConfigMap. Default to empty map. | `map(string)` | `{}` | no |
 | <a name="input_gateway_annotations"></a> [gateway\_annotations](#input\_gateway\_annotations) | Map of annotations to set under spec.infrastructure.annotations of the Gateway resource. Default to empty map. | `map(string)` | `{}` | no |
 | <a name="input_gateway_labels"></a> [gateway\_labels](#input\_gateway\_labels) | Map of labels to set under spec.infrastructure.labels of the Gateway resource. Default to empty map. | `map(string)` | `{}` | no |
-| <a name="input_gateway_name"></a> [gateway\_name](#input\_gateway\_name) | Name of the waypoint Gateway resource. | `string` | `"east-west-waypoint"` | no |
-| <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where the east-west waypoint resources will be deployed. | `string` | n/a | yes |
+| <a name="input_gateway_name"></a> [gateway\_name](#input\_gateway\_name) | Name of the waypoint Gateway resource. | `string` | `"wp-gw"` | no |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where the waypoint resources will be deployed. | `string` | n/a | yes |
 | <a name="input_replicas"></a> [replicas](#input\_replicas) | Number of replicas for the waypoint Deployment. Default to null to leverage on Istio default setting. | `number` | `null` | no |
 | <a name="input_resources_configuration"></a> [resources\_configuration](#input\_resources\_configuration) | Waypoint pod resources configuration (cpu/memory requests and limits). Default to null to leverage on Istio default setting. | <pre>object(<br/>    {<br/>      limits : optional(object(<br/>        {<br/>          cpu : optional(string, null),<br/>          memory : optional(string, null)<br/>      }), null),<br/>      requests : optional(object(<br/>        {<br/>          cpu : optional(string, null)<br/>          memory : optional(string, null)<br/>      }), null)<br/>    }<br/>  )</pre> | `null` | no |
 | <a name="input_rollback_on_failure"></a> [rollback\_on\_failure](#input\_rollback\_on\_failure) | Flag to automatically rollback the helm chart on installation failure. | `bool` | `true` | no |
@@ -178,5 +178,5 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_waypoint_release_name"></a> [waypoint\_release\_name](#output\_waypoint\_release\_name) | Helm release name for the east-west waypoint |
+| <a name="output_waypoint_release_name"></a> [waypoint\_release\_name](#output\_waypoint\_release\_name) | Helm release name for the waypoint |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

@@ -1,6 +1,6 @@
 locals {
   waypoint_release_name = "${var.namespace}-${var.gateway_name}"
-  waypoint_chart_path   = "east-west-waypoint"
+  waypoint_chart_path   = "waypoint"
 
   deployment_labels = length(var.deployment_labels) == 0 ? {} : {
     "configMap" : {
@@ -87,8 +87,8 @@ locals {
   }
 }
 
-# installing helm chart for east-west waypoint deployment
-resource "helm_release" "east_west_waypoint" {
+# installing helm chart for waypoint deployment
+resource "helm_release" "waypoint" {
 
   name              = local.waypoint_release_name
   chart             = "${path.module}/../../chart/${local.waypoint_chart_path}"

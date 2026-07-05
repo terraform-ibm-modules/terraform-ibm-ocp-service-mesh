@@ -1,6 +1,6 @@
 variable "namespace" {
   type        = string
-  description = "Namespace where the east-west waypoint resources will be deployed."
+  description = "Namespace where the waypoint resources will be deployed."
 }
 
 variable "configmap_name" {
@@ -12,7 +12,7 @@ variable "configmap_name" {
 variable "gateway_name" {
   type        = string
   description = "Name of the waypoint Gateway resource."
-  default     = "east-west-waypoint"
+  default     = "wp-gw"
 }
 
 variable "waypoint_for" {

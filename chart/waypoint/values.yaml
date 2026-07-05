@@ -16,7 +16,7 @@ configMap:
     annotations: {}
 
 gateway:
-  name: east-west-waypoint
+  name: waypoint
   waypointFor: service
   allowedRoutes: All
   labels: {}

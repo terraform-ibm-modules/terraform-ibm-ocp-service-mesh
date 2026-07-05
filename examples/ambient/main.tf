@@ -217,7 +217,7 @@ resource "kubernetes_namespace_v1" "waypoint_namespace" {
 
 module "deploy_east_west_waypoint" {
   depends_on     = [kubernetes_namespace_v1.waypoint_namespace]
-  source         = "../../modules/east-west-waypoint"
+  source         = "../../modules/waypoint"
   namespace      = kubernetes_namespace_v1.waypoint_namespace.metadata[0].name
   configmap_name = "wp-cm"
   gateway_name   = "wp-gw"
