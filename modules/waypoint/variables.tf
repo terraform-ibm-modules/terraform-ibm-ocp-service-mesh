@@ -86,10 +86,18 @@ variable "waypoint_pod_annotations" {
 }
 
 variable "tolerations" {
-  type        = list(any)
-  default     = []
+  type = list(object({
+    key                = optional(string)
+    operator           = optional(string)
+    value              = optional(string)
+    effect             = optional(string)
+    toleration_seconds = optional(number)
+  }))
+  default = [{
+    operator = "Exists"
+  }]
   nullable    = false
-  description = "Tolerations to apply to the waypoint pods. Default to empty list."
+  description = "Tolerations to apply to the waypoint pods. Default to a single entry tolerating all taints."
 }
 
 variable "affinity" {

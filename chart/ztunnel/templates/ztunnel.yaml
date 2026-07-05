@@ -11,3 +11,7 @@ spec:
       {{- if .Values.ztunnel.resources }}
       {{- toYaml .Values.ztunnel.resources | nindent 8 }}
       {{- end }}
+      {{- if .Values.ztunnel.tolerations }}
+      tolerations:
+      {{- toYaml .Values.ztunnel.tolerations | nindent 8 }}
+      {{- end }}

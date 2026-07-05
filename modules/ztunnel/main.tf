@@ -7,6 +7,12 @@ locals {
       "resources" : var.ztunnel_resources_configuration
     }
   }
+
+  ztunnel_tolerations_configuration = length(var.tolerations) == 0 ? {} : {
+    "ztunnel" : {
+      "tolerations" : var.tolerations
+    }
+  }
 }
 
 # installing helm chart for ztunnel deployment
@@ -33,7 +39,8 @@ resource "helm_release" "ztunnel" {
   ]
 
   values = [
-    yamlencode(local.ztunnel_resources_configuration)
+    yamlencode(local.ztunnel_resources_configuration),
+    yamlencode(local.ztunnel_tolerations_configuration)
   ]
 
 }

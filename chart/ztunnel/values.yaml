@@ -7,3 +7,8 @@ ztunnel:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+  tolerations: []
+    # - key: "key1"
+    #   operator: "Equal"
+    #   value: "value1"
+    #   effect: "NoSchedule"
