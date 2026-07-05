@@ -95,6 +95,24 @@ EOF
 # Generate kubeconfig from the provided credentials
 generate_kubeconfig "$3" "$4" "$5" "$6"
 
+# Verify cluster is reachable
+if ! kubectl get pods -A --request-timeout=30s > /dev/null 2>&1; then
+  echo "Cluster unreachable... Exiting."
+  exit 0
+fi
+
+ISTIO_COUNT=$(kubectl get Istio -A --no-headers 2>/dev/null | wc -l)
+if [ "${ISTIO_COUNT}" -gt 0 ]; then
+  echo "Istio is still installed on the cluster, can't proceed with operator deletion."
+  exit 0
+fi
+
+ISTIOCNI_COUNT=$(kubectl get IstioCNI -A --no-headers 2>/dev/null | wc -l)
+if [ "${ISTIOCNI_COUNT}" -gt 0 ]; then
+  echo "IstioCNI CRs still present (${ISTIOCNI_COUNT}), can't proceed with operator deletion."
+  exit 0
+fi
+
 echo "Start deprovision-sm-operator.sh with ${1} ${2} at $(date '+%Y-%m-%d %H:%M:%S')"
 echo "Start deprovision-sm-operator.sh with ${1} ${2} at $(date '+%Y-%m-%d %H:%M:%S')" >> "${LOGFILE}"
 
