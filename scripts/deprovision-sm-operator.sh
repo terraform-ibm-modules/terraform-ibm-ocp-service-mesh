@@ -101,14 +101,18 @@ if ! kubectl get pods -A --request-timeout=30s > /dev/null 2>&1; then
   exit 0
 fi
 
-ISTIO_COUNT=$(kubectl get Istio -A --no-headers 2>/dev/null | wc -l)
-if [ "${ISTIO_COUNT}" -gt 0 ]; then
+if ! ISTIO_OUT=$(kubectl get Istio -A --no-headers 2>/dev/null); then
+  echo "Error querying Istio resources... Halting operator deletion for safety."
+  exit 0
+elif [ -n "$ISTIO_OUT" ]; then
   echo "Istio is still installed on the cluster, can't proceed with operator deletion."
   exit 0
 fi
 
-ISTIOCNI_COUNT=$(kubectl get IstioCNI -A --no-headers 2>/dev/null | wc -l)
-if [ "${ISTIOCNI_COUNT}" -gt 0 ]; then
+if ! ISTIOCNI_OUT=$(kubectl get IstioCNI -A --no-headers 2>/dev/null); then
+  echo "Error querying IstioCNI resources... Halting operator deletion for safety."
+  exit 0
+elif [ -n "$ISTIOCNI_OUT" ]; then
   echo "IstioCNI is still installed on the cluster, can't proceed with operator deletion."
   exit 0
 fi
