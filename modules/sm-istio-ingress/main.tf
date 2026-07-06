@@ -48,8 +48,8 @@ locals {
     }
   }
 
-  ingress_hpa_name = var.ingress_autoscale_configuration.hpa_name != null && var.ingress_autoscale_configuration.hpa_name != "" ? var.ingress_autoscale_configuration.hpa_name : "${local.prefix}${var.name}"
-  ingress_pdb_name = var.ingress_pdb_configuration != null && var.ingress_pdb_configuration.name != null && var.ingress_pdb_configuration.name != "" ? var.ingress_pdb_configuration.name : "${local.prefix}${var.name}"
+  ingress_hpa_name = try(var.ingress_autoscale_configuration.hpa_name, null) != null && try(var.ingress_autoscale_configuration.hpa_name, "") != "" ? var.ingress_autoscale_configuration.hpa_name : "${local.prefix}${var.name}"
+  ingress_pdb_name = try(var.ingress_pdb_configuration.name, null) != null && try(var.ingress_pdb_configuration.name, "") != "" ? var.ingress_pdb_configuration.name : "${local.prefix}${var.name}"
 
   ingress_autoscale_configuration = {
     "ingress" : {
