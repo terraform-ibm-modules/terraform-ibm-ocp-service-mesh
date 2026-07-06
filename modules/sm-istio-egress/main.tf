@@ -186,6 +186,20 @@ resource "helm_release" "istio_egress" {
       value = var.egress_termination_grace_period
     },
     {
+      name  = "egress.extendSelector"
+      value = var.extend_selectors
+    },
+    {
+      name  = "egress.serviceName"
+      type  = "string"
+      value = local.service_name
+    },
+    {
+      name  = "egress.serviceAccountName"
+      type  = "string"
+      value = local.egress_service_account_name
+    },
+    {
       name  = "egress.autoscale.hpa_name"
       type  = "string"
       value = local.egress_hpa_name
@@ -199,20 +213,6 @@ resource "helm_release" "istio_egress" {
       name  = "egress.deploymentName"
       type  = "string"
       value = local.egress_deployment_name
-    },
-    {
-      name  = "egress.extendSelector"
-      value = var.extend_selectors
-    },
-    {
-      name  = "egress.serviceName"
-      type  = "string"
-      value = local.service_name
-    },
-    {
-      name  = "egress.serviceAccountName"
-      type  = "string"
-      value = local.egress_service_account_name
     },
   ]
 
