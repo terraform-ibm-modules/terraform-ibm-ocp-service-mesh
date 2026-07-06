@@ -143,6 +143,14 @@ module "basic_workload_ingress" {
   ingress_selectors = {
     "istio" : "ingress-gateway",
   }
+  ingress_autoscale_configuration = {
+    enabled  = false
+    hpa_name = "alb-ingress-hpa"
+  }
+  ingress_pdb_configuration = {
+    name         = "alb-ingress-pdb"
+    minAvailable = "1"
+  }
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
 }
@@ -158,6 +166,14 @@ module "default_workload_egress" {
   egress_affinity        = {}
   egress_selectors = {
     "istio" : "egress-gateway",
+  }
+  egress_autoscale_configuration = {
+    enabled  = false
+    hpa_name = "basic-egress-hpa"
+  }
+  egress_pdb_configuration = {
+    name         = "basic-egress-pdb"
+    minAvailable = "1"
   }
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
