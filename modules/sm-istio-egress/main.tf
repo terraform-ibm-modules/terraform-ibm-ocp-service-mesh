@@ -30,8 +30,8 @@ locals {
     }
   }
 
-  egress_hpa_name = var.egress_autoscale_configuration.hpa_name != null && var.egress_autoscale_configuration.hpa_name != "" ? var.egress_autoscale_configuration.hpa_name : "${local.prefix}${var.name}"
-  egress_pdb_name = var.egress_pdb_configuration != null && var.egress_pdb_configuration.name != null && var.egress_pdb_configuration.name != "" ? var.egress_pdb_configuration.name : "${local.prefix}${var.name}"
+  egress_hpa_name = try(var.egress_autoscale_configuration.hpa_name, null) != null && try(var.egress_autoscale_configuration.hpa_name, "") != "" ? var.egress_autoscale_configuration.hpa_name : "${local.prefix}${var.name}"
+  egress_pdb_name = try(var.egress_pdb_configuration.name, null) != null && try(var.egress_pdb_configuration.name, "") != "" ? var.egress_pdb_configuration.name : "${local.prefix}${var.name}"
 
   egress_autoscale_configuration = {
     "egress" : {
