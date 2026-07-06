@@ -2,6 +2,9 @@ locals {
   waypoint_release_name = "${var.namespace}-${var.gateway_name}"
   waypoint_chart_path   = "waypoint"
 
+  deployment_name = var.deployment_name != null && var.deployment_name != "" ? var.deployment_name : var.gateway_name
+  service_name    = var.service_name != null && var.service_name != "" ? var.service_name : var.gateway_name
+
   deployment_labels = length(var.deployment_labels) == 0 ? {} : {
     "configMap" : {
       "deployment" : {
@@ -132,6 +135,16 @@ resource "helm_release" "waypoint" {
       name  = "configMap.deployment.replicas"
       type  = "string"
       value = var.replicas
+    },
+    {
+      name  = "configMap.deployment.name"
+      type  = "string"
+      value = local.deployment_name
+    },
+    {
+      name  = "configMap.service.name"
+      type  = "string"
+      value = local.service_name
     },
   ]
 

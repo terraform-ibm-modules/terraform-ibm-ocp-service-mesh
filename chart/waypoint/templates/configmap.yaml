@@ -6,6 +6,7 @@ metadata:
 data:
   deployment: |
     metadata:
+      name: {{ .Values.configMap.deployment.name }}
       {{- if .Values.configMap.deployment.labels }}
       labels:
         {{- toYaml .Values.configMap.deployment.labels | nindent 8 }}
@@ -62,6 +63,7 @@ data:
 
   service: |
     metadata:
+      name: {{ .Values.configMap.service.name }}
       {{- if .Values.configMap.service.labels }}
       labels:
         {{- toYaml .Values.configMap.service.labels | nindent 8 }}

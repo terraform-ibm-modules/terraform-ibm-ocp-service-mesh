@@ -182,21 +182,7 @@ module "basic_workload_ingress" {
   resource_group_id = module.resource_group.resource_group_id
 }
 
-module "default_workload_egress" {
-  depends_on             = [time_sleep.wait_istio]
-  source                 = "../../modules/sm-istio-egress"
-  name                   = "basic-egress"
-  namespace              = "basic-egress"
-  create_namespace       = true
-  force_dataplane_update = true
-  istio_mesh_enrollment  = "default"
-  egress_affinity        = {}
-  egress_selectors = {
-    "istio" : "egress-gateway",
-  }
-  cluster_id        = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
-}
+
 
 resource "kubernetes_namespace_v1" "waypoint_namespace" {
   depends_on = [module.deploy_istio]
@@ -264,6 +250,32 @@ module "deploy_east_west_waypoint" {
   }
 }
 
+
+resource "kubernetes_namespace_v1" "egress_namespace" {
+  depends_on = [module.deploy_istio]
+  metadata {
+    name = "istio-egress"
+    labels = {
+      "istio-discovery" = "enabled"
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations,
+      metadata[0].labels
+    ]
+  }
+}
+
+module "egress_waypoint" {
+  depends_on     = [kubernetes_namespace_v1.egress_namespace]
+  source         = "../../modules/waypoint"
+  namespace      = kubernetes_namespace_v1.egress_namespace.metadata[0].name
+  configmap_name = "wp-egress-config"
+  gateway_name   = "wp-egress-gateway"
+  replicas       = 3
+}
 
 resource "kubernetes_namespace_v1" "sample_app_namespace" {
   depends_on = [time_sleep.wait_istio]

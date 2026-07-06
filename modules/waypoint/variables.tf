@@ -7,12 +7,14 @@ variable "configmap_name" {
   type        = string
   description = "Name of the waypoint ConfigMap resource."
   default     = "waypoint-config"
+  nullable    = false
 }
 
 variable "gateway_name" {
   type        = string
   description = "Name of the waypoint Gateway resource."
   default     = "wp-gw"
+  nullable    = false
 }
 
 variable "waypoint_for" {
@@ -67,7 +69,7 @@ variable "deployment_annotations" {
 
 variable "replicas" {
   type        = number
-  default     = null
+  default     = 1
   description = "Number of replicas for the waypoint Deployment. Default to null to leverage on Istio default setting."
 }
 
@@ -141,6 +143,18 @@ variable "service_annotations" {
   default     = {}
   nullable    = false
   description = "Map of annotations to set under metadata.annotations of the waypoint Service in the ConfigMap. Default to empty map."
+}
+
+variable "deployment_name" {
+  type        = string
+  description = "Name to set under metadata.name of the waypoint Deployment in the ConfigMap. Defaults to gateway_name when null."
+  default     = null
+}
+
+variable "service_name" {
+  type        = string
+  description = "Name to set under metadata.name of the waypoint Service in the ConfigMap. Defaults to gateway_name when null."
+  default     = null
 }
 
 variable "rollback_on_failure" {

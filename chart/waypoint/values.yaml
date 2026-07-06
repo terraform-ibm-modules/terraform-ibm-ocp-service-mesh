@@ -3,6 +3,7 @@ namespace: istio-system
 configMap:
   name: waypoint-config
   deployment:
+    name: null
     labels: {}
     annotations: {}
     replicas: null
@@ -12,6 +13,7 @@ configMap:
     affinity: {}
     resources: {}
   service:
+    name: null
     labels: {}
     annotations: {}
 
