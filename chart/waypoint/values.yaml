@@ -3,19 +3,10 @@ namespace: istio-system
 configMap:
   name: waypoint-config
   deployment:
-    name: null
-    labels: {}
-    annotations: {}
-    replicas: null
-    podLabels: {}
-    podAnnotations: {}
+    replicas: 1
     tolerations: []
     affinity: {}
     resources: {}
-  service:
-    name: null
-    labels: {}
-    annotations: {}
 
 gateway:
   name: waypoint

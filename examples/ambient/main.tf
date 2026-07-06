@@ -215,22 +215,6 @@ module "deploy_east_west_waypoint" {
     }
   }
 
-  deployment_labels = {
-    "app.kubernetes.io/component" = "waypoint"
-  }
-
-  waypoint_pod_labels = {
-    "workload-type" = "waypoint"
-  }
-
-  service_labels = {
-    "service-owner" = "platform"
-  }
-
-  gateway_labels = {
-    "environment" = "dev"
-  }
-
   affinity = {
     nodeAffinity = {
       preferredDuringSchedulingIgnoredDuringExecution = [
@@ -254,7 +238,7 @@ module "deploy_east_west_waypoint" {
 resource "kubernetes_namespace_v1" "egress_namespace" {
   depends_on = [module.deploy_istio]
   metadata {
-    name = "istio-egress"
+    name = "istio-egress-ns"
     labels = {
       "istio-discovery" = "enabled"
     }
@@ -272,8 +256,8 @@ module "egress_waypoint" {
   depends_on     = [kubernetes_namespace_v1.egress_namespace]
   source         = "../../modules/waypoint"
   namespace      = kubernetes_namespace_v1.egress_namespace.metadata[0].name
-  configmap_name = "wp-egress-config"
-  gateway_name   = "wp-egress-gateway"
+  configmap_name = "waypoint-egress-config"
+  gateway_name   = "waypoint-egress-gateway"
   replicas       = 3
 }
 

@@ -2,40 +2,7 @@ locals {
   waypoint_release_name = "${var.namespace}-${var.gateway_name}"
   waypoint_chart_path   = "waypoint"
 
-  deployment_name = var.deployment_name != null && var.deployment_name != "" ? var.deployment_name : var.gateway_name
-  service_name    = var.service_name != null && var.service_name != "" ? var.service_name : var.gateway_name
 
-  deployment_labels = length(var.deployment_labels) == 0 ? {} : {
-    "configMap" : {
-      "deployment" : {
-        "labels" : var.deployment_labels
-      }
-    }
-  }
-
-  deployment_annotations = length(var.deployment_annotations) == 0 ? {} : {
-    "configMap" : {
-      "deployment" : {
-        "annotations" : var.deployment_annotations
-      }
-    }
-  }
-
-  waypoint_pod_labels = length(var.waypoint_pod_labels) == 0 ? {} : {
-    "configMap" : {
-      "deployment" : {
-        "podLabels" : var.waypoint_pod_labels
-      }
-    }
-  }
-
-  waypoint_pod_annotations = length(var.waypoint_pod_annotations) == 0 ? {} : {
-    "configMap" : {
-      "deployment" : {
-        "podAnnotations" : var.waypoint_pod_annotations
-      }
-    }
-  }
 
   tolerations = length(var.tolerations) == 0 ? {} : {
     "configMap" : {
@@ -57,22 +24,6 @@ locals {
     "configMap" : {
       "deployment" : {
         "resources" : var.resources_configuration
-      }
-    }
-  }
-
-  service_labels = length(var.service_labels) == 0 ? {} : {
-    "configMap" : {
-      "service" : {
-        "labels" : var.service_labels
-      }
-    }
-  }
-
-  service_annotations = length(var.service_annotations) == 0 ? {} : {
-    "configMap" : {
-      "service" : {
-        "annotations" : var.service_annotations
       }
     }
   }
@@ -136,28 +87,12 @@ resource "helm_release" "waypoint" {
       type  = "string"
       value = var.replicas
     },
-    {
-      name  = "configMap.deployment.name"
-      type  = "string"
-      value = local.deployment_name
-    },
-    {
-      name  = "configMap.service.name"
-      type  = "string"
-      value = local.service_name
-    },
   ]
 
   values = [
-    yamlencode(local.deployment_labels),
-    yamlencode(local.deployment_annotations),
-    yamlencode(local.waypoint_pod_labels),
-    yamlencode(local.waypoint_pod_annotations),
     yamlencode(local.tolerations),
     yamlencode(local.affinity),
     yamlencode(local.resources_configuration),
-    yamlencode(local.service_labels),
-    yamlencode(local.service_annotations),
     yamlencode(local.gateway_labels),
     yamlencode(local.gateway_annotations),
   ]

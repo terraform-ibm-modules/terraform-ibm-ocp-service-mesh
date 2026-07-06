@@ -53,39 +53,12 @@ variable "gateway_annotations" {
   description = "Map of annotations to set under spec.infrastructure.annotations of the Gateway resource. Default to empty map."
 }
 
-variable "deployment_labels" {
-  type        = map(string)
-  default     = {}
-  nullable    = false
-  description = "Map of labels to set under metadata.labels of the waypoint Deployment in the ConfigMap. Default to empty map."
-}
-
-variable "deployment_annotations" {
-  type        = map(string)
-  default     = {}
-  nullable    = false
-  description = "Map of annotations to set under metadata.annotations of the waypoint Deployment in the ConfigMap. Default to empty map."
-}
-
 variable "replicas" {
   type        = number
   default     = 1
   description = "Number of replicas for the waypoint Deployment. Default to null to leverage on Istio default setting."
 }
 
-variable "waypoint_pod_labels" {
-  type        = map(string)
-  default     = {}
-  nullable    = false
-  description = "Map of labels to set under spec.template.metadata.labels of the waypoint Deployment in the ConfigMap. Default to empty map."
-}
-
-variable "waypoint_pod_annotations" {
-  type        = map(string)
-  default     = {}
-  nullable    = false
-  description = "Map of annotations to set under spec.template.metadata.annotations of the waypoint Deployment in the ConfigMap. Default to empty map."
-}
 
 variable "tolerations" {
   type = list(object({
@@ -128,32 +101,6 @@ variable "resources_configuration" {
     }
   )
   description = "Waypoint pod resources configuration (cpu/memory requests and limits). Default to null to leverage on Istio default setting."
-  default     = null
-}
-
-variable "service_labels" {
-  type        = map(string)
-  default     = {}
-  nullable    = false
-  description = "Map of labels to set under metadata.labels of the waypoint Service in the ConfigMap. Default to empty map."
-}
-
-variable "service_annotations" {
-  type        = map(string)
-  default     = {}
-  nullable    = false
-  description = "Map of annotations to set under metadata.annotations of the waypoint Service in the ConfigMap. Default to empty map."
-}
-
-variable "deployment_name" {
-  type        = string
-  description = "Name to set under metadata.name of the waypoint Deployment in the ConfigMap. Defaults to gateway_name when null."
-  default     = null
-}
-
-variable "service_name" {
-  type        = string
-  description = "Name to set under metadata.name of the waypoint Service in the ConfigMap. Defaults to gateway_name when null."
   default     = null
 }
 
