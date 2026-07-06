@@ -109,7 +109,7 @@ fi
 
 ISTIOCNI_COUNT=$(kubectl get IstioCNI -A --no-headers 2>/dev/null | wc -l)
 if [ "${ISTIOCNI_COUNT}" -gt 0 ]; then
-  echo "IstioCNI CRs still present (${ISTIOCNI_COUNT}), can't proceed with operator deletion."
+  echo "IstioCNI is still installed on the cluster, can't proceed with operator deletion."
   exit 0
 fi
 
