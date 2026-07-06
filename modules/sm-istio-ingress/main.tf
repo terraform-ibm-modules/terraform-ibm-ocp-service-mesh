@@ -237,21 +237,6 @@ resource "helm_release" "istio_ingress" {
       value = var.ingress_proxy_protocol_allow_without
     },
     {
-      name  = "ingress.autoscale.hpa_name"
-      type  = "string"
-      value = local.ingress_hpa_name
-    },
-    {
-      name  = "ingress.pdb.name"
-      type  = "string"
-      value = local.ingress_pdb_name
-    },
-    {
-      name  = "ingress.deploymentName"
-      type  = "string"
-      value = local.ingress_deployment_name
-    },
-    {
       name  = "ingress.extendSelector"
       value = var.extend_selectors
     },
@@ -269,6 +254,21 @@ resource "helm_release" "istio_ingress" {
       name  = "ingress.proxyProtocol.envoyFilterName"
       type  = "string"
       value = local.ingress_envoy_filter_name
+    },
+    {
+      name  = "ingress.autoscale.hpa_name"
+      type  = "string"
+      value = local.ingress_hpa_name
+    },
+    {
+      name  = "ingress.pdb.name"
+      type  = "string"
+      value = local.ingress_pdb_name
+    },
+    {
+      name  = "ingress.deploymentName"
+      type  = "string"
+      value = local.ingress_deployment_name
     },
   ]
 
