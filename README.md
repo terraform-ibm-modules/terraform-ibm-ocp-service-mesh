@@ -58,6 +58,29 @@ The submodule [modules/sm-istio-ingress](./modules/sm-istio-ingress) and [module
 
 For more details about Gateway injection, see [Gateways](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/gateways/index) and [About gateway injection](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/gateways/ossm-about-gateways#ossm-about-gateway-injection_ossm-about-gateways)
 
+
+### Uninstalling Operator and Custom Resources
+
+This module includes a `terraform_data` resource named `undeploy_servicemesh` in the root module, which is created only when the `clean_servicemesh_on_undeploy` variable is set to `true`. On resource deletion (i.e. during `terraform destroy`), a cleanup script runs that deletes the Sail operator, its ClusterServiceVersions (CSVs), and all associated custom resources.
+
+> **Important:** Because the `undeploy_servicemesh` resource contains a `triggers_replace` block, Terraform will plan to recreate this resource whenever any of the referenced values change. This can also happen when the module is called with an explicit `depends_on`, because data sources will not be evaluated at plan time and Terraform will treat the trigger values as unknown — causing it to destroy and recreate the resource. **Destroying this resource triggers the cleanup script, which is a destructive operation** as it removes the operator and CRDs from the cluster.
+
+To guard against accidental cleanup, the script includes pre-flight checks: if any active `Istio` or `IstioCNI` resources are detected in the cluster, the script halts without making any changes, protecting workloads that are still relying on the mesh.
+
+The default value of `clean_servicemesh_on_undeploy` is `false` to prevent unintentional resource recreation (and the resulting cleanup) during normal plan/apply cycles. **It is strongly recommended to keep this value set to `false` throughout the lifetime of your deployment and only change it immediately before you intend to run `terraform destroy`.**
+
+#### Recommended uninstall workflow
+
+1. Keep `clean_servicemesh_on_undeploy = false` during the initial deployment and all subsequent applies.
+2. Only when you are ready to tear down the infrastructure, set `clean_servicemesh_on_undeploy = true` in your configuration.
+3. Run `terraform apply` immediately after — this creates the `undeploy_servicemesh` resource in state.
+4. Run `terraform destroy` right away — the cleanup script executes and removes the operator, CSVs, and custom resources before the rest of the infrastructure is torn down.
+
+> **Note:** Do not leave `clean_servicemesh_on_undeploy = true` in your configuration during day-to-day operations. Because of the `triggers_replace` behaviour described above, any plan/apply cycle where the trigger values are unknown will cause Terraform to destroy and recreate this resource, inadvertently running the cleanup script against a live cluster.
+
+If you skip steps 2–3 and proceed directly to `terraform destroy` without the resource in state, the cleanup script will not run. In that case you can remove the operator and related resources manually by following the official Red Hat documentation: [Uninstalling Red Hat OpenShift Service Mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.3/html-single/uninstalling/index).
+
+
 <!-- The following content is automatically populated by the pre-commit hook -->
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
