@@ -5,7 +5,7 @@ locals {
   istio_egress_chart_path   = "istio-egress"
 
   egress_deployment_name      = var.egress_deployment_name != null && var.egress_deployment_name != "" ? var.egress_deployment_name : "${local.prefix}${var.name}"
-  service_name                = var.egress_service_name != null && var.egress_service_name != "" ? var.egress_service_name : "${local.prefix}${var.name}"
+  egress_service_name         = var.egress_service_name != null && var.egress_service_name != "" ? var.egress_service_name : "${local.prefix}${var.name}"
   egress_service_account_name = var.egress_service_account_name != null && var.egress_service_account_name != "" ? var.egress_service_account_name : "${local.prefix}${var.name}-service-account"
 
   egress_discovery_configuration = var.egress_discovery_custom_configuration != null ? var.egress_discovery_custom_configuration : (
@@ -192,7 +192,7 @@ resource "helm_release" "istio_egress" {
     {
       name  = "egress.serviceName"
       type  = "string"
-      value = local.service_name
+      value = local.egress_service_name
     },
     {
       name  = "egress.serviceAccountName"
@@ -240,7 +240,7 @@ resource "null_resource" "confirm_egress_operational" {
     helm_revision = helm_release.istio_egress.metadata.revision
   }
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"${local.service_name}\""
+    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"${local.egress_service_name}\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
