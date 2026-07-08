@@ -61,7 +61,8 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
 
 ### Uninstalling Operator and Custom Resources
 
-This module includes a `terraform_data` resource named `undeploy_servicemesh` in the root module, which is created only when the `clean_servicemesh_on_undeploy` variable is set to `true`. On resource deletion (i.e. during `terraform destroy`), a cleanup script runs that deletes the Sail operator, its ClusterServiceVersions (CSVs), and all associated custom resources.
+This module provides a `terraform_data` resource `undeploy_servicemesh` whose purpose is to remove RedHat ServiceMesh from the cluster at destroy time.
+This resource creation is controlled through the input variable`var.clean_servicemesh_on_undeploy`: only when it is set to `true` it is created (default is `false`). When this input variable is `true`, on resource deletion (i.e. during `terraform destroy`), a cleanup script is triggered to remove the [Sail operator](https://github.com/istio-ecosystem/sail-operator/tree/main), its ClusterServiceVersions (CSVs), and all associated custom resources definitions (CRDs).
 
 > **Important:** Because the `undeploy_servicemesh` resource contains a `triggers_replace` block, Terraform will plan to recreate this resource whenever any of the referenced values change. This can also happen when the module is called with an explicit `depends_on`, because data sources will not be evaluated at plan time and Terraform will treat the trigger values as unknown — causing it to destroy and recreate the resource. **Destroying this resource triggers the cleanup script, which is a destructive operation** as it removes the operator and CRDs from the cluster.
 
