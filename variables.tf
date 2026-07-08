@@ -105,7 +105,7 @@ variable "sm_operator_custom_catalog_image_digest" {
 
 variable "clean_servicemesh_on_undeploy" {
   type        = bool
-  description = "Flag to perform a cleanup of ServiceMesh operator custom resources when undeploying the module. Default to true. For more details refer to https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index ."
-  default     = true
+  description = "Flag to perform a cleanup of ServiceMesh operator and custom resources when undeploying the module. Defaults to false to prevent accidental execution of the cleanup script. Before running terraform destroy, set this value to true and run terraform apply once. This creates the terraform_data resource that executes the cleanup script during the destroy phase. For more information, see the Red Hat OpenShift Service Mesh uninstall documentation: https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index."
+  default     = false
   nullable    = false
 }
