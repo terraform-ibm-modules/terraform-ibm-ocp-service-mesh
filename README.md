@@ -66,7 +66,7 @@ This resource creation is controlled through the input variable`var.clean_servic
 
 > **Important:** the `undeploy_servicemesh` terraform_data resource leverages on `triggers_replace` block, and this makes Terraform to plan to recreate this resource everytime any of the referenced values change. This can also happen when the module is called with an explicit `depends_on`, because data sources will not be evaluated at plan time and Terraform will treat the trigger values as unknown — causing it to destroy and recreate the resource. **When destroying this resource triggers the cleanup script, which is a destructive operation** as it removes the operator and CRDs from the cluster.
 
-To guard against accidental cleanup, the script includes pre-flight checks: if any active `Istio` or `IstioCNI` resources are detected in the cluster, the script halts without making any changes, protecting workloads that are still relying on the mesh.
+To guard against accidental cleanup, the script includes pre-flight checks: if any active `Istio` or `IstioCNI` resource is detected in the cluster, the script will exit (without making terraform deployment to fail) without making any changes, protecting workloads that are still relying on the mesh.
 
 The default value of `clean_servicemesh_on_undeploy` is `false` to prevent unintentional resource recreation (and the resulting cleanup) during normal plan/apply cycles. **It is strongly recommended to keep this value set to `false` throughout the lifetime of your deployment and only change it immediately before you intend to run `terraform destroy`.**
 
