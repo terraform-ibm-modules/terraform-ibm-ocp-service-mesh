@@ -74,7 +74,7 @@ The default value of `clean_servicemesh_on_undeploy` is `false` to prevent unint
 
 1. Keep `clean_servicemesh_on_undeploy = false` during the initial deployment and all subsequent applies.
 2. Only when you are ready to tear down the infrastructure, set `clean_servicemesh_on_undeploy = true` in your configuration.
-3. Run `terraform apply` immediately after — this creates the `undeploy_servicemesh` resource in state.
+3. Run `terraform apply` immediately after — this will create the terraform_data `undeploy_servicemesh` resource in the terraform state.
 4. Run `terraform destroy` right away — the cleanup script executes and removes the operator, CSVs, and custom resources before the rest of the infrastructure is torn down.
 
 > **Note:** Do not leave `clean_servicemesh_on_undeploy = true` in your configuration during day-to-day operations. Because of the `triggers_replace` behaviour described above, any plan/apply cycle where the trigger values are unknown will cause Terraform to destroy and recreate this resource, inadvertently running the cleanup script against a live cluster.
