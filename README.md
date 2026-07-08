@@ -68,7 +68,7 @@ This resource creation is controlled through the input variable`var.clean_servic
 
 To guard against accidental cleanup, the script includes pre-flight checks: if any active `Istio` or `IstioCNI` resource is detected in the cluster, the script will exit (without making terraform deployment to fail) without making any changes, protecting workloads that are still relying on the mesh.
 
-The default value of `clean_servicemesh_on_undeploy` is `false` to prevent unintentional resource recreation (and the resulting cleanup) during normal plan/apply cycles. **It is strongly recommended to keep this value set to `false` throughout the lifetime of your deployment and only change it immediately before you intend to run `terraform destroy`.**
+The default value of `clean_servicemesh_on_undeploy` is `false` to prevent unintentional resource recreation (and the resulting cleanup) during normal plan/apply cycles. **It is strongly recommended to keep this value set to `false` throughout the lifetime of your deployment and to change it only immediately before you intend to destroy the deployment through a `terraform destroy`.**
 
 #### Recommended uninstall workflow
 
