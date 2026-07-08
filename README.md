@@ -79,7 +79,11 @@ The default value of `clean_servicemesh_on_undeploy` is `false` to prevent unint
 
 > **Note:** Do not leave `clean_servicemesh_on_undeploy = true` in your configuration during day-to-day operations. Because of the `triggers_replace` behaviour described above, any plan/apply cycle where the trigger values are unknown will cause Terraform to destroy and recreate this resource, inadvertently running the cleanup script against a live cluster.
 
-If you skip steps 2–3 and proceed directly to `terraform destroy` without the resource in state, the cleanup script will not run. In that case you can remove the operator and related resources manually by following the official Red Hat documentation: [Uninstalling Red Hat OpenShift Service Mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.3/html-single/uninstalling/index).
+
+#### RedHat ServiceMesh manual cleanup 
+
+You may need to manually cleanup the RedHat ServiceMesh without leveraging on this resource: for example you could have skipped steps 2–3 and proceed directly to `terraform destroy` without the resource in the terraform state, in this case the cleanup script will not run; or you could have in your cluster other Istio resources that are preventing the script to go on with removal for the safety preliminary check.
+In all these cases you can remove the operator and related resources manually by following the official Red Hat documentation: [Uninstalling Red Hat OpenShift Service Mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.3/html-single/uninstalling/index).
 
 
 <!-- The following content is automatically populated by the pre-commit hook -->
