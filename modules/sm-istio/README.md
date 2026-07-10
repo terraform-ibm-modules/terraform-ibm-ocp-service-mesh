@@ -183,7 +183,7 @@ For all the configuration parameters details refer to the section below
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_istio_namespace"></a> [istio\_namespace](#module\_istio\_namespace) | terraform-ibm-modules/namespace/ibm | v2.0.1 |
+| <a name="module_istio_namespace"></a> [istio\_namespace](#module\_istio\_namespace) | terraform-ibm-modules/namespace/ibm | v2.0.2 |
 
 ### Resources
 
@@ -230,7 +230,7 @@ For all the configuration parameters details refer to the section below
 | <a name="input_mesh_config_tcp_keep_alive"></a> [mesh\_config\_tcp\_keep\_alive](#input\_mesh\_config\_tcp\_keep\_alive) | Istio configuration for TCP keepalive. Default to null, using the Istio default configuration. More details at https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#connectionpoolsettingstcpsettingstcpkeepalive | <pre>object({<br/>    probes : optional(number, 9),<br/>    time : optional(string, "7200s")<br/>    interval : optional(string, "75s")<br/>  })</pre> | `null` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the Istio controlplane | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace where to install istio controlplane. | `string` | n/a | yes |
-| <a name="input_outboundtrafficpolicy"></a> [outboundtrafficpolicy](#input\_outboundtrafficpolicy) | Istio controlplane output traffic policy configuration. Default to ALLOW\_ANY. Values allowed ALLOW\_ANY or REGISTRY\_ONLY | `string` | `"ALLOW_ANY"` | no |
+| <a name="input_outboundtrafficpolicy"></a> [outboundtrafficpolicy](#input\_outboundtrafficpolicy) | Istio controlplane outbound traffic policy configuration. Sets meshConfig.outboundTrafficPolicy.mode. Default to ALLOW\_ANY. Values allowed: ALLOW\_ANY, REGISTRY\_ONLY, or ALLOW\_ANY\_DYNAMIC\_DNS. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfigoutboundtrafficpolicy | `string` | `"ALLOW_ANY"` | no |
 | <a name="input_peer_authentication_name"></a> [peer\_authentication\_name](#input\_peer\_authentication\_name) | Name of the PeerAuthentication policy. Default to null to autogenerate the name as '<controlplane-name>-peerauthentication'. | `string` | `null` | no |
 | <a name="input_pilot_affinity"></a> [pilot\_affinity](#input\_pilot\_affinity) | Istio pilot pods affinity configuration. For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#affinity-v1-core. Default to empty configuration | <pre>object({<br/>    podAntiAffinity : optional(any, null),<br/>    podAffinity : optional(any, null),<br/>    nodeAffinity : optional(any, null)<br/>  })</pre> | `{}` | no |
 | <a name="input_pilot_autoscaling_enabled"></a> [pilot\_autoscaling\_enabled](#input\_pilot\_autoscaling\_enabled) | Enable Istio pilot autoscaling through HorizontalPodAutoscaler. Default to false | `bool` | `false` | no |

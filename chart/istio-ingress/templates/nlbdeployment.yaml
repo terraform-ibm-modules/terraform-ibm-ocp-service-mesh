@@ -1,3 +1,4 @@
+{{- if ne (.Values.ingress).createDeployment false -}}
 {{- if (eq .Values.ingress.lbtype "nlb") }}
 {{- range $lb_subnet, $lb_subnet_zone := .Values.ingress.nlbzonessubnets }}
 apiVersion: apps/v1
@@ -9,9 +10,16 @@ metadata:
   labels:
   {{- toYaml $.Values.ingress.deploymentCustomLabels | nindent 4 }}
   {{- end }}
-  {{- if $.Values.ingress.deploymentCustomAnnotations }}
   annotations:
+  {{- if $.Values.ingress.deploymentCustomAnnotations }}
   {{- toYaml $.Values.ingress.deploymentCustomAnnotations | nindent 4 }}
+  {{- end }}
+  {{- if $.Values.ingress.checkov_skip_list }}
+  {{- if $.Values.ingress.checkov_skip_list.deployment }}
+  {{- range $k, $v := $.Values.ingress.checkov_skip_list.deployment }}
+    {{ $k }}: {{ $v | quote }}
+  {{- end }}
+  {{- end }}
   {{- end }}
 spec:
   {{- if $.Values.ingress.replicacount }}
@@ -23,6 +31,9 @@ spec:
       {{- if $.Values.ingress.istioselectors }}
       {{- toYaml $.Values.ingress.istioselectors | nindent 6 }}
       {{- end }}
+      {{- if $.Values.ingress.extendSelector }}
+      deploymentName: {{ printf "%s-%s" (default $.Values.ingress.name $.Values.ingress.deploymentName) $lb_subnet_zone }}
+      {{- end }}
   {{- end }}
   template:
     metadata:
@@ -31,6 +42,9 @@ spec:
       labels:
         {{- if $.Values.ingress.istioselectors }}
         {{- toYaml $.Values.ingress.istioselectors | nindent 8 }}
+        {{- end }}
+        {{- if $.Values.ingress.extendSelector }}
+        deploymentName: {{ printf "%s-%s" (default $.Values.ingress.name $.Values.ingress.deploymentName) $lb_subnet_zone }}
         {{- end }}
         {{- if eq $.Values.ingress.istioMeshEnrollment "default" }}
         sidecar.istio.io/inject: "true"
@@ -62,7 +76,7 @@ spec:
       topologySpreadConstraints:
       {{- toYaml $.Values.ingress.topologySpreadConstraints | nindent 6 }}
       {{- end }}
-      serviceAccountName: {{ $.Values.ingress.name }}-service-account
+      serviceAccountName: {{ $.Values.ingress.serviceAccountName }}
       {{- if $.Values.ingress.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ $.Values.ingress.terminationGracePeriodSeconds }}
       {{- end }}
@@ -97,5 +111,6 @@ spec:
         {{- end }}
         {{- end }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}

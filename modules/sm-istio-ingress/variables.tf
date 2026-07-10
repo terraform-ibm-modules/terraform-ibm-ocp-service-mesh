@@ -23,7 +23,7 @@ variable "cluster_config_endpoint_type" {
 variable "prefix" {
   type        = string
   nullable    = true
-  description = "Prefix value to append to the name of the resources. The name of the ingress resources created with this module will be in format of <prefix>-<name>."
+  description = "Prefix value to append to the name of the resources. The name of the ingress resources created with this module will be in format of <prefix>-<name>. If individual resource names for service, deployment or serviceAccount are provided then only they are used directly without appending any prefix."
   default     = null
 
   validation {
@@ -333,10 +333,37 @@ variable "ingress_topology_spread_constraints" {
   default     = null
 }
 
+variable "ingress_create_deployment" {
+  description = "Flag to disable ingress Deployment resource creation. Default to true"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
 variable "ingress_deployment_name" {
   description = "Optional override for the ingress Deployment name. If null or empty, the value of var.name is used as default."
   type        = string
   default     = null
+}
+
+variable "ingress_create_service" {
+  description = "Flag to disable ingress Service resource creation. Default to true"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "ingress_service_name" {
+  description = "Optional override for the ingress Service name. If null or empty, the value of var.name is used as default."
+  type        = string
+  default     = null
+}
+
+variable "ingress_create_service_account" {
+  description = "Flag to disable ingress ServiceAccount resource creation. Default to true"
+  type        = bool
+  default     = true
+  nullable    = false
 }
 
 variable "ingress_deployment_custom_labels" {
@@ -355,4 +382,16 @@ variable "ingress_deployment_custom_annotations" {
   default     = {}
   nullable    = true
   description = "Map of custom annotations to add to the ingress Deployment resource"
+}
+
+variable "ingress_service_account_name" {
+  type        = string
+  default     = null
+  description = "Optional override for the ingress ServiceAccount name. If null or empty, defaults to '<ingress.name>-service-account'."
+}
+
+variable "extend_selectors" {
+  type        = bool
+  default     = false
+  description = "Set to true to add deploymentName label to pods and deploymentSelector to matchLabels, ensuring HPA and PDB work correctly for NLBs. Keep false for ALB."
 }

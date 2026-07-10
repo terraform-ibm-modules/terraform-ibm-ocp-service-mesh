@@ -2,71 +2,31 @@ locals {
   istio_controlplane_name = "istio-1"
 }
 
-##############################################################################
-# Resource Group
-##############################################################################
-
-module "resource_group" {
-  source  = "terraform-ibm-modules/resource-group/ibm"
-  version = "1.6.1"
-  # if an existing resource group is not set (null) create a new one using prefix
-  resource_group_name          = var.resource_group == null ? "${var.prefix}-resource-group" : null
-  existing_resource_group_name = var.resource_group
-}
-
 ########################################################################################################################
-# VPC + Subnet + Public Gateway
-#
-# NOTE: This is a very simple VPC with single subnet in a single zone with a public gateway enabled, that will allow
-# all traffic ingress/egress by default.
-# For production use cases this would need to be enhanced by adding more subnets and zones for resiliency, and
-# ACLs/Security Groups for network security.
-########################################################################################################################
-
-resource "ibm_is_vpc" "vpc" {
-  name                      = "${var.prefix}-vpc"
-  resource_group            = module.resource_group.resource_group_id
-  address_prefix_management = "auto"
-  tags                      = var.resource_tags
-}
-
-resource "ibm_is_public_gateway" "gateway" {
-  name           = "${var.prefix}-gateway-1"
-  vpc            = ibm_is_vpc.vpc.id
-  resource_group = module.resource_group.resource_group_id
-  zone           = "${var.region}-1"
-}
-
-resource "ibm_is_subnet" "subnet_zone_1" {
-  name                     = "${var.prefix}-subnet-1"
-  vpc                      = ibm_is_vpc.vpc.id
-  resource_group           = module.resource_group.resource_group_id
-  zone                     = "${var.region}-1"
-  total_ipv4_address_count = 256
-  public_gateway           = ibm_is_public_gateway.gateway.id
-}
-
-########################################################################################################################
-# OCP VPC cluster (single zone)
+# OCP VPC cluster (multi-zone with existing VPC and subnets)
 ########################################################################################################################
 
 locals {
-  cluster_vpc_subnets = {
-    default = [
-      {
-        id         = ibm_is_subnet.subnet_zone_1.id
-        cidr_block = ibm_is_subnet.subnet_zone_1.ipv4_cidr_block
-        zone       = ibm_is_subnet.subnet_zone_1.zone
-      }
-    ]
-  }
-
   worker_pools = [
     {
-      subnet_prefix    = "default"
+      subnet_prefix    = "subnet-1"
       pool_name        = "default" # ibm_container_vpc_cluster automatically names default pool "default" (See https://github.com/IBM-Cloud/terraform-provider-ibm/issues/2849)
       machine_type     = "bx2.4x16"
-      workers_per_zone = 2 # minimum of 2 is allowed when using single zone
+      workers_per_zone = 2
+      operating_system = "RHEL_9_64"
+    },
+    {
+      subnet_prefix    = "subnet-2"
+      pool_name        = "pool-2"
+      machine_type     = "bx2.4x16"
+      workers_per_zone = 2
+      operating_system = "RHEL_9_64"
+    },
+    {
+      subnet_prefix    = "subnet-3"
+      pool_name        = "pool-3"
+      machine_type     = "bx2.4x16"
+      workers_per_zone = 2
       operating_system = "RHEL_9_64"
     }
   ]
@@ -79,13 +39,13 @@ locals {
 module "ocp_base" {
   source                              = "terraform-ibm-modules/base-ocp-vpc/ibm"
   version                             = "3.90.2"
-  resource_group_id                   = module.resource_group.resource_group_id
+  resource_group_id                   = var.resource_group_id
   region                              = var.region
   resource_tags                       = var.resource_tags
   cluster_name                        = "${var.prefix}-cluster"
   force_delete_storage                = true
-  vpc_id                              = ibm_is_vpc.vpc.id
-  vpc_subnets                         = local.cluster_vpc_subnets
+  vpc_id                              = var.vpc_id
+  vpc_subnets                         = var.cluster_vpc_subnets
   worker_pools                        = local.worker_pools
   disable_outbound_traffic_protection = true # set as True to enable outbound traffic; required for accessing Operator Hub in the OpenShift console.
 }
@@ -96,7 +56,7 @@ module "ocp_base" {
 
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
+  resource_group_id = var.resource_group_id
   endpoint_type     = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
 }
 
@@ -104,7 +64,7 @@ module "service_mesh_operator" {
   source              = "../.."
   cluster_id          = module.ocp_base.cluster_id
   develop_mode        = var.develop_mode
-  resource_group_id   = module.resource_group.resource_group_id
+  resource_group_id   = var.resource_group_id
   sm_operator_version = var.service_mesh_operator_version
 }
 
@@ -115,7 +75,7 @@ module "deploy_istio" {
   namespace         = "istio-system"
   create_namespace  = true
   cluster_id        = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
+  resource_group_id = var.resource_group_id
 }
 
 module "deploy_istio_cni" {
@@ -132,26 +92,21 @@ resource "time_sleep" "wait_istio" {
   destroy_duration = "60s"
 }
 
-module "istio_network_policy" {
-  depends_on                        = [time_sleep.wait_istio]
-  source                            = "../../modules/sm-network-policies"
-  network_policy_namespace          = "istio-system"
-  network_policy_istio_controlplane = local.istio_controlplane_name
-  add_default_istio_network_policy  = true
-}
-
-module "basic_workload_ingress" {
-  depends_on                = [time_sleep.wait_istio]
-  source                    = "../../modules/sm-istio-ingress"
-  name                      = "alb-ingress"
-  namespace                 = "alb-ingress"
-  create_namespace          = true
-  force_dataplane_update    = false
-  ingress_loadbalancer_type = "alb"
-  ingress_service_type      = "LoadBalancer"
-  ingress_ip_type           = "public"
-  istio_mesh_enrollment     = local.istio_controlplane_name
-  ingress_affinity          = {}
+module "nlb_workload_ingress" {
+  depends_on                       = [time_sleep.wait_istio]
+  source                           = "../../modules/sm-istio-ingress"
+  name                             = "nlb-ingress"
+  namespace                        = "nlb-ingress"
+  create_namespace                 = true
+  force_dataplane_update           = false
+  ingress_loadbalancer_type        = "nlb"
+  ingress_service_type             = "LoadBalancer"
+  ingress_ip_type                  = "public"
+  istio_mesh_enrollment            = local.istio_controlplane_name
+  istio_ingress_deployment_timeout = 1200
+  ingress_deployment_name          = "nlb-deployment"
+  ingress_service_name             = "nlb-service"
+  ingress_affinity                 = {}
   ingress_selectors = {
     "istio" : "istio-ingress",
   }
@@ -159,10 +114,11 @@ module "basic_workload_ingress" {
     {
       "name" : "http2"
       "port" : "80"
-      "targetPort" : "8000" # ingress gateway target port, to match in network policy, in the gateway configuration and in the workload service configuration
+      "targetPort" : "8080"
       "protocol" : "TCP"
     }
   ]
+  ingress_nlb_zones_subnets = var.ingress_nlb_zones_subnets
   ingress_autoscale_configuration = {
     enabled      = true
     autoscaleMin = 1
@@ -175,38 +131,7 @@ module "basic_workload_ingress" {
     }
   }
   cluster_id        = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
-}
-
-module "istio_ingress_network_policy" {
-  depends_on                       = [time_sleep.wait_istio]
-  source                           = "../../modules/sm-ingress-network-policies"
-  ingress_network_policy_namespace = "alb-ingress"
-  ingress_network_policy_istio_traffic_selectors = {
-    "app" : "istio-ingress",
-    "istio" : "istio-ingress"
-  }
-  ingress_network_policy_istio_controlplane  = local.istio_controlplane_name
-  add_default_istio_ingress_network_policies = true
-  additional_custom_ingress_network_policies = [
-    {
-      policyName      = "httpbin-policy-ingress"
-      isIngressPolicy = true
-      isEgressPolicy  = false
-      ingressSelectors = [
-        {
-          ports = [
-            {
-              protocol = "TCP"
-              port     = 8000
-            }
-          ]
-        }
-      ]
-      egressSelectors = []
-      podSelector     = {}
-    }
-  ]
+  resource_group_id = var.resource_group_id
 }
 
 module "default_workload_egress" {
@@ -247,7 +172,7 @@ module "default_workload_egress" {
     }
   }
   cluster_id        = module.ocp_base.cluster_id
-  resource_group_id = module.resource_group.resource_group_id
+  resource_group_id = var.resource_group_id
 }
 
 resource "kubernetes_namespace_v1" "sample_app_namespace" {

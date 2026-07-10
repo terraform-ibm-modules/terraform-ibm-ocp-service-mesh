@@ -1,3 +1,4 @@
+{{- if ne (.Values.egress).createDeployment false -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,9 +8,16 @@ metadata:
   labels:
   {{- toYaml .Values.egress.deploymentCustomLabels | nindent 4 }}
   {{- end }}
-  {{- if .Values.egress.deploymentCustomAnnotations }}
   annotations:
+  {{- if .Values.egress.deploymentCustomAnnotations }}
   {{- toYaml .Values.egress.deploymentCustomAnnotations | nindent 4 }}
+  {{- end }}
+  {{- if .Values.egress.checkov_skip_list }}
+  {{- if .Values.egress.checkov_skip_list.deployment }}
+  {{- range $k, $v := .Values.egress.checkov_skip_list.deployment }}
+    {{ $k }}: {{ $v | quote }}
+  {{- end }}
+  {{- end }}
   {{- end }}
 spec:
   {{- if .Values.egress.replicacount }}
@@ -19,6 +27,9 @@ spec:
   selector:
     matchLabels:
       {{- toYaml .Values.egress.istioselectors | nindent 6 }}
+      {{- if .Values.egress.extendSelector }}
+      deploymentName: {{ default .Values.egress.name .Values.egress.deploymentName }}
+      {{- end }}
   {{- end }}
   template:
     metadata:
@@ -27,6 +38,9 @@ spec:
       labels:
         {{- if .Values.egress.istioselectors }}
         {{- toYaml .Values.egress.istioselectors | nindent 8 }}
+        {{- end }}
+        {{- if .Values.egress.extendSelector }}
+        deploymentName: {{ default .Values.egress.name .Values.egress.deploymentName }}
         {{- end }}
         {{- if eq .Values.egress.istioMeshEnrollment "default" }}
         sidecar.istio.io/inject: "true"
@@ -54,7 +68,7 @@ spec:
       topologySpreadConstraints:
       {{- toYaml .Values.egress.topologySpreadConstraints | nindent 6 }}
       {{- end }}
-      serviceAccountName: {{ .Values.egress.name }}-service-account
+      serviceAccountName: {{ .Values.egress.serviceAccountName }}
       {{- if .Values.egress.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.egress.terminationGracePeriodSeconds }}
       {{- end }}
@@ -88,3 +102,4 @@ spec:
           name: {{ .name }}
         {{- end }}
         {{- end }}
+{{- end }}

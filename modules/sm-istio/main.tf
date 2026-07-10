@@ -209,7 +209,7 @@ data "ibm_container_cluster_config" "cluster_config" {
 module "istio_namespace" {
   count   = var.create_namespace ? 1 : 0
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "v2.0.1"
+  version = "v2.0.2"
   namespaces = [
     {
       name = var.namespace
@@ -280,7 +280,7 @@ resource "helm_release" "istio_controlplane" {
       type  = "string"
       value = var.istio_update_strategy_type
       }, {
-      name  = "istioconfiguration.outboundtrafficpolicy"
+      name  = "istioconfiguration.meshConfig.outboundTrafficPolicy"
       type  = "string"
       value = var.outboundtrafficpolicy
       }, {

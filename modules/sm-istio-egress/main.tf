@@ -4,6 +4,8 @@ locals {
   istio_egress_release_name = "${var.namespace}-${var.name}"
   istio_egress_chart_path   = "istio-egress"
 
+  service_name = try(trimspace(var.egress_service_name) != "" ? var.egress_service_name : "${local.prefix}${var.name}", "${local.prefix}${var.name}")
+
   egress_discovery_configuration = var.egress_discovery_custom_configuration != null ? var.egress_discovery_custom_configuration : (
     var.istio_mesh_enrollment == "default" ? {
       "istio-discovery" : "enabled",
@@ -73,6 +75,14 @@ locals {
       "deploymentCustomAnnotations" = var.egress_deployment_custom_annotations
     }
   }
+
+  egress_resources_creation = {
+    "egress" = {
+      "createDeployment"     = var.egress_create_deployment
+      "createService"        = var.egress_create_service
+      "createServiceAccount" = var.egress_create_service_account
+    }
+  }
 }
 
 ##############################################################################
@@ -89,7 +99,7 @@ data "ibm_container_cluster_config" "cluster_config" {
 module "egress_namespace" {
   count   = var.create_namespace ? 1 : 0
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "v2.0.1"
+  version = "v2.0.2"
   namespaces = [
     {
       name = var.namespace
@@ -172,7 +182,22 @@ resource "helm_release" "istio_egress" {
     },
     {
       name  = "egress.deploymentName"
+      type  = "string"
       value = var.egress_deployment_name
+    },
+    {
+      name  = "egress.extendSelector"
+      value = var.extend_selectors
+    },
+    {
+      name  = "egress.serviceName"
+      type  = "string"
+      value = var.egress_service_name
+    },
+    {
+      name  = "egress.serviceAccountName"
+      type  = "string"
+      value = var.egress_service_account_name != null ? var.egress_service_account_name : "${local.prefix}${var.name}-service-account"
     },
   ]
 
@@ -187,14 +212,20 @@ resource "helm_release" "istio_egress" {
     yamlencode(local.egress_topology_spread_constraints),
     yamlencode(local.egress_deployment_custom_labels),
     yamlencode(local.egress_deployment_custom_annotations),
+    yamlencode(local.egress_resources_creation)
   ]
 
 }
 
 resource "null_resource" "confirm_egress_operational" {
+
+  count      = var.egress_create_service ? 1 : 0
   depends_on = [helm_release.istio_egress]
+  triggers = {
+    helm_revision = helm_release.istio_egress.metadata.revision
+  }
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"${local.prefix}${var.name}\""
+    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"${local.service_name}\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path

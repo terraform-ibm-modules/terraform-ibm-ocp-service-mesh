@@ -23,7 +23,7 @@ variable "cluster_config_endpoint_type" {
 variable "prefix" {
   type        = string
   nullable    = true
-  description = "Prefix value to append to the name of the resources. The name of the egress resources created with this module will be in format of <prefix>-<name>."
+  description = "Prefix value to append to the name of the resources. The name of the egress resources created with this module will be in format of <prefix>-<name>. If individual resource names for service, deployment or serviceAccount are provided then only they are used directly without appending any prefix."
   default     = null
   validation {
     # - null and empty string is allowed
@@ -257,8 +257,47 @@ variable "egress_deployment_custom_annotations" {
   description = "Map of custom annotations to add to the egress Deployment resource"
 }
 
+variable "egress_create_deployment" {
+  description = "Flag to disable egress Deployment resource creation. Default to true"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
 variable "egress_deployment_name" {
   description = "Optional override for the egress Deployment name. If null or empty, the value of var.name is used as default."
   type        = string
   default     = null
+}
+
+variable "egress_create_service" {
+  description = "Flag to disable egress Service resource creation. Default to true"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "egress_service_name" {
+  description = "Optional override for the egress Service name. If null or empty, the value of var.name is used as default."
+  type        = string
+  default     = null
+}
+
+variable "egress_create_service_account" {
+  description = "Flag to disable egress ServiceAccount resource creation. Default to true"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "egress_service_account_name" {
+  type        = string
+  default     = null
+  description = "Optional override for the egress ServiceAccount name. If null or empty, defaults to '<egress.name>-service-account'."
+}
+
+variable "extend_selectors" {
+  type        = bool
+  default     = false
+  description = "Set to true to add deploymentName label to pods and deploymentSelector to matchLabels, ensuring HPA and PDB work correctly for NLBs. Keep false for ALB."
 }
