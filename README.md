@@ -17,6 +17,7 @@ You can also control placement of the gateways on the desired cluster's worker n
 
 For more details about the Red Hat OpenShift Service Mesh, see [Red Hat OpenShift Service Mesh 3.0](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0) and [Installing Red Hat OpenShift Service Mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh)
 
+
 ### Service Mesh discovery selectors
 
 The submodule [modules/sm-istio](./modules/sm-istio) supports configuring Service Mesh discovery selectors, to configure each Istio controlplane workloads discovery attributes.
