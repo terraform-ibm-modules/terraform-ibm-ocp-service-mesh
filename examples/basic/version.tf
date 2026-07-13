@@ -4,7 +4,7 @@ terraform {
     # Pin to the lowest provider version of the range defined in the main module to ensure lowest version still works
     ibm = {
       source  = "IBM-Cloud/ibm"
-      version = "= 2.1.0"
+      version = "= 2.3.0"
     }
     helm = {
       source  = "hashicorp/helm"

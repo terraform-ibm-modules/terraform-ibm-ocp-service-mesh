@@ -74,10 +74,10 @@ locals {
 
 module "ocp_base" {
   source                              = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version                             = "3.87.5"
+  version                             = "3.90.2"
   resource_group_id                   = module.resource_group.resource_group_id
   region                              = var.region
-  tags                                = var.resource_tags
+  resource_tags                       = var.resource_tags
   cluster_name                        = "${var.prefix}-cluster"
   force_delete_storage                = true
   vpc_id                              = ibm_is_vpc.vpc.id

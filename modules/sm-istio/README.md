@@ -183,7 +183,7 @@ For all the configuration parameters details refer to the section below
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_istio_namespace"></a> [istio\_namespace](#module\_istio\_namespace) | terraform-ibm-modules/namespace/ibm | v2.0.1 |
+| <a name="module_istio_namespace"></a> [istio\_namespace](#module\_istio\_namespace) | terraform-ibm-modules/namespace/ibm | v2.0.2 |
 
 ### Resources
 
