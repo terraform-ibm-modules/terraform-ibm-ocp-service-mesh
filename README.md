@@ -68,6 +68,36 @@ The submodule [modules/sm-istio-ingress](./modules/sm-istio-ingress) and [module
 
 For more details about Gateway injection, see [Gateways](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/gateways/index) and [About gateway injection](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/gateways/ossm-about-gateways#ossm-about-gateway-injection_ossm-about-gateways)
 
+
+### Uninstalling Operator and Custom Resources
+
+This module provides a `terraform_data` resource `undeploy_servicemesh` whose purpose is to remove RedHat ServiceMesh from the cluster at destroy time.
+This resource creation is controlled through the input variable`var.clean_servicemesh_on_undeploy`: only when it is set to `true` it is created (default is `false`). When this input variable is `true`, on resource deletion (i.e. during `terraform destroy`), a cleanup script is triggered to remove the [Sail operator](https://github.com/istio-ecosystem/sail-operator/tree/main), its ClusterServiceVersions (CSVs), and all associated custom resources definitions (CRDs).
+
+> **Important:** the `undeploy_servicemesh` terraform_data resource leverages on `triggers_replace` block, and this makes Terraform to plan to recreate this resource everytime any of the referenced values change. This can also happen when the module is called with an explicit `depends_on`, because data sources will not be evaluated at plan time and Terraform will treat the trigger values as unknown — causing it to destroy and recreate the resource. During _destroy phase_ this resource triggers the cleanup script: this could be a destructive operation as it would remove the ServiceMesh operator and the related CRDs from the cluster.
+
+To guard against accidental cleanup, the script includes pre-flight checks: if any active `Istio` or `IstioCNI` resource is detected in the cluster, the script will exit (without making terraform deployment to fail) without making any changes, protecting workloads that are still relying on the mesh.
+
+The default value of `clean_servicemesh_on_undeploy` is `false` to prevent unintentional resource recreation (and the resulting cleanup) during normal plan/apply cycles. **It is strongly recommended to keep this value set to `false` throughout the lifetime of your deployment and to change it only immediately before you intend to destroy the deployment through a `terraform destroy`.**
+
+#### Recommended uninstall workflow
+
+1. Keep `clean_servicemesh_on_undeploy = false` during the initial deployment and all subsequent applies.
+2. Only when you are ready to tear down the infrastructure, set `clean_servicemesh_on_undeploy = true` in your configuration.
+3. Run `terraform apply` immediately after — this will create the terraform_data `undeploy_servicemesh` resource in the terraform state.
+4. Run `terraform destroy` right away — the cleanup script executes and removes the operator, CSVs, and custom resources before the rest of the infrastructure is torn down.
+
+> **Note:** Do not leave `clean_servicemesh_on_undeploy = true` in your configuration during day-to-day operations. Because of the `triggers_replace` behaviour described above, any plan/apply cycle where the trigger values are unknown will cause Terraform to destroy and recreate this resource, inadvertently running the cleanup script against a live cluster.
+
+
+
+#### RedHat ServiceMesh manual cleanup
+
+
+You may need to manually cleanup the RedHat ServiceMesh without leveraging on this resource: for example you could have skipped steps 2–3 and proceed directly to `terraform destroy` without the resource in the terraform state, in this case the cleanup script will not run; or you could have in your cluster other Istio resources that are preventing the script to go on with removal for the safety preliminary check.
+In all these cases you can remove the operator and related resources manually by following the official Red Hat documentation: [Uninstalling Red Hat OpenShift Service Mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.3/html-single/uninstalling/index).
+
+
 <!-- The following content is automatically populated by the pre-commit hook -->
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
@@ -300,7 +330,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_clean_servicemesh_on_undeploy"></a> [clean\_servicemesh\_on\_undeploy](#input\_clean\_servicemesh\_on\_undeploy) | Flag to perform a cleanup of ServiceMesh operator custom resources when undeploying the module. Default to true. For more details refer to https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index . | `bool` | `true` | no |
+| <a name="input_clean_servicemesh_on_undeploy"></a> [clean\_servicemesh\_on\_undeploy](#input\_clean\_servicemesh\_on\_undeploy) | Flag to perform a cleanup of ServiceMesh operator and custom resources when undeploying the module. Defaults to false to prevent accidental execution of the cleanup script. Before running terraform destroy, set this value to true and run terraform apply once. This creates the terraform\_data resource that executes the cleanup script during the destroy phase. For more information, see the Red Hat OpenShift Service Mesh uninstall documentation: https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index. | `bool` | `false` | no |
 | <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
 | <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
 | <a name="input_develop_mode"></a> [develop\_mode](#input\_develop\_mode) | If set to true, increases the wait time for operator deployment and undeployment to facilitate cluster debugging, and prevents the `helm_release` resource from automatically rolling back changes if the helm deployment fails. | `bool` | `false` | no |

@@ -209,7 +209,7 @@ data "ibm_container_cluster_config" "cluster_config" {
 module "istio_namespace" {
   count   = var.create_namespace ? 1 : 0
   source  = "terraform-ibm-modules/namespace/ibm"
-  version = "v2.0.1"
+  version = "v2.0.2"
   namespaces = [
     {
       name = var.namespace
