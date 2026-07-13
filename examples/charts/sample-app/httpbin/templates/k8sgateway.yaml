@@ -8,7 +8,7 @@ spec:
   gatewayClassName: istio
   addresses:
   - type: Hostname
-    value: alb-ingress.alb-ingress.svc.cluster.local
+    value: alb-ingress.alb-ingress.svc.cluster.local # format: <istio-ingress-svc-name>.<istio-ingress-namespace>.svc.cluster.local
   listeners:
   - name: http
     protocol: HTTP

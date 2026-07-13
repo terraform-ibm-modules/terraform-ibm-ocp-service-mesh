@@ -107,6 +107,34 @@ spec:
 
 Waypoints provide the same L7 capabilities as sidecars but with better resource efficiency since they are deployed only where needed, not in every pod.
 
+## Waypoint as Egress Gateway
+
+This module can also be used to deploy a waypoint that acts as an **egress gateway**, giving you visibility and control over outbound traffic to external destinations — without needing a dedicated Istio egress gateway deployment.
+
+When deployed for egress, this module creates a Kubernetes `Gateway` resource that runs standalone Istio proxy pods. You then create a `ServiceEntry` resource that declares the external host and sets the `istio.io/use-waypoint` label to the name of the `Gateway`. Ztunnel will route all outbound traffic matching that `ServiceEntry` through the waypoint proxies, where you can apply `AuthorizationPolicy`, `HTTPRoute`, or other Istio resources to control and observe the outbound traffic.
+
+### Example — ServiceEntry for Egress via Waypoint
+
+```yaml
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: httpbin.org
+  namespace: istio-egress
+  labels:
+    istio.io/use-waypoint: wp-egress-gateway # replace wp-egress-gateway with the name of the Gateway resource created by this module
+spec:
+  hosts:
+  - httpbin.org
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  resolution: DNS
+```
+
+With this in place, any pod in the mesh that sends traffic to `httpbin.org` on port 80 will have that traffic transparently routed through the waypoint proxies before leaving the cluster, giving you a single point of egress control and observability for that domain.
+
 ## Prerequisites
 
 The namespace where the waypoint is deployed must already exist. It only requires the `istio-discovery: enabled` label so that the Istio control plane can discover and manage it. The `istio.io/dataplane-mode: ambient` label is **not** required on the waypoint namespace — that label belongs on **application** namespaces whose workload traffic should be intercepted by ztunnel.
