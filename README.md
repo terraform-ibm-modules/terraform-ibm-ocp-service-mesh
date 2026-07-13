@@ -17,6 +17,16 @@ You can also control placement of the gateways on the desired cluster's worker n
 
 For more details about the Red Hat OpenShift Service Mesh, see [Red Hat OpenShift Service Mesh 3.0](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0) and [Installing Red Hat OpenShift Service Mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh)
 
+### Ambient Mode (Sidecarless)
+
+This module supports Istio **ambient mode** — a sidecarless approach where a node-level ztunnel DaemonSet replaces per-pod Envoy sidecars. Ambient mode significantly reduces resource consumption and removes the need for sidecar injection.
+
+To deploy in ambient mode, set `is_ambient_mode = true` on both [modules/sm-istio](./modules/sm-istio) and [modules/sm-istio-cni](./modules/sm-istio-cni), and deploy [modules/ztunnel](./modules/ztunnel) for the data plane. When L7 traffic management is required, [modules/waypoint](./modules/waypoint) can be used to deploy waypoint proxies on a per-namespace or per-service basis.
+
+For a full comparison of sidecar mode and ambient mode — including component differences, required Terraform variables, and namespace labelling — see **[docs/sidecar-vs-ambient.md](./docs/sidecar-vs-ambient.md)**.
+
+For a working end-to-end example, see **[examples/ambient](./examples/ambient/README.md)**.
+
 ### Service Mesh discovery selectors
 
 The submodule [modules/sm-istio](./modules/sm-istio) supports configuring Service Mesh discovery selectors, to configure each Istio controlplane workloads discovery attributes.
