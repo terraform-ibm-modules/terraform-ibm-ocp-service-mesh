@@ -386,3 +386,9 @@ variable "mesh_config_status_port" {
   default     = null
   description = "Port on which the Envoy health check, readiness probe, and Prometheus metrics are exposed. When null, uses Istio default (15020). For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
 }
+
+variable "proxy_exclude_ip_ranges" {
+  type        = string
+  default     = null
+  description = "Comma-separated list of IP ranges in CIDR form to be excluded from Envoy proxy interception (e.g. \"10.0.0.1/8,192.168.100.0/24\"). Maps to spec.values.global.proxy.excludeIPRanges. When null, no exclusions are configured. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#proxyconfig"
+}
