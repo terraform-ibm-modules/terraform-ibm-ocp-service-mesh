@@ -1,6 +1,7 @@
 # Service Mesh Istio module
 
 ## Overview
+
 This module deploys the Istio resource that defines a single Istio controlplane on a cluster
 
 ### Discovery selectors configuration
