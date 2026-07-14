@@ -4,7 +4,9 @@ locals {
   istio_egress_release_name = "${var.namespace}-${var.name}"
   istio_egress_chart_path   = "istio-egress"
 
-  service_name = try(trimspace(var.egress_service_name) != "" ? var.egress_service_name : "${local.prefix}${var.name}", "${local.prefix}${var.name}")
+  egress_deployment_name      = var.egress_deployment_name != null && var.egress_deployment_name != "" ? var.egress_deployment_name : "${local.prefix}${var.name}"
+  egress_service_name         = var.egress_service_name != null && var.egress_service_name != "" ? var.egress_service_name : "${local.prefix}${var.name}"
+  egress_service_account_name = var.egress_service_account_name != null && var.egress_service_account_name != "" ? var.egress_service_account_name : "${local.prefix}${var.name}-service-account"
 
   egress_discovery_configuration = var.egress_discovery_custom_configuration != null ? var.egress_discovery_custom_configuration : (
     var.istio_mesh_enrollment == "default" ? {
@@ -27,6 +29,9 @@ locals {
       "ports" : var.egress_ports
     }
   }
+
+  egress_hpa_name = try(var.egress_autoscale_configuration.hpa_name, null) != null && try(var.egress_autoscale_configuration.hpa_name, "") != "" ? var.egress_autoscale_configuration.hpa_name : "${local.prefix}${var.name}"
+  egress_pdb_name = try(var.egress_pdb_configuration.name, null) != null && try(var.egress_pdb_configuration.name, "") != "" ? var.egress_pdb_configuration.name : "${local.prefix}${var.name}"
 
   egress_autoscale_configuration = {
     "egress" : {
@@ -181,23 +186,33 @@ resource "helm_release" "istio_egress" {
       value = var.egress_termination_grace_period
     },
     {
-      name  = "egress.deploymentName"
-      type  = "string"
-      value = var.egress_deployment_name
-    },
-    {
       name  = "egress.extendSelector"
       value = var.extend_selectors
     },
     {
       name  = "egress.serviceName"
       type  = "string"
-      value = var.egress_service_name
+      value = local.egress_service_name
     },
     {
       name  = "egress.serviceAccountName"
       type  = "string"
-      value = var.egress_service_account_name != null ? var.egress_service_account_name : "${local.prefix}${var.name}-service-account"
+      value = local.egress_service_account_name
+    },
+    {
+      name  = "egress.autoscale.hpa_name"
+      type  = "string"
+      value = local.egress_hpa_name
+    },
+    {
+      name  = "egress.pdb.name"
+      type  = "string"
+      value = local.egress_pdb_name
+    },
+    {
+      name  = "egress.deploymentName"
+      type  = "string"
+      value = local.egress_deployment_name
     },
   ]
 
@@ -225,7 +240,7 @@ resource "null_resource" "confirm_egress_operational" {
     helm_revision = helm_release.istio_egress.metadata.revision
   }
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"${local.service_name}\""
+    command     = "${path.module}/scripts/confirm-egress-operational.sh \"${var.namespace}\" \"${local.egress_service_name}\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path

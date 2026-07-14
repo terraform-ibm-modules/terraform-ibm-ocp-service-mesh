@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- toYaml .Values.ingress.istioselectors | nindent 4 }}
     release: istio
-  name: {{ .Values.ingress.name }}
+  name: {{ .Values.ingress.pdb.name }}
   namespace: {{ .Values.ingress.namespace }}
 spec:
   {{- if .Values.ingress.pdb.minAvailable }}
@@ -19,7 +19,7 @@ spec:
     matchLabels:
       {{- toYaml .Values.ingress.istioselectors | nindent 6 }}
       {{- if .Values.ingress.extendSelector }}
-      deploymentName: {{ default .Values.ingress.name .Values.ingress.deploymentName }}
+      deploymentName: {{ .Values.ingress.deploymentName }}
       {{- end }}
 {{- end }}
 {{- end }}

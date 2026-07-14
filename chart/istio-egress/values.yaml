@@ -22,7 +22,7 @@ egress:
   internalTrafficPolicy: Cluster
   autoscale:
     enabled: false
-    # hpa_name: default
+    hpa_name: null
     # autoscaleMin: 1
     # autoscaleMax: 3
     # cpu:
@@ -30,6 +30,7 @@ egress:
     # memory:
     #   targetavgutil: 80
   pdb:
+    name: null
     # minAvailable: 1
     # maxUnavailable: 2
   replicacount: 1

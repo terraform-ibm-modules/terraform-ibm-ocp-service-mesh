@@ -8,7 +8,7 @@ metadata:
     {{- toYaml .Values.ingress.istioselectors | nindent 4 }}
     {{- end }}
     release: istio
-  name: {{ default .Values.ingress.name .Values.ingress.autoscale.hpa_name }}
+  name: {{ .Values.ingress.autoscale.hpa_name }}
   namespace: {{ .Values.ingress.namespace }}
 spec:
   metrics:
@@ -37,6 +37,6 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ default .Values.ingress.name .Values.ingress.deploymentName }}
+    name: {{ .Values.ingress.deploymentName }}
 {{- end }}
 {{- end }}

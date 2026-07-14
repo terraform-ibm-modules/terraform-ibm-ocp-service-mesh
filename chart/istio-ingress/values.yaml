@@ -36,7 +36,7 @@ ingress:
   internalTrafficPolicy: Local
   autoscale:
     enabled: false
-    # hpa_name: default
+    hpa_name: null
     # autoscaleMin: 1
     # autoscaleMax: 3
     # cpu:
@@ -44,6 +44,7 @@ ingress:
     # memory:
     #   targetavgutil: 80
   pdb:
+    name: null
     # minAvailable: 1
     # maxUnavailable: 2
   replicacount: 1
