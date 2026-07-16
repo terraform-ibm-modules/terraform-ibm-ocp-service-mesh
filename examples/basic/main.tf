@@ -112,6 +112,10 @@ module "deploy_istio" {
   create_namespace  = true
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+  # Opt-in sidecar injection (Mesh 2 behavior): only workloads with
+  # sidecar.istio.io/inject: "true" receive a sidecar. Remove or set to
+  # "enabled" to revert to Istio default (opt-out / inject-all).
+  proxy_auto_inject = "disabled"
 }
 
 module "deploy_istio_cni" {

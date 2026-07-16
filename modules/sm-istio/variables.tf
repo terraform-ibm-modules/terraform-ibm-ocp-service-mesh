@@ -392,3 +392,13 @@ variable "proxy_exclude_ip_ranges" {
   default     = null
   description = "Comma-separated list of IP ranges in CIDR form to be excluded from Envoy proxy interception (e.g. \"10.0.0.1/8,192.168.100.0/24\"). Maps to spec.values.global.proxy.excludeIPRanges. When null, no exclusions are configured. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#proxyconfig"
 }
+
+variable "proxy_auto_inject" {
+  type        = string
+  default     = null
+  description = "Controls the sidecar injector policy. Set to 'disabled' for opt-in injection (Mesh 2 behavior — only workloads with sidecar.istio.io/inject: 'true' receive a sidecar). Set to 'enabled' or leave null for the Istio default (opt-out). Maps to spec.values.global.proxy.autoInject. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#proxyconfig"
+  validation {
+    condition     = var.proxy_auto_inject == null || contains(["enabled", "disabled"], var.proxy_auto_inject)
+    error_message = "proxy_auto_inject must be 'enabled', 'disabled', or null."
+  }
+}

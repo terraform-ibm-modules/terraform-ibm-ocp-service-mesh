@@ -19,6 +19,12 @@ spec:
       {{- if .Values.istioconfiguration.proxy.excludeIPRanges }}
       proxy:
         excludeIPRanges: {{ .Values.istioconfiguration.proxy.excludeIPRanges | quote }}
+        {{- if .Values.istioconfiguration.proxy.autoInject }}
+        autoInject: {{ .Values.istioconfiguration.proxy.autoInject }}
+        {{- end }}
+      {{- else if .Values.istioconfiguration.proxy.autoInject }}
+      proxy:
+        autoInject: {{ .Values.istioconfiguration.proxy.autoInject }}
       {{- end }}
     pilot:
       enabled: {{ .Values.istioconfiguration.pilot.enabled }}
