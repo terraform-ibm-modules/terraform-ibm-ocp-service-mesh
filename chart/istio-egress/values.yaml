@@ -30,6 +30,7 @@ egress:
     # memory:
     #   targetavgutil: 80
   pdb:
+    enabled: false
     name: null
     # minAvailable: 1
     # maxUnavailable: 2

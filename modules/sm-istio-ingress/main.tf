@@ -266,6 +266,10 @@ resource "helm_release" "istio_ingress" {
       value = local.ingress_pdb_name
     },
     {
+      name  = "ingress.pdb.enabled"
+      value = var.ingress_pdb_configuration != null
+    },
+    {
       name  = "ingress.deploymentName"
       type  = "string"
       value = local.ingress_deployment_name

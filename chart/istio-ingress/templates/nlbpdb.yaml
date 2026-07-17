@@ -1,4 +1,4 @@
-{{- if .Values.ingress.pdb }}
+{{- if .Values.ingress.pdb.enabled }}
 {{- if (eq .Values.ingress.lbtype "nlb") }}
 {{- range $lb_subnet, $lb_subnet_zone := .Values.ingress.nlbzonessubnets }}
 apiVersion: policy/v1
