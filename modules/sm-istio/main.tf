@@ -202,7 +202,7 @@ locals {
     }
   }
 
-  istio_proxy_auto_inject = var.proxy_auto_inject == null ? {} : {
+  istio_proxy_auto_inject = {
     "istioconfiguration" : {
       "proxy" : {
         "autoInject" : var.proxy_auto_inject

@@ -7,7 +7,7 @@ istioconfiguration:
   enableNetworkPolicy: true
   proxy:
     excludeIPRanges:
-    autoInject:        # leave empty for backwards compat; set to "disabled" for opt-in (Mesh 2) behavior
+    autoInject: enabled
   pilot:
     env:
     enabled: true

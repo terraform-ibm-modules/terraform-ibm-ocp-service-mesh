@@ -395,10 +395,11 @@ variable "proxy_exclude_ip_ranges" {
 
 variable "proxy_auto_inject" {
   type        = string
-  default     = null
-  description = "Controls the sidecar injector policy. Set to 'disabled' for opt-in injection (Mesh 2 behavior — only workloads with sidecar.istio.io/inject: 'true' receive a sidecar). Set to 'enabled' or leave null for the Istio default (opt-out). Maps to spec.values.global.proxy.autoInject. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#proxyconfig"
+  nullable    = false
+  default     = "enabled"
+  description = "Controls automatic sidecar injection. Set to 'disabled' to inject only workloads that have the annotation sidecar.istio.io/inject: 'true'. Set to 'enabled' (default) to inject all workloads except those with sidecar.istio.io/inject: 'false'. Maps to spec.values.global.proxy.autoInject. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#proxyconfig"
   validation {
-    condition     = var.proxy_auto_inject == null || contains(["enabled", "disabled"], var.proxy_auto_inject)
-    error_message = "proxy_auto_inject must be 'enabled', 'disabled', or null."
+    condition     = contains(["enabled", "disabled"], var.proxy_auto_inject)
+    error_message = "proxy_auto_inject must be 'enabled' or 'disabled'."
   }
 }
