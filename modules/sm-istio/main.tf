@@ -201,6 +201,14 @@ locals {
       }
     }
   }
+
+  istio_proxy_auto_inject = {
+    "istioconfiguration" : {
+      "proxy" : {
+        "autoInject" : var.proxy_auto_inject
+      }
+    }
+  }
 }
 
 ##############################################################################
@@ -372,6 +380,7 @@ resource "helm_release" "istio_controlplane" {
       yamlencode(local.istio_mesh_config_status_port),
       yamlencode(local.istio_mesh_config_enable_prometheus_merge),
       yamlencode(local.istio_proxy_exclude_ip_ranges),
+      yamlencode(local.istio_proxy_auto_inject),
     ],
     length(local.merged_proxy_metadata) > 0 ? [yamlencode(local.istio_mesh_config_proxy_metadata)] : []
   )
