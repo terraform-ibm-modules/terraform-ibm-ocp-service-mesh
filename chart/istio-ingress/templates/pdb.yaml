@@ -1,4 +1,4 @@
-{{- if .Values.ingress.pdb }}
+{{- if .Values.ingress.pdb.enabled }}
 {{- if or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "other") }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget

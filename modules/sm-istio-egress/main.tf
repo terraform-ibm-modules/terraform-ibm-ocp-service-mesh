@@ -210,6 +210,10 @@ resource "helm_release" "istio_egress" {
       value = local.egress_pdb_name
     },
     {
+      name  = "egress.pdb.enabled"
+      value = var.egress_pdb_configuration != null
+    },
+    {
       name  = "egress.deploymentName"
       type  = "string"
       value = local.egress_deployment_name

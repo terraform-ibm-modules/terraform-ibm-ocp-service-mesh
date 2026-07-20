@@ -1,4 +1,4 @@
-{{- if .Values.egress.pdb }}
+{{- if .Values.egress.pdb.enabled }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
