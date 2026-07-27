@@ -16,6 +16,11 @@ spec:
         enabled: {{ .Values.istioconfiguration.defaultpdb }}
       networkPolicy:
         enabled: {{ .Values.istioconfiguration.enableNetworkPolicy }}
+      proxy:
+        autoInject: {{ .Values.istioconfiguration.proxy.autoInject }}
+        {{- if .Values.istioconfiguration.proxy.excludeIPRanges }}
+        excludeIPRanges: {{ .Values.istioconfiguration.proxy.excludeIPRanges | quote }}
+        {{- end }}
     pilot:
       enabled: {{ .Values.istioconfiguration.pilot.enabled }}
       autoscaleEnabled: {{ .Values.istioconfiguration.pilot.autoscale.enabled }}

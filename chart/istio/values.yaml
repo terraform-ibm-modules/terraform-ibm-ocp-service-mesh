@@ -5,6 +5,9 @@ istioconfiguration:
   defaultpdb: false
   updateStrategyType: InPlace
   enableNetworkPolicy: true
+  proxy:
+    excludeIPRanges:
+    autoInject: enabled
   pilot:
     env:
     enabled: true
