@@ -17,5 +17,6 @@ variable "rollback_on_failure" {
 variable "is_ambient_mode" {
   type        = bool
   default     = false
+  nullable    = false
   description = "Enable Istio ambient mode. Ambient mode is a sidecarless approach for service mesh that uses a shared node proxy instead of per-pod sidecars."
 }

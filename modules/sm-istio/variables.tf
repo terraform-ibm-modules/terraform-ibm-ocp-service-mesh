@@ -390,6 +390,7 @@ variable "mesh_config_status_port" {
 variable "is_ambient_mode" {
   type        = bool
   default     = false
+  nullable    = false
   description = "Enable Istio ambient mode. Ambient mode is a sidecarless approach for service mesh that uses a shared node proxy instead of per-pod sidecars."
 }
 
@@ -397,6 +398,11 @@ variable "ztunnel_namespace" {
   type        = string
   default     = "ztunnel"
   description = "Namespace for the ztunnel component when ambient mode is enabled. Only used when is_ambient_mode is true."
+
+  validation {
+    condition     = var.ztunnel_namespace != null && var.ztunnel_namespace != ""
+    error_message = "ztunnel_namespace value can not be null or empty"
+  }
 }
 
 variable "proxy_exclude_ip_ranges" {

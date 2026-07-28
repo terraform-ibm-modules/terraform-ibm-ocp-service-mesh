@@ -2,6 +2,11 @@ variable "namespace" {
   type        = string
   description = "Namespace where to install ZTunnel"
   default     = "ztunnel"
+
+  validation {
+    condition     = var.namespace != null && var.namespace != ""
+    error_message = "Namespace value can not be null or empty"
+  }
 }
 
 variable "ztunnel_resources_configuration" {

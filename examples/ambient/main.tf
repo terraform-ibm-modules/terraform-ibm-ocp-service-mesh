@@ -166,7 +166,7 @@ module "basic_workload_ingress" {
   ingress_service_type      = "LoadBalancer"
   ingress_ip_type           = "public"
   istio_mesh_enrollment     = "default"
-  ingress_affinity          = {} # local.alb_affinity
+  ingress_affinity          = {}
   ingress_selectors = {
     "istio" : "ingress-gateway",
   }

@@ -1,6 +1,11 @@
 variable "namespace" {
   type        = string
   description = "Namespace where the waypoint resources will be deployed."
+
+  validation {
+    condition     = var.namespace != null && var.namespace != ""
+    error_message = "Namespace value can not be null or empty"
+  }
 }
 
 variable "configmap_name" {
