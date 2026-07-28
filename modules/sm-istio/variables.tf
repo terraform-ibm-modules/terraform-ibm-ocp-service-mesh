@@ -397,6 +397,7 @@ variable "ztunnel_namespace" {
   type        = string
   default     = "ztunnel"
   description = "Namespace for the ztunnel component when ambient mode is enabled. Only used when is_ambient_mode is true."
+}
 
 variable "proxy_exclude_ip_ranges" {
   type        = string
