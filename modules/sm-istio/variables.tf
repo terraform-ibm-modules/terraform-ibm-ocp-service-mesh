@@ -386,6 +386,7 @@ variable "mesh_config_status_port" {
   default     = null
   description = "Port on which the Envoy health check, readiness probe, and Prometheus metrics are exposed. When null, uses Istio default (15020). For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
 }
+
 variable "is_ambient_mode" {
   type        = bool
   default     = false
@@ -396,4 +397,20 @@ variable "ztunnel_namespace" {
   type        = string
   default     = "ztunnel"
   description = "Namespace for the ztunnel component when ambient mode is enabled. Only used when is_ambient_mode is true."
+
+variable "proxy_exclude_ip_ranges" {
+  type        = string
+  default     = null
+  description = "Comma-separated list of IP ranges in CIDR form to be excluded from Envoy proxy interception (e.g. \"10.0.0.1/8,192.168.100.0/24\"). Maps to spec.values.global.proxy.excludeIPRanges. When null, no exclusions are configured. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#proxyconfig"
+}
+
+variable "proxy_auto_inject" {
+  type        = string
+  nullable    = false
+  default     = "enabled"
+  description = "Controls automatic sidecar injection. Set to 'disabled' to inject only workloads that have the annotation sidecar.istio.io/inject: 'true'. Set to 'enabled' (default) to inject all workloads except those with sidecar.istio.io/inject: 'false'. Maps to spec.values.global.proxy.autoInject. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#proxyconfig"
+  validation {
+    condition     = contains(["enabled", "disabled"], var.proxy_auto_inject)
+    error_message = "proxy_auto_inject must be 'enabled' or 'disabled'."
+  }
 }

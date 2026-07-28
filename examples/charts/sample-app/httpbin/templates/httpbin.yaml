@@ -42,6 +42,14 @@ kind: Deployment
 metadata:
   name: httpbin
   namespace: {{ .Values.namespace }}
+  {{- if .Values.checkov_skip_list }}
+  {{- if .Values.checkov_skip_list.deployment }}
+  annotations:
+  {{- range $k, $v := .Values.checkov_skip_list.deployment }}
+    {{ $k }}: {{ $v | quote }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 spec:
   replicas: 1
   selector:

@@ -3,3 +3,25 @@ useGatewayApi: false
 gateway:
   istioSelector: ingress-gateway
   istioPort: 80
+checkov_skip_list:
+  deployment:
+    # Security checks not enforced for this httpbin sample app
+    checkov.io/skip1: CKV_K8S_37   # Minimize containers with capabilities assigned
+    checkov.io/skip2: CKV_K8S_31   # Ensure seccomp profile is set to docker/default or runtime/default
+    checkov.io/skip3: CKV_K8S_8    # Liveness probe should be configured
+    checkov.io/skip4: CKV_K8S_12   # Memory requests should be set
+    checkov.io/skip5: CKV_K8S_20   # Containers should not run with allowPrivilegeEscalation
+    checkov.io/skip6: CKV_K8S_15   # Image pull policy should be Always
+    checkov.io/skip7: CKV_K8S_13   # Memory limits should be set
+    checkov.io/skip8: CKV_K8S_40   # Containers should run as a high UID to avoid host conflict
+    checkov.io/skip9: CKV_K8S_10   # CPU requests should be set
+    checkov.io/skip10: CKV_K8S_22  # Use read-only filesystem for containers where possible
+    checkov.io/skip11: CKV_K8S_9   # Readiness probe should be configured
+    checkov.io/skip12: CKV_K8S_28  # Minimize the admission of containers with the NET_RAW capability
+    checkov.io/skip13: CKV_K8S_29  # Apply security context to your pods and containers
+    checkov.io/skip14: CKV_K8S_30  # Apply security context to your containers
+    checkov.io/skip15: CKV_K8S_38  # Ensure that service account tokens are only mounted where necessary
+    checkov.io/skip16: CKV_K8S_23  # Minimize the admission of root containers
+    checkov.io/skip17: CKV_K8S_43  # Image should use digest
+    checkov.io/skip18: CKV_K8S_11  # CPU limits should be set
+    checkov.io/skip19: CKV2_K8S_6  # Minimize the admission of pods which lack an associated NetworkPolicy

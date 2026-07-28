@@ -7,6 +7,9 @@ istioconfiguration:
   enableNetworkPolicy: true
   ambient: false
   ztunnelNamespace: ztunnel
+  proxy:
+    excludeIPRanges:
+    autoInject: enabled
   pilot:
     env:
     enabled: true
