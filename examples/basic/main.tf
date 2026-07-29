@@ -112,6 +112,10 @@ module "deploy_istio" {
   create_namespace  = true
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+
+  istiod_pdb_configuration = {
+    minAvailable = "1"
+  }
 }
 
 module "deploy_istio_cni" {

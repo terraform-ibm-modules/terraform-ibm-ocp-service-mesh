@@ -85,6 +85,36 @@ variable "istio_enable_default_pod_disruption_budget" {
   nullable    = false
 }
 
+variable "istiod_pdb_configuration" {
+  description = "Custom PodDisruptionBudget configuration for the istiod (control plane) deployment. When set, a dedicated PodDisruptionBudget is created for istiod pods (labels: app=istiod, istio=pilot). Set to null to rely solely on the default PDB controlled by var.istio_enable_default_pod_disruption_budget. Only one of minAvailable or maxUnavailable may be set."
+  default     = null
+  type = object({
+    name           = optional(string, null)
+    minAvailable   = optional(string, null)
+    maxUnavailable = optional(string, null)
+  })
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.minAvailable != null && var.istiod_pdb_configuration.maxUnavailable != null ? false : true)
+    error_message = "Only one of minAvailable and maxUnavailable for var.istiod_pdb_configuration can be set to a value that is not null."
+  }
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.minAvailable == null ? true : can(regex("^([0-9]{1,3}%?)$", var.istiod_pdb_configuration.minAvailable)))
+    error_message = "minAvailable for var.istiod_pdb_configuration is not valid. It must be a number or percentage (e.g. '1' or '50%')."
+  }
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.maxUnavailable == null ? true : can(regex("^([0-9]{1,3}%?)$", var.istiod_pdb_configuration.maxUnavailable)))
+    error_message = "maxUnavailable for var.istiod_pdb_configuration is not valid. It must be a number or percentage (e.g. '1' or '50%')."
+  }
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.minAvailable == null ? true : tostring(var.istiod_pdb_configuration.minAvailable) != "0")
+    error_message = "minAvailable for var.istiod_pdb_configuration must be greater than 0."
+  }
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.minAvailable == null ? true : var.istiod_pdb_configuration.minAvailable != "0%")
+    error_message = "minAvailable for var.istiod_pdb_configuration must be greater than 0%."
+  }
+}
+
 variable "istio_update_strategy_type" {
   type        = string
   description = "Type of strategy to use. Allowed values are InPlace or RevisionBased. When InPlace strategy is used, the existing Istio control plane is updated in-place. When the RevisionBased strategy is used, a new Istio control plane instance is created for every change to the Istio.spec.version field. For more details refer to https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#updatestrategytype. Default to InPlace"

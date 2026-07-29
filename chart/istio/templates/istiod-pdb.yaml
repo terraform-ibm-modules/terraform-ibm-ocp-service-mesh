@@ -1,0 +1,22 @@
+{{- if .Values.istioconfiguration.istiod.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app: istiod
+    istio: pilot
+    release: istio
+  name: {{ .Values.istioconfiguration.istiod.pdb.name }}
+  namespace: {{ .Values.istioconfiguration.namespace }}
+spec:
+  {{- if .Values.istioconfiguration.istiod.pdb.minAvailable }}
+  minAvailable: {{ .Values.istioconfiguration.istiod.pdb.minAvailable }}
+  {{- end }}
+  {{- if .Values.istioconfiguration.istiod.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.istioconfiguration.istiod.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: istiod
+      istio: pilot
+{{- end }}
