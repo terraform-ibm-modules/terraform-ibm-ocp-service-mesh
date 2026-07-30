@@ -46,6 +46,6 @@ istioconfiguration:
   istiod:
     pdb:
       enabled: false
-      name:
-      minAvailable:
-      maxUnavailable:
+      name: null
+      # minAvailable: 1
+      # maxUnavailable: 2
