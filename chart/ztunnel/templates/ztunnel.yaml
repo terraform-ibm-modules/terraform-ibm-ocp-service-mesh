@@ -7,8 +7,8 @@ spec:
   profile: ambient
   values:
     ztunnel:
-      resources:
       {{- if .Values.ztunnel.resources }}
+      resources:
       {{- toYaml .Values.ztunnel.resources | nindent 8 }}
       {{- end }}
       {{- if .Values.ztunnel.tolerations }}

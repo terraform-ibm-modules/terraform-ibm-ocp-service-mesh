@@ -63,7 +63,7 @@ One of the most common migration trip-wires is that namespace labels differ betw
 
 | Purpose | Sidecar Mode | Ambient Mode |
 |---|---|---|
-| Enrol namespace into the mesh | `istio-injection=enabled` | `istio.io/dataplane-mode=ambient` |
+| Enroll namespace into the mesh | `istio-injection=enabled` | `istio.io/dataplane-mode=ambient` |
 | Make namespace visible to Istiod | `istio-discovery=enabled` | `istio-discovery=enabled` (same) |
 | Route namespace traffic through a waypoint (L7) | Not applicable | `istio.io/use-waypoint=<gateway-name>` |
 | Specify waypoint namespace when it differs from the app namespace | Not applicable | `istio.io/use-waypoint-namespace=<waypoint-ns>` |
