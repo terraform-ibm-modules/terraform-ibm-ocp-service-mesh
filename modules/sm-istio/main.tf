@@ -286,6 +286,13 @@ resource "helm_release" "istio_controlplane" {
 
   disable_openapi_validation = false
 
+  lifecycle {
+    precondition {
+      condition     = var.istiod_pdb_configuration == null ? true : !var.istio_enable_default_pod_disruption_budget
+      error_message = "When var.istiod_pdb_configuration is set, var.istio_enable_default_pod_disruption_budget must be set to false to avoid multiple PodDisruptionBudgets targeting the same istiod pods. Kubernetes recommends a single PDB per set of pods."
+    }
+  }
+
   set = [
     {
       name  = "istioconfiguration.pilot.enabled"
