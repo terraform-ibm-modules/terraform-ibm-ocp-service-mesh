@@ -359,6 +359,13 @@ resource "helm_release" "istio_controlplane" {
       name  = "istioconfiguration.peerAuthenticationName"
       type  = "string"
       value = var.peer_authentication_name
+      }, {
+      name  = "istioconfiguration.ambient"
+      value = var.is_ambient_mode
+      }, {
+      name  = "istioconfiguration.ztunnelNamespace"
+      type  = "string"
+      value = var.ztunnel_namespace
     }
   ]
 

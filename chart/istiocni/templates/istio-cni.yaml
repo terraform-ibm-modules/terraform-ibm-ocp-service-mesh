@@ -6,3 +6,10 @@ metadata:
   name: {{ .Values.istiocniconfiguration.name }}
 spec:
   namespace: {{ .Values.istiocniconfiguration.namespace }}
+  {{- if .Values.istiocniconfiguration.ambient }}
+  profile: ambient
+  values:
+    cni:
+      ambient:
+        dnsCapture: true
+  {{- end }}

@@ -5,6 +5,8 @@ istioconfiguration:
   defaultpdb: false
   updateStrategyType: InPlace
   enableNetworkPolicy: true
+  ambient: false
+  ztunnelNamespace: ztunnel
   proxy:
     excludeIPRanges:
     autoInject: enabled

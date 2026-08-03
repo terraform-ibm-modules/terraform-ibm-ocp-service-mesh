@@ -1,0 +1,16 @@
+namespace: istio-system
+
+configMap:
+  name: waypoint-config
+  deployment:
+    replicas: 1
+    tolerations: []
+    affinity: {}
+    resources: {}
+
+gateway:
+  name: waypoint
+  waypointFor: service
+  allowedRoutes: All
+  labels: {}
+  annotations: {}

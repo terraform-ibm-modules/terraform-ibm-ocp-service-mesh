@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configMap.name }}
+  namespace: {{ .Values.namespace }}
+data:
+  deployment: |
+
+    spec:
+      {{- if .Values.configMap.deployment.replicas }}
+      replicas: {{ .Values.configMap.deployment.replicas }}
+      {{- end }}
+
+      template:
+
+        spec:
+          {{- if .Values.configMap.deployment.affinity }}
+          affinity:
+            {{- if .Values.configMap.deployment.affinity.podAffinity }}
+            podAffinity:
+              {{- toYaml .Values.configMap.deployment.affinity.podAffinity | nindent 14 }}
+            {{- end }}
+            {{- if .Values.configMap.deployment.affinity.nodeAffinity }}
+            nodeAffinity:
+              {{- toYaml .Values.configMap.deployment.affinity.nodeAffinity | nindent 14 }}
+            {{- end }}
+            {{- if .Values.configMap.deployment.affinity.podAntiAffinity }}
+            podAntiAffinity:
+              {{- toYaml .Values.configMap.deployment.affinity.podAntiAffinity | nindent 14 }}
+            {{- end }}
+          {{- end }}
+
+          tolerations:
+          {{- if .Values.configMap.deployment.tolerations }}
+          {{- toYaml .Values.configMap.deployment.tolerations | nindent 10 }}
+          {{- end }}
+
+          containers:
+          - name: istio-proxy
+            resources:
+            {{- if .Values.configMap.deployment.resources }}
+            {{- toYaml .Values.configMap.deployment.resources | nindent 14 }}
+            {{- end }}

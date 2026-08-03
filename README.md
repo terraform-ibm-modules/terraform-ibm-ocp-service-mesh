@@ -17,6 +17,15 @@ You can also control placement of the gateways on the desired cluster's worker n
 
 For more details about the Red Hat OpenShift Service Mesh, see [Red Hat OpenShift Service Mesh 3.0](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0) and [Installing Red Hat OpenShift Service Mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh)
 
+### Ambient Mode (Sidecarless)
+
+This module supports Istio **ambient mode** — a sidecarless approach where a node-level ztunnel DaemonSet replaces per-pod Envoy sidecars. Ambient mode significantly reduces resource consumption and removes the need for sidecar injection.
+
+To deploy in ambient mode, set `is_ambient_mode = true` on both [modules/sm-istio](./modules/sm-istio) and [modules/sm-istio-cni](./modules/sm-istio-cni), and deploy [modules/ztunnel](./modules/ztunnel) for the data plane. When L7 traffic management is required, [modules/waypoint](./modules/waypoint) can be used to deploy waypoint proxies on a per-namespace or per-service basis.
+
+For a full comparison of sidecar mode and ambient mode — including component differences, required Terraform variables, and namespace labelling — see **[docs/sidecar-vs-ambient.md](./docs/sidecar-vs-ambient.md)**.
+
+For a working end-to-end example, see **[examples/ambient](./examples/ambient/README.md)**.
 
 ### Service Mesh discovery selectors
 
@@ -101,6 +110,8 @@ In all these cases you can remove the operator and related resources manually by
       <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-istio-egress">sm-istio-egress</a></li>
       <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-istio-ingress">sm-istio-ingress</a></li>
       <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-network-policies">sm-network-policies</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/waypoint">waypoint</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/ztunnel">ztunnel</a></li>
     </ul>
   </li>
   <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples">Examples</a>
@@ -108,6 +119,10 @@ In all these cases you can remove the operator and related resources manually by
       <li>
         <a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/advanced">Advanced OCP cluster single zone and single subnet with RedHat ServiceMesh v3, customised ingress and egress configurations and network policies</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-advanced-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/advanced"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+      <li>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/ambient">Ambient Mode Example</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-ambient-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/ambient"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
         <a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>

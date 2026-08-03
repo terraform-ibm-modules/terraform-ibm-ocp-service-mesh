@@ -1,4 +1,5 @@
 namespace: httpbin
+useGatewayApi: false
 gateway:
   istioSelector: ingress-gateway
   istioPort: 80
