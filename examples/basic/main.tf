@@ -116,6 +116,7 @@ module "deploy_istio" {
   istiod_pdb_configuration = {
     minAvailable = "1"
   }
+  istiod_pdb_configuration = {}
   istio_enable_default_pod_disruption_budget = false
 }
 
@@ -148,6 +149,7 @@ module "basic_workload_ingress" {
   ingress_selectors = {
     "istio" : "ingress-gateway",
   }
+  ingresss_pdb_configuration = {}
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
 }
@@ -164,6 +166,7 @@ module "default_workload_egress" {
   egress_selectors = {
     "istio" : "egress-gateway",
   }
+  egress_pdb_configuration = {}
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
 }
