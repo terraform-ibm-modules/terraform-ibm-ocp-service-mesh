@@ -178,6 +178,10 @@ variable "egress_pdb_configuration" {
     condition     = var.egress_pdb_configuration == null ? true : (var.egress_pdb_configuration.minAvailable == null ? true : var.egress_pdb_configuration.minAvailable != "0%")
     error_message = "minAvailable for var.egress_pdb_configuration must be set to a value greater than 0%"
   }
+  validation {
+    condition     = var.egress_pdb_configuration == null ? true : (var.egress_pdb_configuration.minAvailable != null || var.egress_pdb_configuration.maxUnavailable != null)
+    error_message = "When var.egress_pdb_configuration is set, at least one of minAvailable or maxUnavailable must be specified."
+  }
 }
 
 variable "egress_replicas" {

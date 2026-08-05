@@ -114,6 +114,10 @@ variable "istiod_pdb_configuration" {
     error_message = "minAvailable for var.istiod_pdb_configuration must be greater than 0%."
   }
   validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.minAvailable != null || var.istiod_pdb_configuration.maxUnavailable != null)
+    error_message = "When var.istiod_pdb_configuration is set, at least one of minAvailable or maxUnavailable must be specified."
+  }
+  validation {
     condition     = var.istiod_pdb_configuration == null ? true : !var.istio_enable_default_pod_disruption_budget
     error_message = "When var.istiod_pdb_configuration is set, var.istio_enable_default_pod_disruption_budget must be set to false to avoid multiple PodDisruptionBudgets targeting the same istiod pods."
   }
