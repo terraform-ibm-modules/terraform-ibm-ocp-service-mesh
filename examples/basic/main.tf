@@ -74,7 +74,7 @@ locals {
 
 module "ocp_base" {
   source                              = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  version                             = "3.90.4"
+  version                             = "3.90.3"
   resource_group_id                   = module.resource_group.resource_group_id
   region                              = var.region
   resource_tags                       = var.resource_tags
@@ -93,6 +93,7 @@ module "ocp_base" {
 data "ibm_container_cluster_config" "cluster_config" {
   cluster_name_id   = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+  config_dir        = "${path.module}/kubeconfig"
   endpoint_type     = var.cluster_config_endpoint_type != "default" ? var.cluster_config_endpoint_type : null # null represents default
 }
 
@@ -112,6 +113,9 @@ module "deploy_istio" {
   create_namespace  = true
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+  istiod_pdb_configuration = {
+    minAvailable = "1"
+  }
 }
 
 module "deploy_istio_cni" {
