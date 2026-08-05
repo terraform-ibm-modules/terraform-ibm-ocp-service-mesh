@@ -116,6 +116,7 @@ module "deploy_istio" {
   istiod_pdb_configuration = {
     minAvailable = "1"
   }
+  istio_enable_default_pod_disruption_budget = false
 }
 
 module "deploy_istio_cni" {
