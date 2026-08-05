@@ -146,7 +146,7 @@ module "basic_workload_ingress" {
   ingress_selectors = {
     "istio" : "ingress-gateway",
   }
-  ingresss_pdb_configuration = {}
+  ingress_pdb_configuration = {}
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
 }
