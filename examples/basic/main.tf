@@ -113,9 +113,6 @@ module "deploy_istio" {
   create_namespace  = true
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
-  istiod_pdb_configuration = {
-    minAvailable = "1"
-  }
   istiod_pdb_configuration = {}
   istio_enable_default_pod_disruption_budget = false
 }
