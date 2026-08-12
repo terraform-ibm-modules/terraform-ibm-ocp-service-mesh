@@ -1,8 +1,8 @@
 {{- if ne (.Values.ingress).createDeployment false -}}
-{{- if and (eq .Values.ingress.lbtype "nlb") (ne .Values.ingress.daemonsetMode true) }}
+{{- if and (eq .Values.ingress.lbtype "nlb") (eq .Values.ingress.daemonsetMode true) }}
 {{- range $lb_subnet, $lb_subnet_zone := .Values.ingress.nlbzonessubnets }}
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: {{ printf "%s-%s" $.Values.ingress.deploymentName $lb_subnet_zone }}
   namespace: {{ $.Values.ingress.namespace }}
@@ -22,9 +22,6 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
-  {{- if $.Values.ingress.replicacount }}
-  replicas: {{ $.Values.ingress.replicacount }}
-  {{- end }}
   {{- if $.Values.ingress.istioselectors }}
   selector:
     matchLabels:
@@ -114,3 +111,5 @@ spec:
 {{- end }}
 {{- end }}
 {{- end }}
+
+# Made with Bob

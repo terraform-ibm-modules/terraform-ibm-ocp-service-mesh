@@ -1,4 +1,4 @@
-{{- if ne ((.Values.egress).autoscale).enabled false -}}
+{{- if and (ne ((.Values.egress).autoscale).enabled false) (ne .Values.egress.daemonsetMode true) -}}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:

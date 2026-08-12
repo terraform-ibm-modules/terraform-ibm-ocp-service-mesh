@@ -1,6 +1,6 @@
-{{- if and (ne (.Values.egress).createDeployment false) (ne .Values.egress.daemonsetMode true) -}}
+{{- if and (ne (.Values.egress).createDeployment false) (eq .Values.egress.daemonsetMode true) -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: {{ .Values.egress.deploymentName }}
   namespace: {{ .Values.egress.namespace }}
@@ -20,9 +20,6 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
-  {{- if .Values.egress.replicacount }}
-  replicas: {{ .Values.egress.replicacount }}
-  {{- end }}
   {{- if .Values.egress.istioselectors }}
   selector:
     matchLabels:
@@ -78,7 +75,7 @@ spec:
       {{- end }}
       containers:
       - name: istio-proxy
-        image: auto # The image will automatically update each time the pod starts.
+        image: auto
         securityContext:
           capabilities:
             drop:
@@ -103,3 +100,5 @@ spec:
         {{- end }}
         {{- end }}
 {{- end }}
+
+# Made with Bob

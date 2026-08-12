@@ -400,3 +400,10 @@ variable "extend_selectors" {
   default     = false
   description = "Set to true to add deploymentName label to pods and deploymentSelector to matchLabels, ensuring HPA and PDB work correctly for NLBs. Keep false for ALB."
 }
+
+variable "ingress_daemonset_mode" {
+  type        = bool
+  default     = false
+  description = "Deploy ingress gateway as DaemonSet instead of Deployment. When true, one pod runs on each matching worker node automatically. Replica count and HPA are ignored in DaemonSet mode. Default to false."
+  nullable    = false
+}

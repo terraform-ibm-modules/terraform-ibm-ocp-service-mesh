@@ -1,7 +1,7 @@
 {{- if ne (.Values.ingress).createDeployment false -}}
-{{- if and (or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "other")) (ne .Values.ingress.daemonsetMode true) }}
+{{- if and (or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "other")) (eq .Values.ingress.daemonsetMode true) }}
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: {{ .Values.ingress.deploymentName }}
   namespace: {{ .Values.ingress.namespace }}
@@ -21,9 +21,6 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
-  {{- if .Values.ingress.replicacount }}
-  replicas: {{ .Values.ingress.replicacount }}
-  {{- end }}
   {{- if .Values.ingress.istioselectors }}
   selector:
     matchLabels:
@@ -81,7 +78,7 @@ spec:
       {{- end }}
       containers:
       - name: istio-proxy
-        image: auto # The image will automatically update each time the pod starts.
+        image: auto
         securityContext:
           capabilities:
             drop:
@@ -107,3 +104,5 @@ spec:
         {{- end }}
 {{- end }}
 {{- end }}
+
+# Made with Bob

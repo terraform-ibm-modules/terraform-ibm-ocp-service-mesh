@@ -2,6 +2,7 @@ egress:
   name: default
   extendSelector: false
   createDeployment: true
+  daemonsetMode: false
   deploymentName: null
   createService: true
   serviceName: null

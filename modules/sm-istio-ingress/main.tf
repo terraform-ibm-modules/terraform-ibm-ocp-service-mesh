@@ -106,6 +106,12 @@ locals {
       "createServiceAccount" = var.ingress_create_service_account
     }
   }
+
+  ingress_daemonset_mode = {
+    "ingress" = {
+      "daemonsetMode" = var.ingress_daemonset_mode
+    }
+  }
 }
 
 ##############################################################################
@@ -291,7 +297,8 @@ resource "helm_release" "istio_ingress" {
     yamlencode(local.ingress_topology_spread_constraints),
     yamlencode(local.ingress_deployment_custom_labels),
     yamlencode(local.ingress_deployment_custom_annotations),
-    yamlencode(local.ingress_resources_creation)
+    yamlencode(local.ingress_resources_creation),
+    yamlencode(local.ingress_daemonset_mode)
   ]
 }
 

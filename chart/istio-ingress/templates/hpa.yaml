@@ -1,4 +1,4 @@
-{{- if ne ((.Values.ingress).autoscale).enabled false -}}
+{{- if and (ne ((.Values.ingress).autoscale).enabled false) (ne .Values.ingress.daemonsetMode true) -}}
 {{- if or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "other") }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

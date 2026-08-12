@@ -88,6 +88,12 @@ locals {
       "createServiceAccount" = var.egress_create_service_account
     }
   }
+
+  egress_daemonset_mode = {
+    "egress" = {
+      "daemonsetMode" = var.egress_daemonset_mode
+    }
+  }
 }
 
 ##############################################################################
@@ -231,7 +237,8 @@ resource "helm_release" "istio_egress" {
     yamlencode(local.egress_topology_spread_constraints),
     yamlencode(local.egress_deployment_custom_labels),
     yamlencode(local.egress_deployment_custom_annotations),
-    yamlencode(local.egress_resources_creation)
+    yamlencode(local.egress_resources_creation),
+    yamlencode(local.egress_daemonset_mode)
   ]
 
 }
