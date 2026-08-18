@@ -18,3 +18,13 @@ operator:
   source: redhat-operators
   sourcenamespace: openshift-marketplace
   installplanapproval: Manual
+  # Resource limits/requests for the servicemeshoperator3 deployment in openshift-operators.
+  # Omit or set to {} to apply no resource constraints.
+  resources: {}
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 128Mi
+  #   limits:
+  #     cpu: 500m
+  #     memory: 512Mi
