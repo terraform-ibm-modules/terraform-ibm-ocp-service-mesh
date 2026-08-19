@@ -14,3 +14,25 @@ spec:
   {{- if .Values.operator.version }}
   startingCSV: {{ .Values.operator.version }}
   {{- end }}
+  {{- if .Values.operator.resources }}
+  config:
+    resources:
+      {{- if .Values.operator.resources.requests }}
+      requests:
+        {{- if .Values.operator.resources.requests.cpu }}
+        cpu: {{ .Values.operator.resources.requests.cpu }}
+        {{- end }}
+        {{- if .Values.operator.resources.requests.memory }}
+        memory: {{ .Values.operator.resources.requests.memory }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.operator.resources.limits }}
+      limits:
+        {{- if .Values.operator.resources.limits.cpu }}
+        cpu: {{ .Values.operator.resources.limits.cpu }}
+        {{- end }}
+        {{- if .Values.operator.resources.limits.memory }}
+        memory: {{ .Values.operator.resources.limits.memory }}
+        {{- end }}
+      {{- end }}
+  {{- end }}
