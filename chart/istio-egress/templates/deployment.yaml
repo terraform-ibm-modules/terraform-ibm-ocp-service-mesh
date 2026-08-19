@@ -1,6 +1,6 @@
-{{- if and (ne (.Values.egress).createDeployment false) (ne .Values.egress.daemonsetMode true) -}}
+{{- if ne (.Values.egress).createDeployment false -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: {{ if .Values.egress.daemonsetMode }}DaemonSet{{ else }}Deployment{{ end }}
 metadata:
   name: {{ .Values.egress.deploymentName }}
   namespace: {{ .Values.egress.namespace }}
@@ -20,7 +20,7 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
-  {{- if .Values.egress.replicacount }}
+  {{- if and .Values.egress.replicacount (ne .Values.egress.daemonsetMode true) }}
   replicas: {{ .Values.egress.replicacount }}
   {{- end }}
   {{- if .Values.egress.istioselectors }}

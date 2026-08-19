@@ -1,8 +1,8 @@
 {{- if ne (.Values.ingress).createDeployment false -}}
-{{- if and (eq .Values.ingress.lbtype "nlb") (ne .Values.ingress.daemonsetMode true) }}
+{{- if (eq .Values.ingress.lbtype "nlb") }}
 {{- range $lb_subnet, $lb_subnet_zone := .Values.ingress.nlbzonessubnets }}
 apiVersion: apps/v1
-kind: Deployment
+kind: {{ if $.Values.ingress.daemonsetMode }}DaemonSet{{ else }}Deployment{{ end }}
 metadata:
   name: {{ printf "%s-%s" $.Values.ingress.deploymentName $lb_subnet_zone }}
   namespace: {{ $.Values.ingress.namespace }}
@@ -22,7 +22,7 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
-  {{- if $.Values.ingress.replicacount }}
+  {{- if and $.Values.ingress.replicacount (ne $.Values.ingress.daemonsetMode true) }}
   replicas: {{ $.Values.ingress.replicacount }}
   {{- end }}
   {{- if $.Values.ingress.istioselectors }}

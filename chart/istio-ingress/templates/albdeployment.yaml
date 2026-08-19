@@ -1,7 +1,7 @@
 {{- if ne (.Values.ingress).createDeployment false -}}
-{{- if and (or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "other")) (ne .Values.ingress.daemonsetMode true) }}
+{{- if or (eq .Values.ingress.lbtype "alb") (eq .Values.ingress.lbtype "other") }}
 apiVersion: apps/v1
-kind: Deployment
+kind: {{ if .Values.ingress.daemonsetMode }}DaemonSet{{ else }}Deployment{{ end }}
 metadata:
   name: {{ .Values.ingress.deploymentName }}
   namespace: {{ .Values.ingress.namespace }}
@@ -21,7 +21,7 @@ metadata:
   {{- end }}
   {{- end }}
 spec:
-  {{- if .Values.ingress.replicacount }}
+  {{- if and .Values.ingress.replicacount (ne .Values.ingress.daemonsetMode true) }}
   replicas: {{ .Values.ingress.replicacount }}
   {{- end }}
   {{- if .Values.ingress.istioselectors }}
