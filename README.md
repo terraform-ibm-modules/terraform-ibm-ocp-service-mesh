@@ -17,6 +17,16 @@ You can also control placement of the gateways on the desired cluster's worker n
 
 For more details about the Red Hat OpenShift Service Mesh, see [Red Hat OpenShift Service Mesh 3.0](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0) and [Installing Red Hat OpenShift Service Mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/installing/ossm-installing-service-mesh)
 
+### Ambient Mode (Sidecarless)
+
+This module supports Istio **ambient mode** — a sidecarless approach where a node-level ztunnel DaemonSet replaces per-pod Envoy sidecars. Ambient mode significantly reduces resource consumption and removes the need for sidecar injection.
+
+To deploy in ambient mode, set `is_ambient_mode = true` on both [modules/sm-istio](./modules/sm-istio) and [modules/sm-istio-cni](./modules/sm-istio-cni), and deploy [modules/ztunnel](./modules/ztunnel) for the data plane. When L7 traffic management is required, [modules/waypoint](./modules/waypoint) can be used to deploy waypoint proxies on a per-namespace or per-service basis.
+
+For a full comparison of sidecar mode and ambient mode — including component differences, required Terraform variables, and namespace labelling — see **[docs/sidecar-vs-ambient.md](./docs/sidecar-vs-ambient.md)**.
+
+For a working end-to-end example, see **[examples/ambient](./examples/ambient/README.md)**.
+
 ### Service Mesh discovery selectors
 
 The submodule [modules/sm-istio](./modules/sm-istio) supports configuring Service Mesh discovery selectors, to configure each Istio controlplane workloads discovery attributes.
@@ -58,6 +68,36 @@ The submodule [modules/sm-istio-ingress](./modules/sm-istio-ingress) and [module
 
 For more details about Gateway injection, see [Gateways](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/gateways/index) and [About gateway injection](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0/html/gateways/ossm-about-gateways#ossm-about-gateway-injection_ossm-about-gateways)
 
+
+### Uninstalling Operator and Custom Resources
+
+This module provides a `terraform_data` resource `undeploy_servicemesh` whose purpose is to remove RedHat ServiceMesh from the cluster at destroy time.
+This resource creation is controlled through the input variable`var.clean_servicemesh_on_undeploy`: only when it is set to `true` it is created (default is `false`). When this input variable is `true`, on resource deletion (i.e. during `terraform destroy`), a cleanup script is triggered to remove the [Sail operator](https://github.com/istio-ecosystem/sail-operator/tree/main), its ClusterServiceVersions (CSVs), and all associated custom resources definitions (CRDs).
+
+> **Important:** the `undeploy_servicemesh` terraform_data resource leverages on `triggers_replace` block, and this makes Terraform to plan to recreate this resource everytime any of the referenced values change. This can also happen when the module is called with an explicit `depends_on`, because data sources will not be evaluated at plan time and Terraform will treat the trigger values as unknown — causing it to destroy and recreate the resource. During _destroy phase_ this resource triggers the cleanup script: this could be a destructive operation as it would remove the ServiceMesh operator and the related CRDs from the cluster.
+
+To guard against accidental cleanup, the script includes pre-flight checks: if any active `Istio` or `IstioCNI` resource is detected in the cluster, the script will exit (without making terraform deployment to fail) without making any changes, protecting workloads that are still relying on the mesh.
+
+The default value of `clean_servicemesh_on_undeploy` is `false` to prevent unintentional resource recreation (and the resulting cleanup) during normal plan/apply cycles. **It is strongly recommended to keep this value set to `false` throughout the lifetime of your deployment and to change it only immediately before you intend to destroy the deployment through a `terraform destroy`.**
+
+#### Recommended uninstall workflow
+
+1. Keep `clean_servicemesh_on_undeploy = false` during the initial deployment and all subsequent applies.
+2. Only when you are ready to tear down the infrastructure, set `clean_servicemesh_on_undeploy = true` in your configuration.
+3. Run `terraform apply` immediately after — this will create the terraform_data `undeploy_servicemesh` resource in the terraform state.
+4. Run `terraform destroy` right away — the cleanup script executes and removes the operator, CSVs, and custom resources before the rest of the infrastructure is torn down.
+
+> **Note:** Do not leave `clean_servicemesh_on_undeploy = true` in your configuration during day-to-day operations. Because of the `triggers_replace` behaviour described above, any plan/apply cycle where the trigger values are unknown will cause Terraform to destroy and recreate this resource, inadvertently running the cleanup script against a live cluster.
+
+
+
+#### RedHat ServiceMesh manual cleanup
+
+
+You may need to manually cleanup the RedHat ServiceMesh without leveraging on this resource: for example you could have skipped steps 2–3 and proceed directly to `terraform destroy` without the resource in the terraform state, in this case the cleanup script will not run; or you could have in your cluster other Istio resources that are preventing the script to go on with removal for the safety preliminary check.
+In all these cases you can remove the operator and related resources manually by following the official Red Hat documentation: [Uninstalling Red Hat OpenShift Service Mesh](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.3/html-single/uninstalling/index).
+
+
 <!-- The following content is automatically populated by the pre-commit hook -->
 <!-- BEGIN OVERVIEW HOOK -->
 ## Overview
@@ -70,6 +110,8 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
       <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-istio-egress">sm-istio-egress</a></li>
       <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-istio-ingress">sm-istio-ingress</a></li>
       <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/sm-network-policies">sm-network-policies</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/waypoint">waypoint</a></li>
+      <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/modules/ztunnel">ztunnel</a></li>
     </ul>
   </li>
   <li><a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples">Examples</a>
@@ -77,6 +119,10 @@ For more details about Gateway injection, see [Gateways](https://docs.redhat.com
       <li>
         <a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/advanced">Advanced OCP cluster single zone and single subnet with RedHat ServiceMesh v3, customised ingress and egress configurations and network policies</a>
         <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-advanced-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/advanced"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
+      </li>
+      <li>
+        <a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/ambient">Ambient Mode Example</a>
+        <a href="https://cloud.ibm.com/schematics/workspaces/create?workspace_name=ocp-service-mesh-ambient-example&repository=https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/ambient"><img src="https://img.shields.io/badge/Deploy%20with%20IBM%20Cloud%20Schematics-0f62fe?style=flat&logo=ibm&logoColor=white&labelColor=0f62fe" alt="Deploy with IBM Cloud Schematics" style="height: 16px; vertical-align: text-bottom; margin-left: 5px;"></a>
       </li>
       <li>
         <a href="https://github.com/terraform-ibm-modules/terraform-ibm-ocp-service-mesh/tree/main/examples/basic">Basic OCP cluster single zone and single subnet with RedHat ServiceMesh v3</a>
@@ -284,7 +330,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_clean_servicemesh_on_undeploy"></a> [clean\_servicemesh\_on\_undeploy](#input\_clean\_servicemesh\_on\_undeploy) | Flag to perform a cleanup of ServiceMesh operator custom resources when undeploying the module. Default to true. For more details refer to https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index . | `bool` | `true` | no |
+| <a name="input_clean_servicemesh_on_undeploy"></a> [clean\_servicemesh\_on\_undeploy](#input\_clean\_servicemesh\_on\_undeploy) | Flag to perform a cleanup of ServiceMesh operator and custom resources when undeploying the module. Defaults to false to prevent accidental execution of the cleanup script. Before running terraform destroy, set this value to true and run terraform apply once. This creates the terraform\_data resource that executes the cleanup script during the destroy phase. For more information, see the Red Hat OpenShift Service Mesh uninstall documentation: https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index. | `bool` | `false` | no |
 | <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
 | <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
 | <a name="input_develop_mode"></a> [develop\_mode](#input\_develop\_mode) | If set to true, increases the wait time for operator deployment and undeployment to facilitate cluster debugging, and prevents the `helm_release` resource from automatically rolling back changes if the helm deployment fails. | `bool` | `false` | no |
@@ -299,6 +345,7 @@ No modules.
 | <a name="input_sm_operator_custom_catalog_registry_pullsecret_value"></a> [sm\_operator\_custom\_catalog\_registry\_pullsecret\_value](#input\_sm\_operator\_custom\_catalog\_registry\_pullsecret\_value) | Value of the pull secret to access the registry for the mirrored Service Mesh Operator images | `string` | `null` | no |
 | <a name="input_sm_operator_custom_catalog_registry_url"></a> [sm\_operator\_custom\_catalog\_registry\_url](#input\_sm\_operator\_custom\_catalog\_registry\_url) | Registry URL for the mirrored Service Mesh Operator images | `string` | `"icr.io"` | no |
 | <a name="input_sm_operator_installplan_approval"></a> [sm\_operator\_installplan\_approval](#input\_sm\_operator\_installplan\_approval) | OpenShift OLM install plan approval strategy. Valid values are 'Automatic', to automatically perform installation and upgrades, or 'Manual' to required manual approval | `string` | `"Automatic"` | no |
+| <a name="input_sm_operator_resources"></a> [sm\_operator\_resources](#input\_sm\_operator\_resources) | Resource requests and limits for the servicemeshoperator3 deployment in openshift-operators. Passed through to the OLM Subscription spec.config.resources field. Set to null (default) to apply no resource constraints. NOTE: the OLM CRD marks spec.config.resources as Immutable — changing this value on an existing Subscription requires deleting and recreating it. | <pre>object({<br/>    requests = optional(object({<br/>      cpu    = optional(string)<br/>      memory = optional(string)<br/>    }))<br/>    limits = optional(object({<br/>      cpu    = optional(string)<br/>      memory = optional(string)<br/>    }))<br/>  })</pre> | `null` | no |
 | <a name="input_sm_operator_version"></a> [sm\_operator\_version](#input\_sm\_operator\_version) | OpenShift ServiceMesh Operator v3 version to install. Default to null to use the latest version available in the catalog. | `string` | `null` | no |
 
 ### Outputs

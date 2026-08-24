@@ -3,7 +3,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ default .Values.ingress.name .Values.ingress.deploymentName }}
+  name: {{ .Values.ingress.deploymentName }}
   namespace: {{ .Values.ingress.namespace }}
   {{- if .Values.ingress.deploymentCustomLabels }}
   labels:
@@ -31,7 +31,7 @@ spec:
       {{- toYaml .Values.ingress.istioselectors | nindent 6 }}
       {{- end }}
       {{- if .Values.ingress.extendSelector }}
-      deploymentName: {{ default .Values.ingress.name .Values.ingress.deploymentName }}
+      deploymentName: {{ .Values.ingress.deploymentName }}
       {{- end }}
   {{- end }}
   template:
@@ -43,7 +43,7 @@ spec:
         {{- toYaml .Values.ingress.istioselectors | nindent 8 }}
         {{- end }}
         {{- if .Values.ingress.extendSelector }}
-        deploymentName: {{ default .Values.ingress.name .Values.ingress.deploymentName }}
+        deploymentName: {{ .Values.ingress.deploymentName }}
         {{- end }}
         {{- if eq .Values.ingress.istioMeshEnrollment "default" }}
         sidecar.istio.io/inject: "true"

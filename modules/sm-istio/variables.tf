@@ -85,6 +85,44 @@ variable "istio_enable_default_pod_disruption_budget" {
   nullable    = false
 }
 
+variable "istiod_pdb_configuration" {
+  description = "Configuration of the PodDisruptionBudget for the istiod (control plane) deployment definition. Default to null to leverage on Istio default configuration."
+  default     = null
+  type = object({
+    name           = optional(string, null)
+    minAvailable   = optional(string, null)
+    maxUnavailable = optional(string, null)
+  })
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.minAvailable != null && var.istiod_pdb_configuration.maxUnavailable != null ? false : true)
+    error_message = "Only one of minAvailable and maxUnavailable for var.istiod_pdb_configuration can be set to a value not null"
+  }
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.minAvailable == null ? true : can(regex("^([0-9]{1,3}%?)$", var.istiod_pdb_configuration.minAvailable)))
+    error_message = "minAvailable for var.istiod_pdb_configuration value is not valid. It can be set only to a number or percentage (regex ^([0-9]{1,3}%?)$)"
+  }
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.maxUnavailable == null ? true : can(regex("^([0-9]{1,3}%?)$", var.istiod_pdb_configuration.maxUnavailable)))
+    error_message = "maxUnavailable for var.istiod_pdb_configuration value is not valid. It can be set only to a number or percentage (regex ^([0-9]{1,3}%?)$)"
+  }
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.minAvailable == null ? true : tostring(var.istiod_pdb_configuration.minAvailable) != "0")
+    error_message = "minAvailable for var.istiod_pdb_configuration must be greater than 0."
+  }
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.minAvailable == null ? true : var.istiod_pdb_configuration.minAvailable != "0%")
+    error_message = "minAvailable for var.istiod_pdb_configuration must be greater than 0%."
+  }
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : (var.istiod_pdb_configuration.minAvailable != null || var.istiod_pdb_configuration.maxUnavailable != null)
+    error_message = "When var.istiod_pdb_configuration is set, at least one of minAvailable or maxUnavailable must be specified."
+  }
+  validation {
+    condition     = var.istiod_pdb_configuration == null ? true : !var.istio_enable_default_pod_disruption_budget
+    error_message = "When var.istiod_pdb_configuration is set, var.istio_enable_default_pod_disruption_budget must be set to false to avoid multiple PodDisruptionBudgets targeting the same istiod pods."
+  }
+}
+
 variable "istio_update_strategy_type" {
   type        = string
   description = "Type of strategy to use. Allowed values are InPlace or RevisionBased. When InPlace strategy is used, the existing Istio control plane is updated in-place. When the RevisionBased strategy is used, a new Istio control plane instance is created for every change to the Istio.spec.version field. For more details refer to https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#updatestrategytype. Default to InPlace"
@@ -385,4 +423,39 @@ variable "mesh_config_status_port" {
   type        = number
   default     = null
   description = "Port on which the Envoy health check, readiness probe, and Prometheus metrics are exposed. When null, uses Istio default (15020). For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md"
+}
+
+variable "is_ambient_mode" {
+  type        = bool
+  default     = false
+  nullable    = false
+  description = "Enable Istio ambient mode. Ambient mode is a sidecarless approach for service mesh that uses a shared node proxy instead of per-pod sidecars."
+}
+
+variable "ztunnel_namespace" {
+  type        = string
+  default     = "ztunnel"
+  description = "Namespace for the ztunnel component when ambient mode is enabled. Only used when is_ambient_mode is true."
+
+  validation {
+    condition     = var.ztunnel_namespace != null && var.ztunnel_namespace != ""
+    error_message = "ztunnel_namespace value can not be null or empty"
+  }
+}
+
+variable "proxy_exclude_ip_ranges" {
+  type        = string
+  default     = null
+  description = "Comma-separated list of IP ranges in CIDR form to be excluded from Envoy proxy interception (e.g. \"10.0.0.1/8,192.168.100.0/24\"). Maps to spec.values.global.proxy.excludeIPRanges. When null, no exclusions are configured. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#proxyconfig"
+}
+
+variable "proxy_auto_inject" {
+  type        = string
+  nullable    = false
+  default     = "enabled"
+  description = "Controls automatic sidecar injection. Set to 'disabled' to inject only workloads that have the annotation sidecar.istio.io/inject: 'true'. Set to 'enabled' (default) to inject all workloads except those with sidecar.istio.io/inject: 'false'. Maps to spec.values.global.proxy.autoInject. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#proxyconfig"
+  validation {
+    condition     = contains(["enabled", "disabled"], var.proxy_auto_inject)
+    error_message = "proxy_auto_inject must be 'enabled' or 'disabled'."
+  }
 }

@@ -60,13 +60,22 @@ locals {
     }
   ]
 
-  service_mesh_operator_set_list = var.sm_operator_version == null ? local.service_mesh_operator_set_list_initial : concat(local.service_mesh_operator_set_list_initial, [
+  service_mesh_operator_set_list_with_version = var.sm_operator_version == null ? local.service_mesh_operator_set_list_initial : concat(local.service_mesh_operator_set_list_initial, [
     {
       name  = "operator.version"
       type  = "string"
       value = var.sm_operator_version
     }
   ])
+
+  service_mesh_operator_resources_set = var.sm_operator_resources == null ? [] : concat(
+    try(var.sm_operator_resources.requests.cpu, null) != null ? [{ name = "operator.resources.requests.cpu", type = "string", value = var.sm_operator_resources.requests.cpu }] : [],
+    try(var.sm_operator_resources.requests.memory, null) != null ? [{ name = "operator.resources.requests.memory", type = "string", value = var.sm_operator_resources.requests.memory }] : [],
+    try(var.sm_operator_resources.limits.cpu, null) != null ? [{ name = "operator.resources.limits.cpu", type = "string", value = var.sm_operator_resources.limits.cpu }] : [],
+    try(var.sm_operator_resources.limits.memory, null) != null ? [{ name = "operator.resources.limits.memory", type = "string", value = var.sm_operator_resources.limits.memory }] : [],
+  )
+
+  service_mesh_operator_set_list = concat(local.service_mesh_operator_set_list_with_version, local.service_mesh_operator_resources_set)
 
   sm_operator_custom_catalog_registry_pullsecret_value = var.sm_operator_custom_catalog_registry_pullsecret_value == null || var.sm_operator_custom_catalog_registry_pullsecret_value == "" ? null : {
     auths = {
