@@ -15,6 +15,9 @@ spec:
     global:
       logAsJson: true
       istioNamespace: {{ .Values.istioconfiguration.namespace }}
+      {{- if .Values.istioconfiguration.priorityClassName }}
+      priorityClassName: {{ .Values.istioconfiguration.priorityClassName | quote }}
+      {{- end }}
       defaultPodDisruptionBudget:
         enabled: {{ .Values.istioconfiguration.defaultpdb }}
       networkPolicy:
