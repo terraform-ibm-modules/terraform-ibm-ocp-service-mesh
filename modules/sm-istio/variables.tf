@@ -459,3 +459,9 @@ variable "proxy_auto_inject" {
     error_message = "proxy_auto_inject must be 'enabled' or 'disabled'."
   }
 }
+
+variable "priority_class_name" {
+  type        = string
+  default     = null
+  description = "Specifies the Kubernetes priorityClassName for the Istio control plane components. Maps to spec.values.global.priorityClassName. When null, no priorityClassName is set and the Istio default is used. See https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass and https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#globalconfig"
+}
