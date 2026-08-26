@@ -193,6 +193,33 @@ locals {
       }
     }
   }
+
+  istio_proxy_exclude_ip_ranges = var.proxy_exclude_ip_ranges == null ? {} : {
+    "istioconfiguration" : {
+      "proxy" : {
+        "excludeIPRanges" : var.proxy_exclude_ip_ranges
+      }
+    }
+  }
+
+  istio_proxy_auto_inject = {
+    "istioconfiguration" : {
+      "proxy" : {
+        "autoInject" : var.proxy_auto_inject
+      }
+    }
+  }
+
+  # istiod (control plane) custom PDB name: falls back to "<namespace>-<name>-istiod"
+  istiod_pdb_name = try(var.istiod_pdb_configuration.name, null) != null && try(var.istiod_pdb_configuration.name, "") != "" ? var.istiod_pdb_configuration.name : "${var.namespace}-${var.name}-istiod"
+
+  istiod_pdb_configuration = var.istiod_pdb_configuration == null ? {} : {
+    "istioconfiguration" : {
+      "istiod" : {
+        "pdb" : var.istiod_pdb_configuration
+      }
+    }
+  }
 }
 
 ##############################################################################
@@ -343,6 +370,20 @@ resource "helm_release" "istio_controlplane" {
       name  = "istioconfiguration.peerAuthenticationName"
       type  = "string"
       value = var.peer_authentication_name
+      }, {
+      name  = "istioconfiguration.ambient"
+      value = var.is_ambient_mode
+      }, {
+      name  = "istioconfiguration.ztunnelNamespace"
+      type  = "string"
+      value = var.ztunnel_namespace
+      }, {
+      name  = "istioconfiguration.istiod.pdb.name"
+      type  = "string"
+      value = local.istiod_pdb_name
+      }, {
+      name  = "istioconfiguration.istiod.pdb.enabled"
+      value = var.istiod_pdb_configuration != null
     }
   ]
 
@@ -363,6 +404,9 @@ resource "helm_release" "istio_controlplane" {
       yamlencode(local.istio_mesh_config_extra_stat_tags),
       yamlencode(local.istio_mesh_config_status_port),
       yamlencode(local.istio_mesh_config_enable_prometheus_merge),
+      yamlencode(local.istio_proxy_exclude_ip_ranges),
+      yamlencode(local.istio_proxy_auto_inject),
+      yamlencode(local.istiod_pdb_configuration),
     ],
     length(local.merged_proxy_metadata) > 0 ? [yamlencode(local.istio_mesh_config_proxy_metadata)] : []
   )

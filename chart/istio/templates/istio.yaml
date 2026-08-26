@@ -5,6 +5,9 @@ metadata:
   name: {{ .Values.istioconfiguration.name }}
 spec:
   namespace: {{ .Values.istioconfiguration.namespace }}
+  {{- if .Values.istioconfiguration.ambient }}
+  profile: ambient
+  {{- end }}
   updateStrategy:
     inactiveRevisionDeletionGracePeriodSeconds: 30
     type: {{ .Values.istioconfiguration.updateStrategyType }}
@@ -16,6 +19,11 @@ spec:
         enabled: {{ .Values.istioconfiguration.defaultpdb }}
       networkPolicy:
         enabled: {{ .Values.istioconfiguration.enableNetworkPolicy }}
+      proxy:
+        autoInject: {{ .Values.istioconfiguration.proxy.autoInject }}
+        {{- if .Values.istioconfiguration.proxy.excludeIPRanges }}
+        excludeIPRanges: {{ .Values.istioconfiguration.proxy.excludeIPRanges | quote }}
+        {{- end }}
     pilot:
       enabled: {{ .Values.istioconfiguration.pilot.enabled }}
       autoscaleEnabled: {{ .Values.istioconfiguration.pilot.autoscale.enabled }}
@@ -59,11 +67,14 @@ spec:
       {{- if .Values.istioconfiguration.pilot.env }}
       env:
       {{- toYaml .Values.istioconfiguration.pilot.env | nindent 8 }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.ambient }}
+      trustedZtunnelNamespace: {{ .Values.istioconfiguration.ztunnelNamespace }}
+      {{- end }}
     {{- if .Values.istioconfiguration.telemetry }}
     telemetry:
       {{- toYaml .Values.istioconfiguration.telemetry | nindent 6 }}
     {{- end }}
-      {{- end }}
     {{- if .Values.istioconfiguration.meshConfig }}
     meshConfig: # https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig
       {{- if .Values.istioconfiguration.meshConfig.enableAutoMTLS }}

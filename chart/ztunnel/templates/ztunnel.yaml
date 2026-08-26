@@ -1,0 +1,17 @@
+apiVersion: sailoperator.io/v1alpha1
+kind: ZTunnel
+metadata:
+  name: default
+spec:
+  namespace: {{ .Values.ztunnel.namespace }}
+  profile: ambient
+  values:
+    ztunnel:
+      {{- if .Values.ztunnel.resources }}
+      resources:
+      {{- toYaml .Values.ztunnel.resources | nindent 8 }}
+      {{- end }}
+      {{- if .Values.ztunnel.tolerations }}
+      tolerations:
+      {{- toYaml .Values.ztunnel.tolerations | nindent 8 }}
+      {{- end }}

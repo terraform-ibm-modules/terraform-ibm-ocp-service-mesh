@@ -230,6 +230,7 @@ variable "ingress_pdb_configuration" {
   description = "Configuration of the PodDisruptionBudget for the istio ingress definition. Default to null to leverage on Istio default configuration."
   default     = null
   type = object({
+    name           = optional(string, null)
     minAvailable   = optional(string, null)
     maxUnavailable = optional(string, null)
   })
@@ -252,6 +253,10 @@ variable "ingress_pdb_configuration" {
   validation {
     condition     = var.ingress_pdb_configuration == null ? true : (var.ingress_pdb_configuration.minAvailable == null ? true : var.ingress_pdb_configuration.minAvailable != "0%")
     error_message = "minAvailable for var.ingress_pdb_configuration must be set to a value greater than 0%"
+  }
+  validation {
+    condition     = var.ingress_pdb_configuration == null ? true : (var.ingress_pdb_configuration.minAvailable != null || var.ingress_pdb_configuration.maxUnavailable != null)
+    error_message = "When var.ingress_pdb_configuration is set, at least one of minAvailable or maxUnavailable must be specified."
   }
 }
 

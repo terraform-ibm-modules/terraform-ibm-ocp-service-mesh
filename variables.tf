@@ -103,9 +103,24 @@ variable "sm_operator_custom_catalog_image_digest" {
   default     = null
 }
 
+variable "sm_operator_resources" {
+  description = "Resource requests and limits for the servicemeshoperator3 deployment in openshift-operators. Passed through to the OLM Subscription spec.config.resources field. Set to null (default) to apply no resource constraints. NOTE: the OLM CRD marks spec.config.resources as Immutable — changing this value on an existing Subscription requires deleting and recreating it."
+  type = object({
+    requests = optional(object({
+      cpu    = optional(string)
+      memory = optional(string)
+    }))
+    limits = optional(object({
+      cpu    = optional(string)
+      memory = optional(string)
+    }))
+  })
+  default = null
+}
+
 variable "clean_servicemesh_on_undeploy" {
   type        = bool
-  description = "Flag to perform a cleanup of ServiceMesh operator custom resources when undeploying the module. Default to true. For more details refer to https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index ."
-  default     = true
+  description = "Flag to perform a cleanup of ServiceMesh operator and custom resources when undeploying the module. Defaults to false to prevent accidental execution of the cleanup script. Before running terraform destroy, set this value to true and run terraform apply once. This creates the terraform_data resource that executes the cleanup script during the destroy phase. For more information, see the Red Hat OpenShift Service Mesh uninstall documentation: https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index."
+  default     = false
   nullable    = false
 }
