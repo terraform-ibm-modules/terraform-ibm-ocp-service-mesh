@@ -202,6 +202,12 @@ locals {
     }
   }
 
+  istio_priority_class_name = var.priority_class_name == null ? {} : {
+    "istioconfiguration" : {
+      "priorityClassName" : var.priority_class_name
+    }
+  }
+
   istio_proxy_auto_inject = {
     "istioconfiguration" : {
       "proxy" : {
@@ -407,6 +413,7 @@ resource "helm_release" "istio_controlplane" {
       yamlencode(local.istio_proxy_exclude_ip_ranges),
       yamlencode(local.istio_proxy_auto_inject),
       yamlencode(local.istiod_pdb_configuration),
+      yamlencode(local.istio_priority_class_name),
     ],
     length(local.merged_proxy_metadata) > 0 ? [yamlencode(local.istio_mesh_config_proxy_metadata)] : []
   )
