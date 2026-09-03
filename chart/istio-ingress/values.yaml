@@ -1,6 +1,6 @@
 ingress:
   name: default
-  overrideNlbResourceNames: false
+  nlbAppendZoneToResourceNames: true
   extendSelector: false
   createDeployment: true
   deploymentName: null

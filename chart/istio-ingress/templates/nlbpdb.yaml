@@ -9,7 +9,7 @@ metadata:
     {{- toYaml $.Values.ingress.istioselectors | nindent 4 }}
     {{- end }}
     release: istio
-  name: {{ if $.Values.ingress.overrideNlbResourceNames }}{{ $.Values.ingress.pdb.name }}{{ else }}{{ printf "%s-%s" $.Values.ingress.pdb.name $lb_subnet_zone }}{{ end }}
+  name: {{ if $.Values.ingress.nlbAppendZoneToResourceNames }}{{ printf "%s-%s" $.Values.ingress.pdb.name $lb_subnet_zone }}{{ else }}{{ $.Values.ingress.pdb.name }}{{ end }}
   namespace: {{ $.Values.ingress.namespace }}
 spec:
   {{- if $.Values.ingress.pdb.minAvailable }}
@@ -22,7 +22,7 @@ spec:
     matchLabels:
       {{- toYaml $.Values.ingress.istioselectors | nindent 6 }}
       {{- if $.Values.ingress.extendSelector }}
-      deploymentName: {{ if $.Values.ingress.overrideNlbResourceNames }}{{ $.Values.ingress.deploymentName }}{{ else }}{{ printf "%s-%s" $.Values.ingress.deploymentName $lb_subnet_zone }}{{ end }}
+      deploymentName: {{ if $.Values.ingress.nlbAppendZoneToResourceNames }}{{ printf "%s-%s" $.Values.ingress.deploymentName $lb_subnet_zone }}{{ else }}{{ $.Values.ingress.deploymentName }}{{ end }}
       {{- end }}
 ---
 {{- end }}
