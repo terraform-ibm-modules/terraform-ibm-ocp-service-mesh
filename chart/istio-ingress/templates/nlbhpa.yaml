@@ -9,7 +9,11 @@ metadata:
     {{- toYaml $.Values.ingress.istioselectors | nindent 4 }}
     {{- end }}
     release: istio
+  {{- if $.Values.ingress.nlbAppendZoneToResourceNames }}
   name: {{ printf "%s-%s" $.Values.ingress.autoscale.hpa_name $lb_subnet_zone }}
+  {{- else }}
+  name: {{ $.Values.ingress.autoscale.hpa_name }}
+  {{- end }}
   namespace: {{ $.Values.ingress.namespace }}
 spec:
   metrics:
@@ -38,7 +42,11 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
+    {{- if $.Values.ingress.nlbAppendZoneToResourceNames }}
     name: {{ printf "%s-%s" $.Values.ingress.deploymentName $lb_subnet_zone }}
+    {{- else }}
+    name: {{ $.Values.ingress.deploymentName }}
+    {{- end }}
 ---
 {{- end }}
 {{- end }}

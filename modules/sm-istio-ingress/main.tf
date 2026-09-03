@@ -274,6 +274,10 @@ resource "helm_release" "istio_ingress" {
       type  = "string"
       value = local.ingress_deployment_name
     },
+    {
+      name  = "ingress.nlbAppendZoneToResourceNames"
+      value = var.nlb_append_zone_to_resource_names
+    },
   ]
 
   # yamlencode(local.ingress_namespace_enrollment_labels),
@@ -319,7 +323,7 @@ resource "null_resource" "confirm_ingress_operational_nlb" {
   }
   for_each = var.ingress_loadbalancer_type == "nlb" && var.ingress_create_service == true ? var.ingress_nlb_zones_subnets : {}
   provisioner "local-exec" {
-    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${local.ingress_service_name}-${each.value}\" \"nlb\""
+    command     = "${path.module}/scripts/confirm-ingress-operational.sh \"${var.namespace}\" \"${var.nlb_append_zone_to_resource_names ? "${local.ingress_service_name}-${each.value}" : local.ingress_service_name}\" \"nlb\""
     interpreter = ["/bin/bash", "-c"]
     environment = {
       KUBECONFIG = data.ibm_container_cluster_config.cluster_config.config_file_path
@@ -356,9 +360,9 @@ locals {
   ingress_services_map = var.ingress_create_service ? (
     var.ingress_loadbalancer_type == "nlb" ? {
       for subnet_id, zone in var.ingress_nlb_zones_subnets :
-      "${local.ingress_service_name}-${zone}" => {
+      (var.nlb_append_zone_to_resource_names ? "${local.ingress_service_name}-${zone}" : local.ingress_service_name) => {
         namespace = var.namespace
-        service   = "${local.ingress_service_name}-${zone}"
+        service   = var.nlb_append_zone_to_resource_names ? "${local.ingress_service_name}-${zone}" : local.ingress_service_name
       }
       } : {
       (local.ingress_service_name) = {

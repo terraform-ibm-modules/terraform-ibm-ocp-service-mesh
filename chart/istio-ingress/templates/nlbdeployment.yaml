@@ -4,7 +4,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  {{- if $.Values.ingress.nlbAppendZoneToResourceNames }}
   name: {{ printf "%s-%s" $.Values.ingress.deploymentName $lb_subnet_zone }}
+  {{- else }}
+  name: {{ $.Values.ingress.deploymentName }}
+  {{- end }}
   namespace: {{ $.Values.ingress.namespace }}
   {{- if $.Values.ingress.deploymentCustomLabels }}
   labels:
@@ -32,7 +36,11 @@ spec:
       {{- toYaml $.Values.ingress.istioselectors | nindent 6 }}
       {{- end }}
       {{- if $.Values.ingress.extendSelector }}
+      {{- if $.Values.ingress.nlbAppendZoneToResourceNames }}
       deploymentName: {{ printf "%s-%s" $.Values.ingress.deploymentName $lb_subnet_zone }}
+      {{- else }}
+      deploymentName: {{ $.Values.ingress.deploymentName }}
+      {{- end }}
       {{- end }}
   {{- end }}
   template:
@@ -44,7 +52,11 @@ spec:
         {{- toYaml $.Values.ingress.istioselectors | nindent 8 }}
         {{- end }}
         {{- if $.Values.ingress.extendSelector }}
+        {{- if $.Values.ingress.nlbAppendZoneToResourceNames }}
         deploymentName: {{ printf "%s-%s" $.Values.ingress.deploymentName $lb_subnet_zone }}
+        {{- else }}
+        deploymentName: {{ $.Values.ingress.deploymentName }}
+        {{- end }}
         {{- end }}
         {{- if eq $.Values.ingress.istioMeshEnrollment "default" }}
         sidecar.istio.io/inject: "true"
