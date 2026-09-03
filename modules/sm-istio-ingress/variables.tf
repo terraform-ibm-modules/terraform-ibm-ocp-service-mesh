@@ -171,6 +171,17 @@ variable "ingress_nlb_zones_subnets" {
   description = "Map of tuples \"subnetID\": \"VPC zone\" to configure IBM Cloud Network LoadBalancer instances on the expected zone and subnet. Null value is not allowed. Default to empty map."
 }
 
+variable "override_nlb_resource_names" {
+  type        = bool
+  default     = false
+  nullable    = false
+  description = "Flag to disable appending the zone suffix to NLB resource names (service, deployment, HPA, and PDB). Only allowed when ingress_nlb_zones_subnets contains at most one zone. Default to false."
+  validation {
+    condition     = !var.override_nlb_resource_names || length(var.ingress_nlb_zones_subnets) <= 1
+    error_message = "var.override_nlb_resource_names can only be set to true if var.ingress_nlb_zones_subnets has at most one zone entry."
+  }
+}
+
 variable "ingress_ports" {
   type = list(object(
     {
