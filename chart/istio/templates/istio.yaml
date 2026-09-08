@@ -149,6 +149,13 @@ spec:
       tlsDefaults:
         {{- toYaml .Values.istioconfiguration.meshConfig.tlsDefaults | nindent 8 }}
       {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.trustDomain }}
+      trustDomain: {{ .Values.istioconfiguration.meshConfig.trustDomain | quote }}
+      {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.trustDomainAliases }}
+      trustDomainAliases:
+        {{- toYaml .Values.istioconfiguration.meshConfig.trustDomainAliases | nindent 8 }}
+      {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.extensionProviders }}
       extensionProviders:
       {{- toYaml .Values.istioconfiguration.meshConfig.extensionProviders | nindent 8 }}

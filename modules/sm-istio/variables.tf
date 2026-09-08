@@ -474,3 +474,15 @@ variable "priority_class_name" {
   default     = null
   description = "Specifies the Kubernetes priorityClassName for the Istio control plane components. Maps to spec.values.global.priorityClassName. When null, no priorityClassName is set and the Istio default is used. See https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass and https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#globalconfig"
 }
+
+variable "mesh_config_trust_domain" {
+  type        = string
+  default     = null
+  description = "The trust domain corresponds to the trust root of the mesh. All workload certificates in the mesh are issued under this trust domain. The SPIFFE format of a workload certificate is spiffe://<trust-domain>/ns/<namespace>/sa/<service-account>. When null, the Istio default (cluster.local) is used. Maps to spec.values.meshConfig.trustDomain. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig"
+}
+
+variable "mesh_config_trust_domain_aliases" {
+  type        = list(string)
+  default     = null
+  description = "A list of additional trust domains that should be trusted with the same trust root as the primary trust domain. Workloads from these trust domains are authenticated and their SPIFFE identities are accepted. When null, no aliases are configured. Maps to spec.values.meshConfig.trustDomainAliases. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig"
+}
