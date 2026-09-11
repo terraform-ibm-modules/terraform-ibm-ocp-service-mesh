@@ -208,6 +208,15 @@ variable "pilot_resources" {
   description = "Istio pilot pods resources requests and limits for memory and CPU. Default to requests CPU 10m memory 128M limits CPU 100m memory 256M, using the default Istio values. For more details # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcerequirements-v1-core"
 }
 
+variable "proxy_resources" {
+  type = object({
+    limits : optional(map(string), null),
+    requests : optional(map(string), null)
+  })
+  default     = null
+  description = "Configure resource requests and limits for the sidecar proxy container. Default to null (uses Istio defaults). For more details https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcerequirements-v1-core"
+}
+
 variable "pilot_affinity" {
   type = object({
     podAntiAffinity : optional(any, null),

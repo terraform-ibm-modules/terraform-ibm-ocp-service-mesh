@@ -202,6 +202,14 @@ locals {
     }
   }
 
+  istio_proxy_resources = var.proxy_resources == null ? {} : {
+    "istioconfiguration" : {
+      "proxy" : {
+        "resources" : var.proxy_resources
+      }
+    }
+  }
+
   istio_priority_class_name = var.priority_class_name == null ? {} : {
     "istioconfiguration" : {
       "priorityClassName" : var.priority_class_name
@@ -412,6 +420,7 @@ resource "helm_release" "istio_controlplane" {
       yamlencode(local.istio_mesh_config_enable_prometheus_merge),
       yamlencode(local.istio_proxy_exclude_ip_ranges),
       yamlencode(local.istio_proxy_auto_inject),
+      yamlencode(local.istio_proxy_resources),
       yamlencode(local.istiod_pdb_configuration),
       yamlencode(local.istio_priority_class_name),
     ],

@@ -11,6 +11,7 @@ istioconfiguration:
   proxy:
     excludeIPRanges:
     autoInject: enabled
+    resources:
   pilot:
     env:
     enabled: true

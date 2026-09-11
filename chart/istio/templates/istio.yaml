@@ -27,6 +27,10 @@ spec:
         {{- if .Values.istioconfiguration.proxy.excludeIPRanges }}
         excludeIPRanges: {{ .Values.istioconfiguration.proxy.excludeIPRanges | quote }}
         {{- end }}
+        {{- if .Values.istioconfiguration.proxy.resources }}
+        resources:
+        {{- toYaml .Values.istioconfiguration.proxy.resources | nindent 8 }}
+        {{- end }}
     pilot:
       enabled: {{ .Values.istioconfiguration.pilot.enabled }}
       autoscaleEnabled: {{ .Values.istioconfiguration.pilot.autoscale.enabled }}
