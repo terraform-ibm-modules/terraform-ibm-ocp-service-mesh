@@ -29,7 +29,7 @@ spec:
         {{- end }}
         {{- if .Values.istioconfiguration.proxy.resources }}
         resources:
-        {{- toYaml .Values.istioconfiguration.proxy.resources | nindent 8 }}
+        {{- toYaml .Values.istioconfiguration.proxy.resources | nindent 10 }}
         {{- end }}
     pilot:
       enabled: {{ .Values.istioconfiguration.pilot.enabled }}
