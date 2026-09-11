@@ -114,7 +114,7 @@ module "deploy_istio" {
   resource_group_id = module.resource_group.resource_group_id
   proxy_resources = {
     requests = {
-      cpu    = "17m"
+      cpu    = "27m"
       memory = "131Mi"
     }
     limits = {
