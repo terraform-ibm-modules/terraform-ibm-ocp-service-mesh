@@ -95,6 +95,25 @@ The default values are the below ones:
 }
 ```
 
+
+### Sidecar proxy resources requests and limits
+
+Through the input variable `proxy_resources` you can set resource requests and limits for the sidecar proxy container injected into workload pods. Defaults to `null`, leaving Istio's own sidecar defaults in place.
+
+```hcl
+proxy_resources = {
+  requests = {
+    cpu    = "100m"
+    memory = "128Mi"
+  }
+  limits = {
+    cpu    = "500m"
+    memory = "256Mi"
+  }
+}
+```
+
+
 ### DNS Capture Configuration for ServiceEntry Resources
 
 DNS capture is **enabled by default** in this module to support ServiceEntry resources that rely on DNS resolution. The default configuration sets `ISTIO_META_DNS_AUTO_ALLOCATE` and `ISTIO_META_DNS_CAPTURE` to `"true"` in the proxy metadata.
