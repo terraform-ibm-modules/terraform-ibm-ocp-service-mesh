@@ -98,7 +98,7 @@ The default values are the below ones:
 
 ### Sidecar proxy resources requests and limits
 
-Through the input variable `proxy_resources` you can set resource requests and limits for the sidecar proxy container injected into workload pods. Defaults to `null`, leaving Istio's own sidecar defaults in place.
+The input variable `proxy_resources` allows you to set resource requests and limits for the istio sidecar proxy container injected into workload pods. Defaults to `null`, leaving Istio sidecar defaults in place. For more details about setting these resources parameters please refer [to this doc](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#resourcerequirements-v1-core)
 
 ```hcl
 proxy_resources = {
