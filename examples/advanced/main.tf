@@ -116,6 +116,9 @@ module "deploy_istio" {
   create_namespace  = true
   cluster_id        = module.ocp_base.cluster_id
   resource_group_id = module.resource_group.resource_group_id
+
+  mesh_config_trust_domain         = var.mesh_config_trust_domain
+  mesh_config_trust_domain_aliases = var.mesh_config_trust_domain_aliases
 }
 
 module "deploy_istio_cni" {

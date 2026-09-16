@@ -49,3 +49,15 @@ variable "service_mesh_operator_version" {
   type        = string
   default     = null
 }
+
+variable "mesh_config_trust_domain" {
+  type        = string
+  default     = null
+  description = "The trust domain for the Istio mesh. When null, the Istio default (cluster.local) is used."
+}
+
+variable "mesh_config_trust_domain_aliases" {
+  type        = list(string)
+  default     = null
+  description = "Additional trust domains trusted by the Istio mesh. When null, no aliases are configured."
+}
