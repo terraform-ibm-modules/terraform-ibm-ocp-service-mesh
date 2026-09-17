@@ -439,9 +439,9 @@ resource "helm_release" "istio_controlplane" {
       yamlencode(local.istio_proxy_resources),
       yamlencode(local.istiod_pdb_configuration),
       yamlencode(local.istio_priority_class_name),
-      yamlencode(local.istio_mesh_config_trust_domain),
-      yamlencode(local.istio_mesh_config_trust_domain_aliases),
     ],
+    length(local.istio_mesh_config_trust_domain) > 0 ? [yamlencode(local.istio_mesh_config_trust_domain)] : [],
+    length(local.istio_mesh_config_trust_domain_aliases) > 0 ? [yamlencode(local.istio_mesh_config_trust_domain_aliases)] : [],
     length(local.merged_proxy_metadata) > 0 ? [yamlencode(local.istio_mesh_config_proxy_metadata)] : []
   )
 }
