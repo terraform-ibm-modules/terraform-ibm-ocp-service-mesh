@@ -484,5 +484,5 @@ variable "mesh_config_trust_domain" {
 variable "mesh_config_trust_domain_aliases" {
   type        = list(string)
   default     = null
-  description = "A list of additional trust domains that should be trusted with the same trust root as the primary trust domain. Workloads from these trust domains are authenticated and their SPIFFE identities are accepted. When null, no aliases are configured. Maps to spec.values.meshConfig.trustDomainAliases. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig"
+  description = "A list of additional trust domains that to trust as the primary trust domain. Workloads from these trust domains are authenticated and their SPIFFE identities are accepted. When left to the default null value, no aliases are configured. For more details: https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig"
 }
