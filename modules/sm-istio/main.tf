@@ -184,6 +184,14 @@ locals {
     }
   }
 
+  istio_mesh_config_dns_refresh_rate = var.mesh_config_dns_refresh_rate == null ? {} : {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "dnsRefreshRate" : var.mesh_config_dns_refresh_rate
+      }
+    }
+  }
+
   istio_mesh_config_status_port = var.mesh_config_status_port == null ? {} : {
     "istioconfiguration" : {
       "meshConfig" : {
@@ -418,6 +426,7 @@ resource "helm_release" "istio_controlplane" {
       yamlencode(local.istio_mesh_config_extra_stat_tags),
       yamlencode(local.istio_mesh_config_status_port),
       yamlencode(local.istio_mesh_config_enable_prometheus_merge),
+      yamlencode(local.istio_mesh_config_dns_refresh_rate),
       yamlencode(local.istio_proxy_exclude_ip_ranges),
       yamlencode(local.istio_proxy_auto_inject),
       yamlencode(local.istio_proxy_resources),
