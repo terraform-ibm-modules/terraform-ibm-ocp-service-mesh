@@ -210,6 +210,22 @@ locals {
     }
   }
 
+  istio_mesh_config_trust_domain = var.mesh_config_trust_domain == null ? {} : {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "trustDomain" : var.mesh_config_trust_domain
+      }
+    }
+  }
+
+  istio_mesh_config_trust_domain_aliases = var.mesh_config_trust_domain_aliases == null ? {} : {
+    "istioconfiguration" : {
+      "meshConfig" : {
+        "trustDomainAliases" : var.mesh_config_trust_domain_aliases
+      }
+    }
+  }
+
   istio_priority_class_name = var.priority_class_name == null ? {} : {
     "istioconfiguration" : {
       "priorityClassName" : var.priority_class_name
@@ -424,6 +440,8 @@ resource "helm_release" "istio_controlplane" {
       yamlencode(local.istiod_pdb_configuration),
       yamlencode(local.istio_priority_class_name),
     ],
+    length(local.istio_mesh_config_trust_domain) > 0 ? [yamlencode(local.istio_mesh_config_trust_domain)] : [],
+    length(local.istio_mesh_config_trust_domain_aliases) > 0 ? [yamlencode(local.istio_mesh_config_trust_domain_aliases)] : [],
     length(local.merged_proxy_metadata) > 0 ? [yamlencode(local.istio_mesh_config_proxy_metadata)] : []
   )
 }
