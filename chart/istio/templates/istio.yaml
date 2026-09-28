@@ -90,6 +90,9 @@ spec:
       {{- if .Values.istioconfiguration.meshConfig.connectTimeout }}
       connectTimeout: {{ .Values.istioconfiguration.meshConfig.connectTimeout }}
       {{- end }}
+      {{- if .Values.istioconfiguration.meshConfig.dnsRefreshRate }}
+      dnsRefreshRate: {{ .Values.istioconfiguration.meshConfig.dnsRefreshRate }}
+      {{- end }}
       {{- if .Values.istioconfiguration.meshConfig.tcpKeepalive }}
       tcpKeepalive:
       {{- toYaml .Values.istioconfiguration.meshConfig.tcpKeepalive | nindent 8 }}

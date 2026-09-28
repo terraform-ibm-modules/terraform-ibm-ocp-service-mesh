@@ -35,6 +35,7 @@ istioconfiguration:
     enableAutoMTLS: true
     tcpKeepalive:
     connectTimeout:
+    dnsRefreshRate:
     ingressControllerMode: STRICT
     ingressService: istio-ingressgateway
     ingressSelector: ingressgateway

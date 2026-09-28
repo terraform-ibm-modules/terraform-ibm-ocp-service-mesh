@@ -263,6 +263,12 @@ variable "mesh_config_connect_timeout" {
   default     = "10s"
 }
 
+variable "mesh_config_dns_refresh_rate" {
+  type        = string
+  default     = null
+  description = "DNS refresh rate for Envoy clusters of type STRICT_DNS. Configures how frequently Envoy re-resolves DNS for STRICT_DNS cluster endpoints. Default is 60s when unset. Accepts Go duration strings (e.g. '30s', '5m'). More details at https://github.com/istio-ecosystem/sail-operator/blob/main/docs/api-reference/sailoperator.io.md#meshconfig"
+}
+
 variable "mesh_config_tcp_keep_alive" {
   type = object({
     probes : optional(number, 9),
