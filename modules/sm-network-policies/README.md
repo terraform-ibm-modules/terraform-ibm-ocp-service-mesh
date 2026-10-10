@@ -17,7 +17,7 @@ In addiction to this the submodule allows to add custom network policies that in
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 
@@ -28,14 +28,14 @@ No modules.
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.istio_custom_network_policies](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.istio_default_network_policy](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_add_default_istio_network_policy"></a> [add\_default\_istio\_network\_policy](#input\_add\_default\_istio\_network\_policy) | Flag to create the default network policy to limit the ingress traffic to the namespaces enrolled in the same controlplane | `bool` | `true` | no |
 | <a name="input_additional_custom_network_policies"></a> [additional\_custom\_network\_policies](#input\_additional\_custom\_network\_policies) | Custom network policies to create along with the default one, if enabled, in the input namespace. Default to empty | <pre>list(object(<br/>    {<br/>      policyName : string,<br/>      isEgressPolicy : optional(bool, false),<br/>      isIngressPolicy : optional(bool, false),<br/>      ingressSelectors : optional(any, null),<br/>      egressSelectors : optional(any, null),<br/>      podSelector : optional(any, null),<br/>    }<br/>  ))</pre> | `[]` | no |
 | <a name="input_force_network_policies_update"></a> [force\_network\_policies\_update](#input\_force\_network\_policies\_update) | Force network policies to be recreated when updated. Default to false (may require to taint the resource to apply changes) | `bool` | `false` | no |

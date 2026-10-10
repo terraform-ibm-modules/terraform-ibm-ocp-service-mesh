@@ -307,7 +307,7 @@ For more information about the access you need to run Terraform IBM modules, see
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 | <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | >= 1.59.0, < 3.0.0 |
@@ -320,7 +320,7 @@ No modules.
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.service_mesh_operator](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [terraform_data.undeploy_servicemesh](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
 | [time_sleep.wait_operators](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
@@ -329,7 +329,7 @@ No modules.
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_clean_servicemesh_on_undeploy"></a> [clean\_servicemesh\_on\_undeploy](#input\_clean\_servicemesh\_on\_undeploy) | Flag to perform a cleanup of ServiceMesh operator and custom resources when undeploying the module. Defaults to false to prevent accidental execution of the cleanup script. Before running terraform destroy, set this value to true and run terraform apply once. This creates the terraform\_data resource that executes the cleanup script during the destroy phase. For more information, see the Red Hat OpenShift Service Mesh uninstall documentation: https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.1/html-single/uninstalling/index. | `bool` | `false` | no |
 | <a name="input_cluster_config_endpoint_type"></a> [cluster\_config\_endpoint\_type](#input\_cluster\_config\_endpoint\_type) | Specify which type of endpoint to use for for cluster config access: 'default', 'private', 'vpe', 'link'. 'default' value will use the default endpoint of the cluster. | `string` | `"default"` | no |
 | <a name="input_cluster_id"></a> [cluster\_id](#input\_cluster\_id) | Id of the target IBM Cloud OpenShift Cluster | `string` | n/a | yes |
