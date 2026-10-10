@@ -165,7 +165,7 @@ This documentation covers:
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 
@@ -176,13 +176,13 @@ No modules.
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.waypoint](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_affinity"></a> [affinity](#input\_affinity) | Affinity configuration for the waypoint pods. Default to empty configuration. | <pre>object({<br/>    podAntiAffinity : optional(any, null),<br/>    podAffinity : optional(any, null),<br/>    nodeAffinity : optional(any, null)<br/>  })</pre> | `{}` | no |
 | <a name="input_allowed_routes"></a> [allowed\_routes](#input\_allowed\_routes) | Controls which namespaces are allowed to attach routes to this Gateway listener. Valid values are Same (only the same namespace as the Gateway) and All (all namespaces). Default to All. | `string` | `"All"` | no |
 | <a name="input_configmap_name"></a> [configmap\_name](#input\_configmap\_name) | Name of the waypoint ConfigMap resource. | `string` | `"waypoint-config"` | no |
@@ -199,6 +199,6 @@ No modules.
 ### Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_waypoint_release_name"></a> [waypoint\_release\_name](#output\_waypoint\_release\_name) | Helm release name for the waypoint |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
