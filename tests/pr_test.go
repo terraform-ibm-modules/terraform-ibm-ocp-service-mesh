@@ -135,21 +135,18 @@ func TestRunNLBIngressExample(t *testing.T) {
 	existingTerraformOptions := setupTerraform(t, prefix, "./existing-resources")
 	defer cleanupTerraform(t, existingTerraformOptions, prefix)
 
-	// Step 2: Get outputs from existing resources
+	// Step 2: Get outputs from existing resources as native Go types
 	logger.Log(t, "Fetching outputs from existing resources...")
-	resourceGroupID := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "resource_group_id")
-	vpcID := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "vpc_id")
-	region := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "region")
+	existingOutputs, err := terraform.OutputAllContextE(t, context.Background(), existingTerraformOptions)
+	require.NoError(t, err, "Failed to get outputs from existing resources")
 
-	// Get JSON-encoded string outputs (these are already JSON strings from jsonencode())
-	clusterVpcSubnetsJSON := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "cluster_vpc_subnets_json")
-	nlbZonesSubnetsJSON := terraform.OutputContext(t, context.Background(), existingTerraformOptions, "nlb_zones_subnets_json")
-
-	logger.Log(t, fmt.Sprintf("cluster_vpc_subnets_json: %s", clusterVpcSubnetsJSON))
-	logger.Log(t, fmt.Sprintf("nlb_zones_subnets_json: %s", nlbZonesSubnetsJSON))
+	resourceGroupID := existingOutputs["resource_group_id"]
+	vpcID := existingOutputs["vpc_id"]
+	region := existingOutputs["region"]
+	clusterVpcSubnets := existingOutputs["cluster_vpc_subnets"]
+	nlbZonesSubnets := existingOutputs["nlb_zones_subnets"]
 
 	// Step 3: Setup NLB Ingress example with testhelper
-	// Pass the JSON strings directly - Terraform will parse them
 	logger.Log(t, "Setting up NLB Ingress example with testhelper...")
 	options := testhelper.TestOptionsDefaultWithVars(&testhelper.TestOptions{
 		Testing:      t,
@@ -160,8 +157,8 @@ func TestRunNLBIngressExample(t *testing.T) {
 			"region":                    region,
 			"resource_group_id":         resourceGroupID,
 			"vpc_id":                    vpcID,
-			"cluster_vpc_subnets":       clusterVpcSubnetsJSON,
-			"ingress_nlb_zones_subnets": nlbZonesSubnetsJSON,
+			"cluster_vpc_subnets":       clusterVpcSubnets,
+			"ingress_nlb_zones_subnets": nlbZonesSubnets,
 		},
 		IgnoreUpdates: testhelper.Exemptions{ // Ignore for consistency check
 			List: []string{
