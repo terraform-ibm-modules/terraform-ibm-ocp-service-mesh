@@ -18,7 +18,7 @@ In addiction to these the submodule allows to add custom ingress network policie
 ### Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0, <4.0.0 |
 
@@ -29,14 +29,14 @@ No modules.
 ### Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [helm_release.istio_custom_ingress_network_policies](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.istio_default_ingress_network_policy_traffic_selectors](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 
 ### Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_add_default_istio_ingress_network_policies"></a> [add\_default\_istio\_ingress\_network\_policies](#input\_add\_default\_istio\_ingress\_network\_policies) | Flag to create the default ingress network policies to to limit the ingress traffic to the namespaces enrolled in the same controlplane and to limit the traffic on the ingress pods only. | `bool` | `true` | no |
 | <a name="input_additional_custom_ingress_network_policies"></a> [additional\_custom\_ingress\_network\_policies](#input\_additional\_custom\_ingress\_network\_policies) | Custom ingress network policies to create along with the default one, if enabled, in the input namespace. Default to empty | <pre>list(object(<br/>    {<br/>      policyName : string,<br/>      isEgressPolicy : optional(bool, false),<br/>      isIngressPolicy : optional(bool, false),<br/>      ingressSelectors : optional(any, null),<br/>      egressSelectors : optional(any, null),<br/>      podSelector : optional(any, null),<br/>    }<br/>  ))</pre> | `[]` | no |
 | <a name="input_force_ingress_network_policies_update"></a> [force\_ingress\_network\_policies\_update](#input\_force\_ingress\_network\_policies\_update) | Force ingress network policies to be recreated when updated. Default to false (may require to taint the resource to apply changes) | `bool` | `false` | no |
